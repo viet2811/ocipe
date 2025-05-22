@@ -7,11 +7,24 @@ class IngredientInputSerializer(serializers.Serializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientInputSerializer(many=True, write_only=True)
+    #ingredient_list = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
-        fields = '__all__'
+        fields = ['id', 'name', 'meat_type', 'longevity', 'frequency', 'note', 'state', 'ingredients','ingredient_list', 'added_date']
         read_only_fields = ['user']
+
+    def get_ingredient_list(self, obj):
+        # Get all RecipeIngredient objects for this recipe
+        recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj)
+        # Serialize as a list of dicts
+        return [
+            {
+                "name": ri.ingredient.name,
+                "quantity": ri.quantity
+            }
+            for ri in recipe_ingredients
+        ]
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients', [])
@@ -52,3 +65,4 @@ class RecipeSerializer(serializers.ModelSerializer):
                     recipe=instance, ingredient=ingredient, quantity=quantity
                 )
         return instance
+    
