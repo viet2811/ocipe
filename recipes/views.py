@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 # Generics for simple CRUD operations
 from rest_framework import status, generics, permissions, filters
 
