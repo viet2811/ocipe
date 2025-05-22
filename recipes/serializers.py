@@ -8,11 +8,19 @@ class IngredientInputSerializer(serializers.Serializer):
 class RecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientInputSerializer(many=True, write_only=True)
     ingredient_list = serializers.SerializerMethodField(read_only=True)
+    # For when searching recipe by multiple ingredients
+    accuracy = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
-        fields = ['id', 'name', 'meat_type', 'longevity', 'frequency', 'note', 'state', 'ingredients','ingredient_list', 'added_date']
+        fields = ['id', 'name', 'meat_type', 'longevity', 'frequency', 'note', 'state', 'ingredients','ingredient_list', 'added_date', 'accuracy']
         read_only_fields = ['user']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if rep.get('accuracy') is None:
+            rep.pop('accuracy')
+        return rep
 
     def get_ingredient_list(self, obj):
         # Get all RecipeIngredient objects for this recipe
@@ -66,3 +74,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
         return instance
     
+    def get_accuracy(self, obj):
+        matched_count = getattr(obj, 'matched_count', None)
+        return matched_count #None

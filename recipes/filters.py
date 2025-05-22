@@ -14,9 +14,9 @@ class RecipeFilter(django_filters.FilterSet):
                 "ingredients",
                 filter=Q(ingredients__name__in=ingredient_names),
                 distinct=True
-            )
-        ).filter( 
-            matched_count__gt=0   
+            ) * 100 / len(ingredient_names)
+        ).exclude( 
+            matched_count=0   
         ).order_by('-matched_count')
         return queryset
     
