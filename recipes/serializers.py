@@ -7,7 +7,7 @@ class IngredientInputSerializer(serializers.Serializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientInputSerializer(many=True, write_only=True)
-    #ingredient_list = serializers.SerializerMethodField(read_only=True)
+    ingredient_list = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe

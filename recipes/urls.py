@@ -5,5 +5,8 @@ urlpatterns = [
     # All recipes
     path('', views.RecipeListCreate.as_view(), name="recipe-view-create"),
     # Specific recipes
-    path('<int:pk>/', views.RecipeListRetrieveUpdateDestroy.as_view(), name="recipe-view-retrieve-update")
+    path('<int:pk>/', views.RecipeListRetrieveUpdateDestroy.as_view(), name="recipe-view-retrieve-update"),
+    # Random any active recipe
+    path('random/', views.RandomAnyRecipeList.as_view(), name="retrieve-random-active-recipe"),
+    path('stats/', views.recipe_stats, name="get-recipe-nerd-stats")
 ]
