@@ -8,5 +8,6 @@ urlpatterns = [
     path('<int:pk>/', views.RecipeListRetrieveUpdateDestroy.as_view(), name="recipe-view-retrieve-update"),
     # Random any active recipe
     path('random/', views.RandomAnyRecipeRetrieve.as_view(), name="retrieve-random-active-recipe"),
-    path('stats/', views.RecipeStatRetrieve.as_view(), name="get-recipe-nerd-stats")
+    path('stats/', views.RecipeStatRetrieve.as_view(), name="get-recipe-nerd-stats"),
+    path('genai/', views.GeminiURLAPIView.as_view(), name="generate-recipe-from-url")
 ]

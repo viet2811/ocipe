@@ -4,3 +4,4 @@ djangorestframework-simplejwt
 django-filter
 psycopg2
 python-dotenv
+google-genai

@@ -2,15 +2,18 @@
 from rest_framework import status, generics, permissions, filters
 
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Recipe
 from .serializers import RecipeSerializer
 from .filters import RecipeFilter
 from django.db.models import Count, Q
+from .gemini import getRecipeFromURL
 
 import random
+import json
+
 
 # POST, GET, DELETE
 class RecipeListCreate(generics.ListCreateAPIView):
@@ -98,3 +101,16 @@ class RecipeStatRetrieve(generics.RetrieveAPIView):
             "meat_type_stats": list(meat_stats),
             "frequency_stats": list(frequency_stats),
         })
+
+
+class GeminiURLAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request):
+        url = request.data.get('url')
+        if not url:
+            return Response({"error": "Missing url in request body"}, status=status.HTTP_400_BAD_REQUEST)
+
+        response = getRecipeFromURL(url)
+        json_data = json.loads(response.candidates[0].content.parts[0].text)
+        return Response(json_data)
