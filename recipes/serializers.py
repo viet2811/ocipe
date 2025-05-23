@@ -14,7 +14,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ['id', 'name', 'meat_type', 'longevity', 'frequency', 'note', 'state', 'ingredients','ingredient_list', 'added_date', 'accuracy']
-        read_only_fields = ['user']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
