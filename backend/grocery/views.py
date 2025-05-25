@@ -33,8 +33,8 @@ class GroceryList(APIView):
         groceryList = recipeIngredientSet - fridgeIngredientSet
 
         # Save recipes to history
-        recipes = Recipe.objects.filter(id__in=recipe_ids).values_list('id', 'name')
-        recipes_data = {id:name for id, name in recipes}
+        recipes = Recipe.objects.filter(id__in=recipe_ids).values_list('id', 'name', 'meat_type')
+        recipes_data = {id:(name, mt) for id, name, mt in recipes}
         History.objects.create(user=user, recipes=recipes_data)
 
         # Update those recipe state to 'used'
