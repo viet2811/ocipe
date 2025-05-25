@@ -14,6 +14,9 @@ from .gemini import getRecipeFromURL
 import random
 import json
 
+from urllib.parse import urlparse
+from rest_framework.exceptions import ValidationError
+
 
 # POST, GET, DELETE
 class RecipeListCreate(generics.ListCreateAPIView):
@@ -106,11 +109,34 @@ class RecipeStatRetrieve(generics.RetrieveAPIView):
 class GeminiURLAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     
+    def validate_video_url(self, url):
+        parsed = urlparse(url)
+        domain = parsed.netloc.lower()
+
+        allowed_domains = ['www.youtube.com', 'youtube.com', 'youtu.be', 'www.tiktok.com', 'tiktok.com']
+
+        if domain in allowed_domains:
+            raise ValidationError
+
+
     def post(self, request):
         url = request.data.get('url')
         if not url:
             return Response({"error": "Missing url in request body"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            self.validate_video_url(url)
+        except ValidationError as e:
+            return Response({"error": "Invalid link. Please submit a non-video web link, I dont want to spend money on AI"}, status=status.HTTP_400_BAD_REQUEST)
 
         response = getRecipeFromURL(url)
         json_data = json.loads(response.candidates[0].content.parts[0].text)
         return Response(json_data)
+
+
+class RefreshRecipesView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        updated = Recipe.objects.filter(user=request.user).update(state='active')
+        return Response({"updated_count": updated}, status=status.HTTP_200_OK)
