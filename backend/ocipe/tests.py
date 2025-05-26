@@ -11,5 +11,5 @@ class AuthenticatedAPITestCase(APITestCase):
         # Obtain JWT token
         token_url = reverse('token_obtain_pair')
         response = self.client.post(token_url, {'username': self.username, 'password': self.password})
-        tokens = response.data
+        tokens = response.data['access']
         return tokens

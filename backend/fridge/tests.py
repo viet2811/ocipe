@@ -1,18 +1,16 @@
 from ocipe.tests import AuthenticatedAPITestCase
 from rest_framework.test import APIClient
 from django.urls import reverse
-from django.contrib.auth.models import User
 from rest_framework import status
 from .models import FridgeIngredient
 
-class FridgeIngredientAuthTests(AuthenticatedAPITestCase):
+class FridgeTests(AuthenticatedAPITestCase):
     def setUp(self):
-        self.token = self.register_and_authenticate()['access']
+        self.token = self.register_and_authenticate()
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
         self.unauthenticated_user = APIClient()
 
     def test_add_ingredient_authenticated(self):
-        # Set Authorization header
         url = reverse('create-fridge-ingredient')
         data = {
             'name': 'Chicken',
@@ -30,7 +28,7 @@ class FridgeIngredientAuthTests(AuthenticatedAPITestCase):
         )
 
     def test_add_ingredient_unauthenticated(self):
-        url = reverse('create-fridge-ingredient')  # Make sure this matches your urls.py name
+        url = reverse('create-fridge-ingredient')
         data = {
             'name': 'Chicken',
             'group': 'meat'
@@ -122,7 +120,7 @@ class FridgeIngredientAuthTests(AuthenticatedAPITestCase):
         ingredient_id = response.data['id']
 
         # Register a second user
-        second_token = self.register_and_authenticate(test_user_number=2)['access']
+        second_token = self.register_and_authenticate(test_user_number=2)
 
         # Use second user's token to try to update the first user's ingredient
         self.unauthenticated_user.credentials(HTTP_AUTHORIZATION='Bearer ' + second_token)
