@@ -15,6 +15,7 @@ import os
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 from datetime import timedelta
+import sys
 
 load_dotenv()
 
@@ -83,8 +84,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ocipe.wsgi.application'
 
 
-# Database
-tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+# Default database
+# tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+tmpPostgres = urlparse(os.getenv("TEST_DATABASE_URL"))
+
 
 DATABASES = {
     'default': {
