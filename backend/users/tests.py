@@ -14,6 +14,23 @@ class UserAuthTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(User.objects.filter(username='testuser').exists())
 
+    def test_user_register_already_exists(self):
+        url = reverse('register')
+        data = [
+            {
+            'username': 'testuser',
+            'password': 'testpass123'
+            },
+            {
+            'username': 'testuser',
+            'password': 'testpass245'
+            },
+        ]
+        self.client.post(url, data[0])
+        response = self.client.post(url, data[1])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
     def test_jwt_token_obtain(self):
         # First, create a user
         User.objects.create_user(username='jwtuser', password='jwtpass123')

@@ -1,22 +1,15 @@
-from rest_framework.test import APITestCase, APIClient
+from ocipe.tests import AuthenticatedAPITestCase
+from rest_framework.test import APIClient
 from django.urls import reverse
 from django.contrib.auth.models import User
 from rest_framework import status
 from .models import FridgeIngredient
 
-class FridgeIngredientAuthTests(APITestCase):
+class FridgeIngredientAuthTests(AuthenticatedAPITestCase):
     def setUp(self):
-        self.username = 'testuser'
-        self.password = 'testpass123'
-        # Register user
-        register_url = reverse('register')
-        self.client.post(register_url, {'username': self.username, 'password': self.password})
-        # Obtain JWT token
-        url = reverse('token_obtain_pair')
-        response = self.client.post(url, {'username': self.username, 'password': self.password})
-        self.token = response.data['access']
-        self.unauthenticated_user = APIClient()
+        self.token = self.register_and_authenticate()['access']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
+        self.unauthenticated_user = APIClient()
 
     def test_add_ingredient_authenticated(self):
         # Set Authorization header
@@ -58,8 +51,6 @@ class FridgeIngredientAuthTests(APITestCase):
         ingredients = [
             {'name': 'Chicken thighs', 'group': 'meat'},
             {'name': 'Beef', 'group': 'meat'},
-            {'name': 'Milk', 'group': 'dairy'},
-            {'name': 'Egg', 'group': 'dairy'},
             {'name': 'Fish Sauce', 'group': 'sauce'},
             {'name': 'Sugar', 'group': 'condiment'},
         ]
@@ -73,9 +64,20 @@ class FridgeIngredientAuthTests(APITestCase):
         
         # Structure
         self.assertIn('ingredient_list', response.data[0])
-        sauce_group = response.data[0]['ingredient_list']['sauce']
+        ingre_list = response.data[0]['ingredient_list']
+        
+        ## 3 ingredient group
+        self.assertEqual(3, len(ingre_list)) 
+
+        ## Ingredient group values is a list
+        sauce_group = ingre_list['sauce']
         self.assertIsInstance(sauce_group, list)
         self.assertEqual('Fish Sauce', sauce_group[0]['name'])
+        
+        ## 2 ingredient in meat_group
+        meat_group = ingre_list['meat']
+        self.assertEqual(2, len(meat_group))
+
 
     def test_update_a_ingredient_by_id(self):
         url = reverse('create-fridge-ingredient')
@@ -120,15 +122,7 @@ class FridgeIngredientAuthTests(APITestCase):
         ingredient_id = response.data['id']
 
         # Register a second user
-        second_username = 'otheruser'
-        second_password = 'otherpass123'
-        register_url = reverse('register')
-        self.unauthenticated_user.post(register_url, {'username': second_username, 'password': second_password})
-
-        # Obtain JWT token for second user
-        token_url = reverse('token_obtain_pair')
-        token_response = self.unauthenticated_user.post(token_url, {'username': second_username, 'password': second_password})
-        second_token = token_response.data['access']
+        second_token = self.register_and_authenticate(test_user_number=2)['access']
 
         # Use second user's token to try to update the first user's ingredient
         self.unauthenticated_user.credentials(HTTP_AUTHORIZATION='Bearer ' + second_token)
@@ -136,7 +130,6 @@ class FridgeIngredientAuthTests(APITestCase):
         update_data = {'name': 'Chicken', 'group': 'notmeat'}
         response = self.unauthenticated_user.put(update_url, update_data)
 
-        # Should be forbidden or not found
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_a_ingredient_by_id(self):
