@@ -41,7 +41,7 @@ class GroceryList(APIView):
         Recipe.objects.filter(id__in=recipe_ids).update(state='used')
         
         return Response(
-            {'grocery list': groceryList}
+            {'grocery_list': groceryList}
         )
 
 class HistoryList(generics.ListAPIView):

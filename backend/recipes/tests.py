@@ -27,6 +27,16 @@ class RecipeTests(AuthenticatedAPITestCase):
         # This field only apply to searching recipe with ingredient
         self.assertNotIn('accuracy', response.data)
 
+    def test_get_all_recipe(self):
+        self.postRecipes(0,1)
+        url = reverse('recipe-view-create-destroy')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(
+            Recipe.objects.filter(
+                user__username=self.username,
+            ).exists()
+        )
     def test_delete_all_recipe(self):
         self.postRecipes(0,2)
         url = reverse('recipe-view-create-destroy')
@@ -113,6 +123,54 @@ class RecipeTests(AuthenticatedAPITestCase):
             Recipe.objects.filter(user__username=self.username, state='used').exists()
         )
 
+    def test_get_recipe_stats(self):
+        last = self.postRecipes(0,3).data['id']
+        Recipe.objects.filter(id=last).update(state='used')
+        url = reverse('get-recipe-nerd-stats')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        meat_stats = response.data['meat_type_stats']
+        self.assertEqual(2, len(meat_stats))
+        chicken = meat_stats[0]
+        self.assertEqual(2, chicken['total'])
+        self.assertEqual(1, chicken['active'])
         
+    def test_get_generated_recipe_by_url_valid_link(self):
+        data = {
+            "url": 'https://www.justonecookbook.com/gyudon/'
+        }
+        url = reverse('generate-recipe-from-url')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('Gyudon', response.data['name'])
     
+    def test_get_generated_recipe_by_url_invalid_link(self):
+        data = {
+            "url": 'https://www.youtube.com/watch?v=YgoCC-GTQcA'
+        }
+        url = reverse('generate-recipe-from-url')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_get_recipe_by_ingredients(self):
+        self.postRecipes(0,3)
+        url = reverse('recipe-view-create-destroy')
+        response = self.client.get(url, {'ingredients': 'chicken thighs, soy sauce'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        first = response.data[0]
+        self.assertEqual(first['name'], 'Soy Chicken')
+        self.assertIn('accuracy', first)
+        self.assertEqual(first['accuracy'], 100)
+    
+    def test_get_recipe_by_search_and_order_filter(self):
+        self.postRecipes(0,3)
+        url = reverse('recipe-view-create-destroy')
+        response = self.client.get(url, {'search': 'chicken', 'ordering': 'name'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        first = response.data[0]
+        self.assertEqual(first['name'], 'Oyakodon')
+        self.assertEqual(response.data[1]['name'], 'Soy Chicken')
+
                 

@@ -4,7 +4,7 @@ recipes = [
         "note": "", "state": "active",
         "ingredients": [
             {"name": "minced pork", "quantity": "200g"},
-            {"name": "eggs", "quantity": "4"},
+            {"name": "egg", "quantity": "4"},
             {"name": "spring onions", "quantity": "1"},
             {"name": "bot canh", "quantity": "2tbsp"}
         ]
