@@ -93,8 +93,8 @@ WSGI_APPLICATION = 'ocipe.wsgi.application'
 
 
 # Default database
-# tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
-tmpPostgres = urlparse(os.getenv("TEST_DATABASE_URL"))
+tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+# tmpPostgres = urlparse(os.getenv("TEST_DATABASE_URL"))
 
 
 DATABASES = {
