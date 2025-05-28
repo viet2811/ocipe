@@ -9,12 +9,47 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Link } from "react-router-dom"
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import axios from "axios"
+import { axiosInstance } from "@/lib/axios"
+import { useAuth } from "@/contexts/AuthContext"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const { login } = useAuth()
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const response = await axiosInstance.post(
+        "/user/token/",
+        {username, password},
+        {withCredentials: true}
+      )
+      // Save access later
+      console.log(response)
+      login(response.data?.access)
+      navigate("/home")
+    }
+    catch(error) {
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+          alert("Cannot connect to server. Please check if the backend is running.")
+        } else if (error.response?.status === 401) {
+          alert("Username or password is not correct. Please retry")
+        }
+      } else {
+          console.log(error)
+          alert("An error occurred. Please try again.")
+      } 
+    }
+  }  
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -25,7 +60,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="username">Username</Label>
@@ -34,6 +69,8 @@ export function LoginForm({
                   type="text"
                   placeholder="Enter your username"
                   required
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
                 />
               </div>
               <div className="grid gap-3">
@@ -46,7 +83,13 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  required
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
