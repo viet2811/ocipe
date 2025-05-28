@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import axios from "axios"
+import { axiosInstance } from "@/lib/axios"
 
 
 export function RegisterForm({
@@ -24,22 +26,27 @@ export function RegisterForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/user/register/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({username, password}),
-      })
-      if (response.ok) {
-        // Registration successful
-        alert("Registration successful! Now log-in to your account")
-        // Optionally redirect or clear form
-        navigate("/login")
-      } else {
-        // Handle error
-        alert("Username already exists. Please retry")
-      }
+      await axiosInstance.post(
+        "/user/register/",
+        { username, password },
+        {
+          headers: { "Content-Type": "application/json" }
+        }
+      )
+      // Axious resolve for 2xx status 
+      alert("Registration successful! Now log-in to your account")
+      navigate("/login")
+    // Non-2xx errors
     } catch (error) {
-      alert("An error occurred. Please try again.")
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+          alert("Cannot connect to server. Please check if the backend is running.")
+        } else if (error.response?.status === 400) {
+          alert("Username already exists. Please try another username.")
+        }
+      } else {
+          alert("An error occurred. Please try again.")
+      }
     }
   }
 
