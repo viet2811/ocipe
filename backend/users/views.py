@@ -14,4 +14,5 @@ class UserRegistrationView(APIView):
             return Response({
               "message": "User registered successfully"
             }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Username already exists
+        return Response({"username": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
