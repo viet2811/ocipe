@@ -46,7 +46,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     kitchen: [
       {
         title: "Recipe",
-        url: "#",
+        url: "/recipes",
         icon: CookingPot,
         isActive: true,
         children: [
@@ -63,14 +63,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       // Fridge
       {
         title: "Fridge",
-        url: "#",
+        url: "/fridge",
         icon: Refrigerator,
         children: [],
       },
       // Groceries
       {
         title: "Groceries",
-        url: "#",
+        url: "/grocery",
         icon: ShoppingBasket,
         isActive: true,
         children: [
