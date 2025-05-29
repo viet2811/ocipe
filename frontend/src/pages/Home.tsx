@@ -62,7 +62,7 @@ const Home = () => {
     const user = localStorage.getItem('name')
     return (
       <div className="flex flex-col items-center justify-center h-[80%]">
-        <h1 className="text-2xl font-bold">Hi {user}, how are we feeling?</h1>
+        <h1>Hi {user}, how are we feeling?</h1>
         <div className="grid grid-cols-2 gap-2 mt-4">
         {quickButtonData.map((data) => quickButton(data))}
         </div>
