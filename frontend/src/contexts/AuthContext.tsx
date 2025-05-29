@@ -20,15 +20,19 @@ export function AuthProvider({children}: {children: ReactNode}) {
     const login = (token: string) => {
         setAccessToken(token)
         setIsAuthenticated(true)
-        console.log("I've been here")
-        console.log(token)
     }
 
     const logout = async () => {
         setAccessToken(null)
         setIsAuthenticated(false)
         // call backend to logout
-        await axiosInstance.post("/user/logout/", {}, {withCredentials: true})
+        try {
+            await axiosInstance.post("/user/logout/", {}, {withCredentials: true})
+        }
+        catch (e){
+            console.log(e)
+        }
+        localStorage.removeItem('name')
     }
 
     // Run when mount: Instantly get refresh token when reopening

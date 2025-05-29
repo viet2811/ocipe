@@ -32,9 +32,8 @@ export function LoginForm({
         {username, password},
         {withCredentials: true}
       )
-      // Save access later
-      console.log(response)
       login(response.data?.access)
+      localStorage.setItem('name', username)
       navigate("/home")
     }
     catch(error) {

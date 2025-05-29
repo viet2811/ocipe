@@ -9,6 +9,7 @@ import WelcomePage from "./pages/WelcomePage"
 import ProtectedRoute from "./components/ProtectedRoute"
 import PublicOnlyRoute from "./components/PublicOnlyRoute"
 import { AuthProvider} from "./contexts/AuthContext"
+import DashboardLayout from "./layouts/DashboardLayout"
 
 
 function App() {
@@ -22,7 +23,9 @@ function App() {
                 <Route path="/register" element={<Register />}/>
               </Route>
               <Route element={<ProtectedRoute/>}>
-                <Route path="/home" element={<Home />}/> 
+                <Route element={<DashboardLayout />}>
+                  <Route path="/home" element={<Home />}/> 
+                </Route>
               </Route> 
             </Routes>
           </AuthProvider>
