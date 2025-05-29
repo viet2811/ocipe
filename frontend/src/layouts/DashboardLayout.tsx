@@ -13,7 +13,49 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { Fragment } from "react/jsx-runtime";
+
+const Breadcrumbs: React.FC = () => {
+  const {pathname} = useLocation();
+  const pathnames = pathname.split("/").filter((x) => x)
+  let breadcrumbPath = "";
+
+  const capitalizeFirst = (str: string) => {
+    str = str.replace(/-/g, " ") // the / / is the regex, g is global-find all hyphen
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        {pathnames.map((name, index) => {
+          breadcrumbPath += `/${name}`;
+          const isLast = index === pathnames.length - 1;
+          name = capitalizeFirst(name)
+          return isLast ? (
+            <BreadcrumbItem key={index}>
+              <BreadcrumbPage>
+                {name}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          ) : (
+            <Fragment key={index}>
+              <BreadcrumbLink asChild>
+                  <Link to={breadcrumbPath}>{name}</Link>
+              </BreadcrumbLink>
+              <BreadcrumbSeparator className="hidden md:block" />
+            </Fragment>
+          )
+        })}
+
+        
+
+      </BreadcrumbList>
+    </Breadcrumb>
+
+  )
+}
+
 
 const DashboardLayout: React.FC = () => {
   return (
@@ -24,19 +66,7 @@ const DashboardLayout: React.FC = () => {
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <Breadcrumbs />
           </div>
         </header>
         <Outlet />

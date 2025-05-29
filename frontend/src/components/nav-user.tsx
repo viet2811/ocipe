@@ -4,6 +4,8 @@ import {
   BadgeCheck,
   ChevronsUpDown,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react"
 
 import {
@@ -26,6 +28,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/contexts/AuthContext"
+import { Switch } from "@/components/ui/switch"
+import { useTheme } from "@/contexts/ThemeContext"
 
 export function NavUser({
   user,
@@ -37,6 +41,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const {logout} = useAuth()
+  const {theme, toggleTheme} = useTheme()
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -73,14 +78,21 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+              <DropdownMenuItem onSelect={(e)=> e.preventDefault()}>
+                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                Theme
+                <Switch 
+                  checked={theme === 'dark'}
+                  onCheckedChange={toggleTheme}
+                  aria-label="Toggle theme"
+                  className="ml-auto"
+                />
+              </DropdownMenuItem>
               <DropdownMenuItem>
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>
-              {/* <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem> */}
               <DropdownMenuItem onClick={logout}>
                 <LogOut />
                 Log out

@@ -52,11 +52,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         children: [
           {
             title: "View recipes",
-            url: "#",
+            url: "/recipes",
           },
           {
             title: "Add a recipe",
-            url: "#",
+            url: "/recipes/add-a-recipe",
           },
         ],
       },
