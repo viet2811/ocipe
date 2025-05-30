@@ -12,8 +12,10 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
-import { axiosInstance } from "@/lib/axios"
 import { useAuth } from "@/contexts/AuthContext"
+import { axiosInstance } from "@/lib/axios"
+import { toast } from 'sonner'
+
 
 export function LoginForm({
   className,
@@ -34,18 +36,19 @@ export function LoginForm({
       )
       login(response.data?.access)
       localStorage.setItem('name', username)
+      toast.success("Log in successfully")
       navigate("/home")
     }
     catch(error) {
       if (axios.isAxiosError(error)) {
         if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-          alert("Cannot connect to server. Please check if the backend is running.")
+          toast.error("Cannot connect to server. Please check if the backend is running.")
         } else if (error.response?.status === 401) {
-          alert("Username or password is not correct. Please retry")
+          toast.warning("Username or password is not correct. Please retry")
         }
       } else {
           console.log(error)
-          alert("An error occurred. Please try again.")
+          toast.error("An error occurred. Please try again.")
       } 
     }
   }  

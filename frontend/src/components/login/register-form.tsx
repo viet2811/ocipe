@@ -13,6 +13,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { axiosInstance } from "@/lib/axios"
+import { toast } from 'sonner'
 
 
 export function RegisterForm({
@@ -34,18 +35,18 @@ export function RegisterForm({
         }
       )
       // Axious resolve for 2xx status 
-      alert("Registration successful! Now log-in to your account")
+      toast.success("Registration successful! Now log-in to your account")
       navigate("/login")
     // Non-2xx errors
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-          alert("Cannot connect to server. Please check if the backend is running.")
+          toast.error("Cannot connect to server. Please check if the backend is running.")
         } else if (error.response?.status === 400) {
-          alert("Username already exists. Please try another username.")
+          toast.warning("Username already exists. Please try another username.")
         }
       } else {
-          alert("An error occurred. Please try again.")
+          toast.error("An error occurred. Please try again.")
       }
     }
   }

@@ -13,6 +13,7 @@ import DashboardLayout from "./layouts/DashboardLayout"
 import { ThemeProvider } from "./contexts/ThemeContext"
 import RecipeList from "./pages/RecipeList"
 import RecipeAdd from "./pages/RecipeAdd"
+import { Toaster } from "sonner"
 
 const AppContent = () => {
     return (
@@ -36,7 +37,9 @@ const AppContent = () => {
 }
 
 function App() {
-    return (
+  return (
+      <>
+        <Toaster position="top-center"/>
         <BrowserRouter>
           <ThemeProvider>
             <AuthProvider>
@@ -44,7 +47,7 @@ function App() {
             </AuthProvider>
           </ThemeProvider>
         </BrowserRouter>
-  )
-}
+      </>
+)}
 
 export default App
