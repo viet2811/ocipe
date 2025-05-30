@@ -90,8 +90,10 @@ export function AuthProvider({children}: {children: ReactNode}) {
                         await logout()
                     }
                 }
+                return Promise.reject(error)
             }
         )
+
 
         // Clean up function
         return () => {
