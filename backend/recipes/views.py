@@ -29,7 +29,7 @@ class RecipeListCreate(generics.ListCreateAPIView):
         filters.OrderingFilter
     ]
     search_fields = ['name', 'meat_type']
-    ordering_fields = ['name', 'meat_type', 'longevity', 'frequency'] #Will have frequency..
+    ordering_fields = ['added_date'] #Will have frequency..
 
     def get_queryset(self):
         return Recipe.objects.filter(user=self.request.user)
