@@ -1,4 +1,4 @@
-import { Card, CardDescription, CardTitle } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { 
   type LucideIcon, 
   Soup, 
