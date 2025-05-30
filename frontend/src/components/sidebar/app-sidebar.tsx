@@ -7,9 +7,9 @@ import {
   ChefHat,
 } from "lucide-react"
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
-import { ProjectHeader } from "@/components/project-header"
+import { NavMain } from "@/components/sidebar/nav-main"
+import { NavUser } from "@/components/sidebar/nav-user"
+import { ProjectHeader } from "@/components/sidebar/project-header"
 import {
   Sidebar,
   SidebarContent,
