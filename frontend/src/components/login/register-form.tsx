@@ -1,55 +1,58 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import axios from "axios"
-import { axiosInstance } from "@/lib/axios"
-import { toast } from 'sonner'
-
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { axiosInstance } from "@/api/axios";
+import { toast } from "sonner";
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const navigate = useNavigate()
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
       await axiosInstance.post(
         "/user/register/",
         { username, password },
         {
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json" },
         }
-      )
-      // Axious resolve for 2xx status 
-      toast.success("Registration successful! Now log-in to your account")
-      navigate("/login")
-    // Non-2xx errors
+      );
+      // Axious resolve for 2xx status
+      toast.success("Registration successful! Now log-in to your account");
+      navigate("/login");
+      // Non-2xx errors
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-          toast.error("Cannot connect to server. Please check if the backend is running.")
+        if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {
+          toast.error(
+            "Cannot connect to server. Please check if the backend is running."
+          );
         } else if (error.response?.status === 400) {
-          toast.warning("Username already exists. Please try another username.")
+          toast.warning(
+            "Username already exists. Please try another username."
+          );
         }
       } else {
-          toast.error("An error occurred. Please try again.")
+        toast.error("An error occurred. Please try again.");
       }
     }
-  }
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -71,20 +74,20 @@ export function RegisterForm({
                   placeholder="Enter your username"
                   required
                   value={username}
-                  onChange={e => setUsername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
-                <Input 
-                  id="password" 
-                  type="password" 
+                <Input
+                  id="password"
+                  type="password"
                   required
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
-                   />
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
@@ -102,5 +105,5 @@ export function RegisterForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
