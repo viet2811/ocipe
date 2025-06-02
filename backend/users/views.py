@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from .serializers import UserRegistrationSerializer
 from fridge.models import Fridge
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -43,8 +44,10 @@ class CookieTokenRefreshView(APIView):
         try:
             token = RefreshToken(refresh_cookie)
             access = str(token.access_token)
+        except TokenError as e:
+            raise TokenError("Refresh token is invalid or expired")
         except Exception as e:
-            return Response({'error': str(e)}, status=400)
+            return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
         return Response({
             'access': access
