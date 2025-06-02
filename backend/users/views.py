@@ -37,7 +37,6 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             )
         return response
 
-import time
 class CookieTokenRefreshView(APIView):
     def post(self, request):
         refresh_cookie = request.COOKIES.get("refresh_token")
