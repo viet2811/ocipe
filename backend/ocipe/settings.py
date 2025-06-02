@@ -158,6 +158,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES' : [
+        # 'rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],

@@ -6,7 +6,8 @@ from fridge.models import Fridge
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+# from rest_framework_simplejwt.authentication import JWTStatelessUserAuthentication
 
 class UserRegistrationView(APIView):
     def post(self, request):
@@ -37,20 +38,28 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             )
         return response
 
-class CookieTokenRefreshView(APIView):
-    def post(self, request):
-        refresh_cookie = request.COOKIES.get("refresh_token")
-        try:
-            token = RefreshToken(refresh_cookie)
-            access = str(token.access_token)
-        except TokenError as e:
-            raise TokenError("Refresh token is invalid or expired")
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+# class CookieTokenRefreshView(APIView):
+#     def post(self, request):
+#         if 'refresh' not in request.data:
+#             refresh_cookie = request.COOKIES.get("refresh_token")
+#         try:
+#             token = RefreshToken(refresh_cookie)
+#             access = str(token.access_token)
+#         except TokenError as e:
+#             return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
-        return Response({
-            'access': access
-        })
+#         return Response({
+#             'access': access
+#         })
+class CookieTokenRefreshView(TokenRefreshView):
+    # authentication_classes = [JWTStatelessUserAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        # Get refresh token from cookie if not in body
+        if 'refresh' not in request.data:
+            request.data['refresh'] = request.COOKIES.get('refresh_token')
+        response = super().post(request, *args, **kwargs)
+        return response
     
 class LogoutView(APIView):
     def post(self, request):

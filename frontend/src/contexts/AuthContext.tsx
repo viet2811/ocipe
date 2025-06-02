@@ -28,15 +28,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    setAccessToken(null);
-    setIsAuthenticated(false);
     // call backend to logout
     try {
       await axiosInstance.post("/user/logout/", {}, { withCredentials: true });
+      setAccessToken(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem("name");
     } catch (e) {
       console.log(e);
     }
-    localStorage.removeItem("name");
   };
 
   // Run when mount: Instantly get refresh token when reopening
@@ -84,6 +84,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               "user/token/refresh/",
               {}
             );
+            console.log(response);
+
             const newAccessToken = response.data.access;
             setAccessToken(newAccessToken);
             setIsAuthenticated(true);
