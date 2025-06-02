@@ -3,8 +3,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import UserRegistrationSerializer
 from fridge.models import Fridge
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 class UserRegistrationView(APIView):
     def post(self, request):
@@ -35,13 +36,19 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             )
         return response
 
-class CookieTokenRefreshView(TokenRefreshView):
-    def post(self, request, *args, **kwargs):
-        # Get refresh token from cookie if not in body
-        if 'refresh' not in request.data:
-            request.data['refresh'] = request.COOKIES.get('refresh_token')
-        response = super().post(request, *args, **kwargs)
-        return response
+import time
+class CookieTokenRefreshView(APIView):
+    def post(self, request):
+        refresh_cookie = request.COOKIES.get("refresh_token")
+        try:
+            token = RefreshToken(refresh_cookie)
+            access = str(token.access_token)
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
+
+        return Response({
+            'access': access
+        })
     
 class LogoutView(APIView):
     def post(self, request):
