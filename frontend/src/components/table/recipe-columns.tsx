@@ -59,6 +59,7 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
         </div>
       );
     },
+    enableGlobalFilter: false,
   },
   {
     accessorKey: "longevity",
@@ -66,11 +67,13 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
     cell: ({ row }) => (
       <div className="px-3 text-center">{row.getValue("longevity")}</div>
     ),
+    enableGlobalFilter: false,
   },
   {
     accessorKey: "frequency",
     header: ({ column }) => <SortButton column={column} label="Frequency" />,
     cell: ({ row }) => <div className="px-3">{row.getValue("frequency")}</div>,
+    enableGlobalFilter: false,
   },
   {
     accessorKey: "note",
@@ -93,6 +96,7 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
         </Popover>
       );
     },
+    enableGlobalFilter: false,
   },
   {
     id: "actions",
@@ -144,5 +148,6 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
         </DropdownMenu>
       );
     },
+    enableGlobalFilter: false,
   },
 ];

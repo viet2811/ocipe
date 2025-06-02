@@ -1,5 +1,5 @@
 import { recipeColumns } from "@/components/table/recipe-columns";
-import { DataTable } from "@/components/table/data-table";
+import { DataTable } from "@/components/table/recipe-table";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
@@ -48,7 +48,7 @@ export default function RecipeList() {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" size="sm">
-          <Trash /> Delete all recipes
+          <Trash /> Delete all
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

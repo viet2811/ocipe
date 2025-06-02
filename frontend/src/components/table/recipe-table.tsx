@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   type ColumnDef,
@@ -8,7 +8,7 @@ import {
   getPaginationRowModel,
   getCoreRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -17,23 +17,34 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { useState } from "react"
-import { DataTablePagination } from "./table-pagination"
+} from "@/components/ui/table";
+import { useState } from "react";
+import { DataTablePagination } from "./table-pagination";
+import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  LeftComponent?:React.FC
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  LeftComponent?: React.FC;
 }
 
-export function DataTable<TData extends {id: number}, TValue>({
+export function DataTable<TData extends { id: number }, TValue>({
   columns,
   data,
-  LeftComponent
+  LeftComponent,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = useState("search term");
+
   const table = useReactTable({
     data,
     columns,
@@ -44,11 +55,31 @@ export function DataTable<TData extends {id: number}, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       sorting,
+      globalFilter,
     },
-  })
+    onGlobalFilterChange: setGlobalFilter,
+  });
 
   return (
     <div>
+      <div className="mb-3 flex items-center">
+        <Input
+          value="" //Temporary set, fix later: TODO
+          onChange={(e) => table.setGlobalFilter(String(e.target.value))}
+          placeholder="Search by name or meat type..."
+          className="w-1/3 mr-3"
+        />
+        <Select defaultValue="default">
+          <SelectTrigger className="w-max">
+            <SelectValue>Search by</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="default">Name + Meat Type</SelectItem>
+            <SelectItem value="ingredients">Ingredient(s)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="rounded-md border mb-3">
         <Table>
           <TableHeader>
@@ -64,7 +95,7 @@ export function DataTable<TData extends {id: number}, TValue>({
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -78,14 +109,20 @@ export function DataTable<TData extends {id: number}, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   No results.
                 </TableCell>
               </TableRow>
@@ -93,9 +130,7 @@ export function DataTable<TData extends {id: number}, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} LeftComponent={LeftComponent}/>
+      <DataTablePagination table={table} LeftComponent={LeftComponent} />
     </div>
-    
-  )
+  );
 }
-
