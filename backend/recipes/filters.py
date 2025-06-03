@@ -20,11 +20,3 @@ class RecipeFilter(django_filters.FilterSet):
         ).order_by('-matched_count')
         return queryset
     
-    class Meta:
-        model = Recipe
-        fields = {
-            'name': ['iexact','icontains'],
-            'meat_type': ['iexact', 'icontains'],
-            'longevity': ['exact', 'lt', 'gt', 'range'],
-            'frequency': ['iexact']
-        }

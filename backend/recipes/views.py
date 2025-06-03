@@ -25,10 +25,8 @@ class RecipeListCreate(generics.ListCreateAPIView):
     filterset_class = RecipeFilter
     filter_backends = [
         DjangoFilterBackend,
-        filters.SearchFilter,
         filters.OrderingFilter
     ]
-    search_fields = ['name', 'meat_type']
     ordering_fields = ['added_date'] #Will have frequency..
 
     def get_queryset(self):
