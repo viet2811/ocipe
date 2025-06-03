@@ -39,7 +39,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(user=user, **validated_data)
 
         for ingredient_data in ingredients_data:
-            name = ingredient_data['name']
+            name = str(ingredient_data['name']).lower()
             quantity = ingredient_data['quantity']
             ingredient, created = Ingredient.objects.get_or_create(
                 name=name, user=user
@@ -62,7 +62,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             instance.recipeingredient_set.all().delete()
             user = instance.user
             for ingredient_data in ingredients_data:
-                name = ingredient_data['name']
+                name = str(ingredient_data['name']).lower()
                 quantity = ingredient_data['quantity']
                 # Add new or reference created one
                 ingredient, created = Ingredient.objects.get_or_create(

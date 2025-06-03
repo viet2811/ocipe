@@ -7,7 +7,7 @@ class RecipeFilter(django_filters.FilterSet):
 
     def filter_by_ingredients(self, queryset, name, value):
         # Prevent bug by leaving an empty space before comma
-        ingredient_names = [name.strip() for name in value.split(',') if name.strip()]
+        ingredient_names = [name.strip().lower() for name in value.split(',') if name.strip()]
         # Return recipe rank on the most ingredient match with the request, excluding ones with no matched
         queryset = queryset.annotate(
             matched_count=Count(
