@@ -92,7 +92,12 @@ export function DataTable<TData extends { id: number }, TValue>({
         )}
         <Select
           defaultValue={searchType}
-          onValueChange={(value) => setSearchType(value)}
+          onValueChange={(value) => {
+            setSearchType(value);
+            // Prevent bug
+            table.setGlobalFilter("");
+            setIngredientInput("");
+          }}
         >
           <SelectTrigger className="w-max">
             <SelectValue>Search by</SelectValue>

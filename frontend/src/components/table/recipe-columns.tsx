@@ -23,20 +23,22 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 const accuracyNode = (accuracy: number) => {
-  let color = "";
+  let colorStyling = "";
+  // I love u tailwind but this is abyssmal
   if (accuracy < 33) {
-    color = "red";
+    colorStyling = "bg-red-400 dark:bg-red-900 text-red-900 dark:text-red-400";
   } else if (accuracy < 66) {
-    color = "yellow";
+    colorStyling =
+      "bg-yellow-400 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-400";
   } else if (accuracy < 100) {
-    color = "orange";
+    colorStyling =
+      "bg-orange-400 dark:bg-orange-900 text-orange-900 dark:text-orange-400";
   } else {
-    color = "green";
+    colorStyling =
+      "bg-green-400 dark:bg-green-900 text-green-900 dark:text-green-400";
   }
   return (
-    <span
-      className={`text-xs bg-${color}-400 dark:bg-${color}-900 text-${color}-900 dark:text-${color}-400  ml-1 px-2 py-0.5 rounded`}
-    >
+    <span className={`text-xs ${colorStyling} ml-1 px-2 py-0.5 rounded`}>
       {accuracy}%
     </span>
   );
