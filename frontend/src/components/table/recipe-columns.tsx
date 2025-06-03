@@ -22,17 +22,42 @@ import { deleteSingleRecipe } from "@/api/recipes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+const accuracyNode = (accuracy: number) => {
+  let color = "";
+  if (accuracy < 33) {
+    color = "red";
+  } else if (accuracy < 66) {
+    color = "yellow";
+  } else if (accuracy < 100) {
+    color = "orange";
+  } else {
+    color = "green";
+  }
+  return (
+    <span
+      className={`text-xs bg-${color}-400 dark:bg-${color}-900 text-${color}-900 dark:text-${color}-400  ml-1 px-2 py-0.5 rounded`}
+    >
+      {accuracy}%
+    </span>
+  );
+};
+
 export const recipeColumns: ColumnDef<Recipe>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => <SortButton column={column} label="Recipe" />,
-    cell: ({ row }) => (
-      <div className="px-3 font-medium">
-        <Link to={`/recipes/${row.original.id}`} className="hover:underline">
-          {row.getValue("name")}
-        </Link>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const accuracy = row.original.accuracy;
+      return (
+        <div className="px-3 font-medium">
+          <Link to={`/recipes/${row.original.id}`} className="hover:underline">
+            {row.getValue("name")}
+          </Link>
+          {accuracy !== undefined && accuracyNode(accuracy)}
+        </div>
+      );
+    },
+    enableGlobalFilter: true,
   },
   {
     accessorKey: "meat_type",
@@ -42,6 +67,7 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
         {row.getValue("meat_type")}
       </div>
     ),
+    enableGlobalFilter: true,
   },
   {
     accessorKey: "state",
@@ -59,7 +85,6 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
         </div>
       );
     },
-    enableGlobalFilter: false,
   },
   {
     accessorKey: "longevity",
@@ -67,13 +92,11 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
     cell: ({ row }) => (
       <div className="px-3 text-center">{row.getValue("longevity")}</div>
     ),
-    enableGlobalFilter: false,
   },
   {
     accessorKey: "frequency",
     header: ({ column }) => <SortButton column={column} label="Frequency" />,
     cell: ({ row }) => <div className="px-3">{row.getValue("frequency")}</div>,
-    enableGlobalFilter: false,
   },
   {
     accessorKey: "note",
@@ -96,7 +119,6 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
         </Popover>
       );
     },
-    enableGlobalFilter: false,
   },
   {
     id: "actions",
@@ -148,6 +170,5 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
         </DropdownMenu>
       );
     },
-    enableGlobalFilter: false,
   },
 ];

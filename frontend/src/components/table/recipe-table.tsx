@@ -6,6 +6,7 @@ import {
   type SortingState,
   getSortedRowModel,
   getPaginationRowModel,
+  getFilteredRowModel,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -24,9 +25,7 @@ import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
@@ -35,15 +34,23 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   LeftComponent?: React.FC;
+  searchType: string;
+  setSearchType: (s: string) => void;
+  ingredientInput: string;
+  setIngredientInput: (s: string) => void;
 }
 
 export function DataTable<TData extends { id: number }, TValue>({
   columns,
   data,
   LeftComponent,
+  searchType,
+  setSearchType,
+  ingredientInput,
+  setIngredientInput,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState("search term");
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
     data,
@@ -53,6 +60,7 @@ export function DataTable<TData extends { id: number }, TValue>({
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
       globalFilter,
@@ -63,13 +71,29 @@ export function DataTable<TData extends { id: number }, TValue>({
   return (
     <div>
       <div className="mb-3 flex items-center">
-        <Input
-          value="" //Temporary set, fix later: TODO
-          onChange={(e) => table.setGlobalFilter(String(e.target.value))}
-          placeholder="Search by name or meat type..."
-          className="w-1/3 mr-3"
-        />
-        <Select defaultValue="default">
+        {searchType === "default" ? (
+          <Input
+            type="text"
+            value={globalFilter}
+            onChange={(e) => table.setGlobalFilter(String(e.target.value))}
+            placeholder="Search by name or meat type..."
+            className="w-1/3 mr-3"
+          />
+        ) : (
+          <Input
+            type="text"
+            value={ingredientInput}
+            onChange={(e) => {
+              setIngredientInput(String(e.target.value));
+            }}
+            placeholder="Search by ingredient1, ingredient2, ..."
+            className="w-1/3 mr-3"
+          />
+        )}
+        <Select
+          defaultValue={searchType}
+          onValueChange={(value) => setSearchType(value)}
+        >
           <SelectTrigger className="w-max">
             <SelectValue>Search by</SelectValue>
           </SelectTrigger>

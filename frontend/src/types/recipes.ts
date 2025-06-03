@@ -10,4 +10,5 @@ export interface Recipe {
     name: string;
     quantity: string;
   }[];
+  accuracy: number;
 }
