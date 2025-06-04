@@ -1,48 +1,48 @@
-import * as React from "react"
+import * as React from "react";
 import {
   BookOpen,
   ShoppingBasket,
   CookingPot,
   Refrigerator,
   ChefHat,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/sidebar/nav-main"
-import { NavUser } from "@/components/sidebar/nav-user"
-import { ProjectHeader } from "@/components/sidebar/project-header"
+import { NavMain } from "@/components/sidebar/nav-main";
+import { NavUser } from "@/components/sidebar/nav-user";
+import { ProjectHeader } from "@/components/sidebar/project-header";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 // This is sample data.
 
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [username, setUsername] = React.useState(() => localStorage.getItem("name") || "")
-  const userInitial = username ? username[0].toUpperCase(): ""
+  const [username, setUsername] = React.useState(
+    () => localStorage.getItem("name") || ""
+  );
+  const userInitial = username ? username[0].toUpperCase() : "";
 
   React.useEffect(() => {
-    const name = localStorage.getItem("name")
+    const name = localStorage.getItem("name");
     if (name) {
-      setUsername(name)
+      setUsername(name);
     }
-  }, [])
+  }, []);
 
   const data = {
     user: {
       name: username,
-      avatar: userInitial
+      avatar: userInitial,
     },
-    header:
-      {
-        name: "Ocipe",
-        logo: ChefHat,
-        description: "Meal planner",
-      },
+    header: {
+      name: "Ocipe",
+      logo: ChefHat,
+      description: "Meal planner",
+    },
     kitchen: [
       {
         title: "Recipe",
@@ -114,21 +114,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ],
       },
     ],
-  }
-  
+  };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <ProjectHeader project={data.header} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.kitchen} label="My Kitchen"/>
-        <NavMain items={data.documentation} label="How's this works?"/>
+        <NavMain items={data.kitchen} label="My Kitchen" />
+        <NavMain items={data.documentation} label="How's this works?" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

@@ -8,7 +8,7 @@ export interface Recipe {
   state: "active" | "used";
   ingredients: {
     name: string;
-    quantity: string;
+    quantity?: string;
   }[];
   accuracy: number;
 }
