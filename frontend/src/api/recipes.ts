@@ -1,7 +1,13 @@
+import type { RecipeInput } from "@/types/recipes";
 import { axiosInstance } from "./axios";
 
 export async function getAllRecipes() {
   const response = await axiosInstance.get("/recipes?ordering=-added_date");
+  return response.data;
+}
+
+export async function postRecipe(data: RecipeInput) {
+  const response = await axiosInstance.post("/recipes/", data);
   return response.data;
 }
 

@@ -3,7 +3,7 @@ export interface Recipe {
   name: string;
   meat_type: string;
   longevity: number;
-  frequency: string;
+  frequency: "weekday" | "weekend" | "rarely";
   note: string;
   state: "active" | "used";
   ingredients: {
@@ -11,4 +11,17 @@ export interface Recipe {
     quantity?: string;
   }[];
   accuracy: number;
+}
+
+export interface RecipeInput {
+  name: string;
+  meat_type: string;
+  longevity: number;
+  frequency: "weekday" | "weekend" | "rarely";
+  note?: string;
+  state: "active" | "used";
+  ingredients: {
+    name: string;
+    quantity?: string;
+  }[];
 }
