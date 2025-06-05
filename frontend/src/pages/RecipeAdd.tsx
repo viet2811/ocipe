@@ -19,23 +19,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroupItem, RadioGroup } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CircleHelp, NotebookPen, Plus, Sparkles, X } from "lucide-react";
+import { CircleHelp, NotebookPen, Plus, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getRecipeFromURL, postRecipe } from "@/api/recipes";
+import { postRecipe } from "@/api/recipes";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { type RecipeInput } from "@/types/recipes";
+import GeminiAutofillDialog from "@/components/GeminiAutofillDialog";
 
 const ingredientSchema = z.object({
   name: z
@@ -64,23 +55,6 @@ const recipeSchema = z.object({
   ingredients: z
     .array(ingredientSchema)
     .min(1, "Surely a recipe has an ingredient right?"),
-});
-
-const invalidDomains = [
-  "www.youtube.com",
-  "youtube.com",
-  "youtu.be",
-  "www.tiktok.com",
-  "tiktok.com",
-];
-const urlSchema = z.object({
-  url: z
-    .string()
-    .url("Please enter a valid URL (e.g. https://...)")
-    .refine(
-      (url) => !invalidDomains.some((domain) => url.includes(domain)),
-      "Please submit a non-video web link, I dont want to spend money on AI"
-    ),
 });
 
 export default function RecipeAdd() {
@@ -129,18 +103,9 @@ export default function RecipeAdd() {
     console.log(values);
   }
 
-  const closeDialog = useRef<HTMLButtonElement>(null);
-
-  const [urlInput, setUrlInput] = useState("");
-  const recipeFetchViaURL = useMutation({
-    mutationFn: getRecipeFromURL,
-    onSuccess: (data) => {
-      toast.success("Recipe fetched!");
-      setFormValues(data);
-      closeDialog.current?.click();
-    },
-    onError: () => toast.error("Something went wrong. Please try again"),
-  });
+  const onAutofillSuccess = (data: RecipeInput) => {
+    setFormValues(data);
+  };
 
   return (
     <div className="mx-auto mt-12 w-4/5 lg:w-2/5 ">
@@ -175,7 +140,7 @@ export default function RecipeAdd() {
                   <FormLabel>
                     Frequency
                     <Tooltip>
-                      <TooltipTrigger>
+                      <TooltipTrigger asChild>
                         <CircleHelp size={16} />
                       </TooltipTrigger>
                       <TooltipContent side="right">
@@ -200,17 +165,19 @@ export default function RecipeAdd() {
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      {...field}
+                      id="frequency"
                     >
                       <div className="flex items-center gap-3">
-                        <RadioGroupItem value="weekday" />
+                        <RadioGroupItem value="weekday" id="weekday" />
                         <Label htmlFor="weekday">Weekday</Label>
                       </div>
                       <div className="flex items-center gap-3">
-                        <RadioGroupItem value="weekend" />
+                        <RadioGroupItem value="weekend" id="weekend" />
                         <Label htmlFor="weekend">Weekend</Label>
                       </div>
                       <div className="flex items-center gap-3">
-                        <RadioGroupItem value="rarely" />
+                        <RadioGroupItem value="rarely" id="rarely" />
                         <Label htmlFor="rarely">Rarely</Label>
                       </div>
                     </RadioGroup>
@@ -230,7 +197,7 @@ export default function RecipeAdd() {
                   <FormLabel>
                     Longevity
                     <Tooltip>
-                      <TooltipTrigger>
+                      <TooltipTrigger asChild>
                         <CircleHelp size={14} />
                       </TooltipTrigger>
                       <TooltipContent>
@@ -289,112 +256,67 @@ export default function RecipeAdd() {
           {/* Ingredients */}
           <FormItem className="flex-1 mt-4">
             <FormLabel>Ingredients</FormLabel>
-            {fields.map((field, index) => (
-              <div key={field.id} className="flex space-x-1 lg:space-x-4">
-                <Button
-                  variant="outline"
-                  type="button"
-                  onClick={() => append({ name: "", quantity: "" })}
-                  className="-ml-6 md:-ml-9 lg:-ml-15  !p-1.5 lg:has-[>svg]:!px-3" //border-none shadow-none
-                >
-                  <Plus></Plus>
-                </Button>
-                {/* Name */}
-                <FormField
-                  control={form.control}
-                  name={`ingredients.${index}.name`}
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormControl>
-                        <Input {...field} placeholder="Ingredient name.." />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                ></FormField>
-                {/* Quantity */}
-                <FormField
-                  control={form.control}
-                  name={`ingredients.${index}.quantity`}
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormControl>
-                        <Input {...field} placeholder="Quantity(optional)..." />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                ></FormField>
-                {index !== 0 && (
+            <FormItem>
+              {fields.map((field, index) => (
+                <div key={field.id} className="flex space-x-1 lg:space-x-4">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     type="button"
-                    onClick={() => remove(index)}
-                    className="lg:-mr-14 -mr-7 !p-1 lg:has-[>svg]:!px-3"
+                    aria-label="Add a ingredient"
+                    onClick={() => append({ name: "", quantity: "" })}
+                    className="-ml-6 md:-ml-9 lg:-ml-15  !p-1.5 lg:has-[>svg]:!px-3" //border-none shadow-none
                   >
-                    <X />
+                    <Plus></Plus>
                   </Button>
-                )}
-              </div>
-            ))}
+                  {/* Name */}
+                  <FormField
+                    control={form.control}
+                    name={`ingredients.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormControl>
+                          <Input {...field} placeholder="Ingredient name.." />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  ></FormField>
+                  {/* Quantity */}
+                  <FormField
+                    control={form.control}
+                    name={`ingredients.${index}.quantity`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Quantity(optional)..."
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  ></FormField>
+                  {index !== 0 && (
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      aria-label="Remove this ingredient"
+                      onClick={() => remove(index)}
+                      className="lg:-mr-14 -mr-7 !p-1 lg:has-[>svg]:!px-3"
+                    >
+                      <X />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </FormItem>
+
             <FormMessage />
           </FormItem>
           <div className="flex justify-between mt-4">
             {/* Gemini autofill */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  type="button"
-                  className="bg-blue-500 hover:bg-blue-600 cursor-pointer"
-                >
-                  <Sparkles />
-                  Autofill with Gemini
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Autofill with Gemini</DialogTitle>
-                  <DialogDescription>
-                    Add non-video recipe web link here.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-3">
-                  <Label htmlFor="url-1">URL</Label>
-                  <Input
-                    value={urlInput}
-                    form="none"
-                    placeholder="Any non-video url here..."
-                    onChange={(e) => setUrlInput(e.target.value)}
-                  />
-                </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline" ref={closeDialog}>
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      const validateLink = urlSchema.safeParse({
-                        url: urlInput,
-                      });
-                      if (!validateLink.success) {
-                        toast.warning(
-                          validateLink.error.format().url?._errors[0]
-                        );
-                      } else {
-                        toast.success("Input is a valid URL. Now fetching...");
-                        recipeFetchViaURL.mutate(urlInput);
-                      }
-                    }}
-                  >
-                    Submit
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-
+            <GeminiAutofillDialog onAutofillSuccess={onAutofillSuccess} />
             <Button type="submit">Submit</Button>
           </div>
         </form>
