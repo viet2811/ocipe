@@ -11,6 +11,11 @@ export async function postRecipe(data: RecipeInput) {
   return response.data;
 }
 
+export async function getRecipeFromURL(url: string) {
+  const response = await axiosInstance.post("/recipes/genai/", { url });
+  return response.data;
+}
+
 export async function deleteAllRecipes() {
   await axiosInstance.delete("/recipes/");
 }
