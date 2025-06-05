@@ -34,7 +34,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type RecipeInput } from "@/types/recipes";
 
 const ingredientSchema = z.object({
@@ -129,13 +129,17 @@ export default function RecipeAdd() {
     console.log(values);
   }
 
+  const closeDialog = useRef<HTMLButtonElement>(null);
+
   const [urlInput, setUrlInput] = useState("");
   const recipeFetchViaURL = useMutation({
     mutationFn: getRecipeFromURL,
     onSuccess: (data) => {
-      console.log(data);
+      toast.success("Recipe fetched!");
       setFormValues(data);
+      closeDialog.current?.click();
     },
+    onError: () => toast.error("Something went wrong. Please try again"),
   });
 
   return (
@@ -365,7 +369,9 @@ export default function RecipeAdd() {
                 </div>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
+                    <Button variant="outline" ref={closeDialog}>
+                      Cancel
+                    </Button>
                   </DialogClose>
                   <Button
                     type="button"
