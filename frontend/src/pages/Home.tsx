@@ -1,19 +1,18 @@
-import { Card } from "@/components/ui/card"
-import { 
-  type LucideIcon, 
-  Soup, 
+import { Card } from "@/components/ui/card";
+import {
+  type LucideIcon,
+  Soup,
   Utensils,
   NotebookPen,
   Hamburger,
-} 
-from "lucide-react"
-import { Link } from "react-router-dom"
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface quickButtonDataType {
-  title: string,
-  description: string,
-  logo: LucideIcon,
-  url: string,
+  title: string;
+  description: string;
+  logo: LucideIcon;
+  url: string;
 }
 
 const quickButtonData: quickButtonDataType[] = [
@@ -21,53 +20,104 @@ const quickButtonData: quickButtonDataType[] = [
     title: "Hungry?",
     description: "Find something to cook",
     logo: Soup,
-    url: "/recipes"
+    url: "/recipes",
   },
   {
     title: "Found a new recipes?",
     description: "Add recipe manually or with Gemini",
     logo: Utensils,
-    url: "/recipes/add-a-recipe"
+    url: "/recipes/add-a-recipe",
   },
   {
-    title: "Planning grocery?",
-    description: "Plan what meals to cook next week",
+    title: "Grocery time?",
+    description: "Plan meals and grocery",
     logo: NotebookPen,
-    url: "/grocery"
+    url: "/grocery",
   },
   {
     title: "Too busy to buy grocery?",
     description: "Find something to cook with your current fridge",
     logo: Hamburger,
-    url: "/fridge"
-  }
-]
+    url: "/fridge",
+  },
+];
 
 const quickButton = (data: quickButtonDataType) => {
-  const Icon = data.logo
+  const Icon = data.logo;
   return (
     <Link to={data.url} key={data.title}>
-      <Card className="w-70 h-20 p-4 flex flex-row items-center">
-        <Icon className="min-h-6 min-w-6"></Icon>
+      <Card className="lg:w-70 h-20 p-1 md:p-4 flex flex-row items-center !gap-3">
+        <Icon className="min-h-6 min-w-6 ml-1"></Icon>
         <div className="w-max">
-          <div className="text-base font-semibold">{data.title}</div>
-          <div className="text-xs">{data.description}</div>
+          <div className="text-xs md:text-sm lg:text-base font-semibold">
+            {data.title}
+          </div>
+          <div className="md:text-xs text-[10px]">{data.description}</div>
         </div>
       </Card>
     </Link>
-  )
-}
+  );
+};
 
 const Home = () => {
-    const user = localStorage.getItem('name')
-    return (
-      <div className="flex flex-col items-center justify-center h-[80%]">
-        <h1>Hi {user}, how are we feeling?</h1>
-        <div className="grid grid-cols-2 gap-2 mt-4">
-        {quickButtonData.map((data) => quickButton(data))}
-        </div>
-      </div>
-    )
-}
+  const user = localStorage.getItem("name");
+  return (
+    //
+    <div className="flex flex-col items-center justify-center h-[80%]">
+      <svg
+        version="1.0"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1080 1080"
+        preserveAspectRatio="xMidYMid meet"
+        className="w-32 h-32 -mb-10"
+      >
+        <g
+          transform="translate(0.000000,1080.000000) scale(0.100000,-0.100000)"
+          fill="currentColor"
+          stroke="none"
+        >
+          <path
+            d="M5365 8270 c-255 -24 -494 -114 -735 -275 -63 -42 -117 -78 -119 -80
+-7 -8 63 -95 73 -92 6 3 56 35 111 72 181 121 396 210 580 241 146 24 377 15
+502 -20 188 -52 318 -111 491 -222 45 -30 84 -54 86 -54 6 0 66 83 66 91 0 7
+-146 103 -221 146 -65 37 -222 105 -310 133 -155 51 -367 75 -524 60z"
+          />
+          <path
+            d="M4200 7769 c-456 -196 -560 -528 -297 -946 28 -46 56 -83 60 -83 5 0
+28 14 52 31 l43 31 -43 67 c-62 97 -92 160 -116 248 -66 238 48 412 356 543
+44 19 81 35 82 35 4 2 -29 99 -36 107 -3 4 -49 -11 -101 -33z"
+          />
+          <path
+            d="M6611 7760 c-14 -65 -14 -70 3 -70 34 0 198 -54 272 -90 197 -95 276
+-239 230 -420 -20 -81 -79 -204 -139 -293 l-45 -67 46 -36 47 -35 21 26 c41
+52 117 188 150 269 90 223 63 400 -83 543 -49 49 -87 75 -175 118 -89 43 -271
+105 -310 105 -3 0 -11 -23 -17 -50z"
+          />
+          <path d="M4402 6018 l3 -613 58 -3 57 -3 0 616 0 615 -60 0 -60 0 2 -612z" />
+          <path d="M6402 6018 l3 -613 58 -3 57 -3 0 616 0 615 -60 0 -60 0 2 -612z" />
+          <path
+            d="M1783 4579 c-63 -31 -97 -87 -101 -168 -3 -80 20 -129 86 -176 87
+-60 224 -31 277 60 84 142 -6 305 -167 305 -33 0 -68 -8 -95 -21z"
+          />
+          <path
+            d="M8835 4583 c-76 -40 -108 -92 -109 -178 -2 -119 79 -199 201 -200 52
+0 68 4 105 30 66 47 89 96 86 176 -4 81 -38 138 -102 169 -51 24 -138 26 -181
+3z"
+          />
+          <path
+            d="M5060 4029 l-45 -39 45 -46 c69 -70 168 -141 240 -171 56 -23 79 -27
+170 -28 101 0 108 1 184 38 43 20 97 51 120 69 59 45 136 120 136 133 0 5 -19
+25 -41 43 l-40 34 -52 -49 c-211 -199 -393 -203 -597 -15 l-75 69 -45 -38z"
+          />
+        </g>
+      </svg>
 
-export default Home
+      <h1>Hi {user}, how are we feeling?</h1>
+      <div className="grid grid-cols-2 gap-2 mt-4 mx-4">
+        {quickButtonData.map((data) => quickButton(data))}
+      </div>
+    </div>
+  );
+};
+
+export default Home;

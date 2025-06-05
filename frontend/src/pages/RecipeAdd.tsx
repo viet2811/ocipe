@@ -143,7 +143,7 @@ export default function RecipeAdd() {
   });
 
   return (
-    <div className="mx-auto mt-12 w-2/5">
+    <div className="mx-auto mt-12 w-4/5 lg:w-2/5 ">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -290,12 +290,12 @@ export default function RecipeAdd() {
           <FormItem className="flex-1 mt-4">
             <FormLabel>Ingredients</FormLabel>
             {fields.map((field, index) => (
-              <div key={field.id} className="flex space-x-4">
+              <div key={field.id} className="flex space-x-1 lg:space-x-4">
                 <Button
                   variant="outline"
                   type="button"
                   onClick={() => append({ name: "", quantity: "" })}
-                  className="-ml-15"
+                  className="-ml-6 md:-ml-9 lg:-ml-15  !p-1.5 lg:has-[>svg]:!px-3" //border-none shadow-none
                 >
                   <Plus></Plus>
                 </Button>
@@ -330,7 +330,7 @@ export default function RecipeAdd() {
                     variant="ghost"
                     type="button"
                     onClick={() => remove(index)}
-                    className="-mr-14"
+                    className="lg:-mr-14 -mr-7 !p-1 lg:has-[>svg]:!px-3"
                   >
                     <X />
                   </Button>

@@ -74,7 +74,7 @@ export default function RecipeList() {
     },
   });
   const LeftSideButtons: React.FC = () => (
-    <>
+    <div className="grid grid-cols-2 md:flex">
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button variant="destructive" size="sm" className="cursor-pointer">
@@ -106,7 +106,7 @@ export default function RecipeList() {
       >
         <RefreshCw /> Reset all states
       </Button>
-    </>
+    </div>
   );
 
   // Handle loading state

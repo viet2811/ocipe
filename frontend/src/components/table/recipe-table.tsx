@@ -70,14 +70,14 @@ export function DataTable<TData extends { id: number }, TValue>({
 
   return (
     <div>
-      <div className="mb-3 flex items-center">
+      <div id="searchFields" className="mb-3 flex items-center">
         {searchType === "default" ? (
           <Input
             type="text"
             value={globalFilter}
             onChange={(e) => table.setGlobalFilter(String(e.target.value))}
             placeholder="Search by name or meat type..."
-            className="w-1/3 mr-3"
+            className="w-2/3 md:w-1/3 mr-3"
           />
         ) : (
           <Input
@@ -86,8 +86,8 @@ export function DataTable<TData extends { id: number }, TValue>({
             onChange={(e) => {
               setIngredientInput(String(e.target.value));
             }}
-            placeholder="Search by ingredient1, ingredient2, ..."
-            className="w-1/3 mr-3"
+            placeholder="Search by ingredient1, ingre2, ..."
+            className="w-2/3 md:w-1/3 mr-3"
           />
         )}
         <Select
@@ -109,7 +109,7 @@ export function DataTable<TData extends { id: number }, TValue>({
         </Select>
       </div>
 
-      <div className="rounded-md border mb-3">
+      <div id="tableField" className="rounded-md border mb-3">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

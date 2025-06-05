@@ -25,7 +25,7 @@ export function DataTablePagination<TData>({
   LeftComponent,
 }: DataTablePaginationProps<TData>) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="grid gap-2 items-center grid-cols-1 md:flex md:justify-between">
       {LeftComponent && <LeftComponent />}
       <div className="flex items-center space-x-6 lg:space-x-8 ml-auto">
         <div className="flex items-center space-x-2">

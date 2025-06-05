@@ -119,6 +119,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  input::placeholder {
+    @apply text-sm lg:text-base;
+  }
 }
 
 @theme {
