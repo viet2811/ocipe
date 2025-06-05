@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -20,11 +19,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroupItem, RadioGroup } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CircleHelp, NotebookPen, Plus, X } from "lucide-react";
+import { CircleHelp, NotebookPen, Plus, Sparkles, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { postRecipe } from "@/api/recipes";
+import { getRecipeFromURL, postRecipe } from "@/api/recipes";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useEffect, useState } from "react";
+import { type RecipeInput } from "@/types/recipes";
 
 const ingredientSchema = z.object({
   name: z
@@ -55,19 +66,42 @@ const recipeSchema = z.object({
     .min(1, "Surely a recipe has an ingredient right?"),
 });
 
+const invalidDomains = [
+  "www.youtube.com",
+  "youtube.com",
+  "youtu.be",
+  "www.tiktok.com",
+  "tiktok.com",
+];
+const urlSchema = z.object({
+  url: z
+    .string()
+    .url("Please enter a valid URL (e.g. https://...)")
+    .refine(
+      (url) => !invalidDomains.some((domain) => url.includes(domain)),
+      "Please submit a non-video web link, I dont want to spend money on AI"
+    ),
+});
+
 export default function RecipeAdd() {
+  const [formValues, setFormValues] = useState<RecipeInput>({
+    name: "",
+    meat_type: "",
+    longevity: 1,
+    frequency: "weekday",
+    note: "",
+    state: "active",
+    ingredients: [{ name: "", quantity: "" }],
+  });
+
   const form = useForm<z.infer<typeof recipeSchema>>({
     resolver: zodResolver(recipeSchema),
-    defaultValues: {
-      name: "",
-      meat_type: "",
-      longevity: 1,
-      frequency: "weekday",
-      note: "",
-      state: "active",
-      ingredients: [{ name: "", quantity: "" }],
-    },
+    defaultValues: formValues,
   });
+
+  useEffect(() => {
+    form.reset(formValues);
+  }, [formValues]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -95,8 +129,17 @@ export default function RecipeAdd() {
     console.log(values);
   }
 
+  const [urlInput, setUrlInput] = useState("");
+  const recipeFetchViaURL = useMutation({
+    mutationFn: getRecipeFromURL,
+    onSuccess: (data) => {
+      console.log(data);
+      setFormValues(data);
+    },
+  });
+
   return (
-    <div className="mx-auto mt-4 w-2/5">
+    <div className="mx-auto mt-12 w-2/5">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -292,10 +335,61 @@ export default function RecipeAdd() {
             ))}
             <FormMessage />
           </FormItem>
-          <div className="flex justify-end mt-4">
-            <Button type="submit" className="">
-              Submit
-            </Button>
+          <div className="flex justify-between mt-4">
+            {/* Gemini autofill */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  className="bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                >
+                  <Sparkles />
+                  Autofill with Gemini
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Autofill with Gemini</DialogTitle>
+                  <DialogDescription>
+                    Add non-video recipe web link here.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-3">
+                  <Label htmlFor="url-1">URL</Label>
+                  <Input
+                    value={urlInput}
+                    form="none"
+                    placeholder="Any non-video url here..."
+                    onChange={(e) => setUrlInput(e.target.value)}
+                  />
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      const validateLink = urlSchema.safeParse({
+                        url: urlInput,
+                      });
+                      if (!validateLink.success) {
+                        toast.warning(
+                          validateLink.error.format().url?._errors[0]
+                        );
+                      } else {
+                        toast.success("Input is a valid URL. Now fetching...");
+                        recipeFetchViaURL.mutate(urlInput);
+                      }
+                    }}
+                  >
+                    Submit
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Button type="submit">Submit</Button>
           </div>
         </form>
       </Form>

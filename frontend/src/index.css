@@ -1,5 +1,5 @@
-@import url('non.geist');
-@import url('non.geist/mono');
+@import url("non.geist");
+@import url("non.geist/mono");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -122,11 +122,11 @@
 }
 
 @theme {
-  --font-mono: 'Geist Mono Variable';
-  --font-sans: 'Geist Variable';
+  --font-mono: "Geist Mono Variable";
+  --font-sans: "Geist Variable";
   --color-ivory: #fef9f4;
 }
 
 h1 {
-  @apply font-bold text-2xl
+  @apply font-bold text-2xl;
 }

@@ -1,4 +1,5 @@
 import { axiosInstance } from "@/api/axios";
+import { localStoragePersister, queryClient } from "@/main";
 import {
   createContext,
   type ReactNode,
@@ -31,9 +32,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // call backend to logout
     try {
       await axiosInstance.post("/user/logout/", {}, { withCredentials: true });
+      // Clear token
       setAccessToken(null);
       setIsAuthenticated(false);
+      // Clear persisted data, name, query cache on localStorage
       localStorage.removeItem("name");
+
+      queryClient.clear();
+      await localStoragePersister.removeClient();
     } catch (e) {
       console.log(e);
     }
@@ -76,8 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
-        if (error.status === 401 && !originalRequest._retry) {
+        if (error.response.status === 401 && !originalRequest._retry) {
           // First time getting 401 message, attempt to refresh token
+          console.log("Retry here");
           originalRequest._retry = true;
           try {
             const response = await axiosInstance.post(
@@ -90,7 +97,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setAccessToken(newAccessToken);
             setIsAuthenticated(true);
 
-            originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+            originalRequest.headers[
+              "Authorization"
+            ] = `Bearer ${newAccessToken}`;
             return axiosInstance(originalRequest);
           } catch (error) {
             // Refresh token expires
