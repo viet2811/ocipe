@@ -120,7 +120,10 @@
     @apply bg-background text-foreground;
   }
   input::placeholder {
-    @apply text-sm lg:text-base;
+    @apply text-sm;
+  }
+  textarea::placeholder {
+    @apply text-sm;
   }
 }
 

@@ -34,3 +34,8 @@ export async function getRecipesByIngredient(ingredientInput: string) {
 export async function refreshRecipes() {
   await axiosInstance.post("/recipes/refresh/");
 }
+
+export async function getFridge() {
+  const response = await axiosInstance.get("/fridge");
+  return response.data;
+}

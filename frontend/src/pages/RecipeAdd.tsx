@@ -108,153 +108,155 @@ export default function RecipeAdd() {
   };
 
   return (
-    <div className="mx-auto mt-12 w-4/5 lg:w-2/5 ">
+    <div className="mx-auto mt-12 w-4/5 lg:w-4/5 ">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full space-y-4"
+          className="w-full lg:space-y-4 lg:grid lg:grid-cols-2 lg:gap-10 lg:items-start"
         >
-          <div className="flex items-start space-x-4">
-            {/* Name */}
+          <div className="space-y-2">
+            <div className="flex items-start space-x-4">
+              {/* Name */}
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="scroll-m-20 text-center text-xl font-extrabold tracking-tight text-balance">
+                      Recipe Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter recipe name.." />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              ></FormField>
+              {/* Frequency */}
+              <FormField
+                control={form.control}
+                name="frequency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Frequency
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <CircleHelp size={16} />
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <ul className="list-disc list-inside">
+                            How often you want to cook this recipe?
+                            <li>
+                              I don't mind cooking this everyday: <b>Weekday</b>
+                            </li>
+                            <li>
+                              Too busy to cook this during the week:{" "}
+                              <b>Weekend</b>
+                            </li>
+                            <li>
+                              I'll treat myself this once in a while:{" "}
+                              <b>Rarely</b>
+                            </li>
+                          </ul>
+                        </TooltipContent>
+                      </Tooltip>
+                    </FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        {...field}
+                        id="frequency"
+                      >
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem value="weekday" id="weekday" />
+                          <Label htmlFor="weekday">Weekday</Label>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem value="weekend" id="weekend" />
+                          <Label htmlFor="weekend">Weekend</Label>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem value="rarely" id="rarely" />
+                          <Label htmlFor="rarely">Rarely</Label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              ></FormField>
+            </div>
+            <div className="flex items-start space-x-4 -mt-1">
+              {/* Longevity */}
+              <FormField
+                control={form.control}
+                name="longevity"
+                render={({ field }) => (
+                  <FormItem className="w-24">
+                    <FormLabel>
+                      Longevity
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <CircleHelp size={14} />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Portion/Day(s) whatever u think would fit...</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              ></FormField>
+              {/* Meat type */}
+              <FormField
+                control={form.control}
+                name="meat_type"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Meat type</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Enter meat type or None if not..."
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              ></FormField>
+            </div>
+            {/* Note */}
             <FormField
               control={form.control}
-              name="name"
+              name="note"
               render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel className="scroll-m-20 text-center text-xl font-extrabold tracking-tight text-balance">
-                    Recipe Name
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter recipe name.." />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            ></FormField>
-            {/* Frequency */}
-            <FormField
-              control={form.control}
-              name="frequency"
-              render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1 mt-4">
                   <FormLabel>
-                    Frequency
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <CircleHelp size={16} />
-                      </TooltipTrigger>
-                      <TooltipContent side="right">
-                        <ul className="list-disc list-inside">
-                          How often you want to cook this recipe?
-                          <li>
-                            I don't mind cooking this everyday: <b>Weekday</b>
-                          </li>
-                          <li>
-                            Too busy to cook this during the week:{" "}
-                            <b>Weekend</b>
-                          </li>
-                          <li>
-                            I'll treat myself this once in a while:{" "}
-                            <b>Rarely</b>
-                          </li>
-                        </ul>
-                      </TooltipContent>
-                    </Tooltip>
+                    Personal Note <NotebookPen size={14} />{" "}
                   </FormLabel>
                   <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+                    <Textarea
                       {...field}
-                      id="frequency"
-                    >
-                      <div className="flex items-center gap-3">
-                        <RadioGroupItem value="weekday" id="weekday" />
-                        <Label htmlFor="weekday">Weekday</Label>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <RadioGroupItem value="weekend" id="weekend" />
-                        <Label htmlFor="weekend">Weekend</Label>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <RadioGroupItem value="rarely" id="rarely" />
-                        <Label htmlFor="rarely">Rarely</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            ></FormField>
-          </div>
-          <div className="flex items-start space-x-4 -mt-1">
-            {/* Longevity */}
-            <FormField
-              control={form.control}
-              name="longevity"
-              render={({ field }) => (
-                <FormItem className="w-24">
-                  <FormLabel>
-                    Longevity
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <CircleHelp size={14} />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Portion/Day(s) whatever u think would fit...</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      placeholder="Type your personal note, instructions or whatever you like here..."
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             ></FormField>
-            {/* Meat type */}
-            <FormField
-              control={form.control}
-              name="meat_type"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>Meat type</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Enter meat type or None if not..."
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            ></FormField>
           </div>
-          {/* Note */}
-          <FormField
-            control={form.control}
-            name="note"
-            render={({ field }) => (
-              <FormItem className="flex-1 mt-4">
-                <FormLabel>
-                  Personal Note <NotebookPen size={14} />{" "}
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Type your personal note, instructions or whatever you like here..."
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          ></FormField>
           {/* Ingredients */}
-          <FormItem className="flex-1 mt-4">
+          <FormItem className="lg:ml-15 lg:space-y-2">
             <FormLabel>Ingredients</FormLabel>
             <FormItem>
               {fields.map((field, index) => (
@@ -314,7 +316,7 @@ export default function RecipeAdd() {
 
             <FormMessage />
           </FormItem>
-          <div className="flex justify-between mt-4">
+          <div className="flex justify-between mt-4 col-span-2">
             {/* Gemini autofill */}
             <GeminiAutofillDialog onAutofillSuccess={onAutofillSuccess} />
             <Button type="submit">Submit</Button>
