@@ -85,15 +85,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
           // First time getting 401 message, attempt to refresh token
-          console.log("Retry here");
           originalRequest._retry = true;
           try {
             const response = await axiosInstance.post(
               "user/token/refresh/",
               {}
             );
-            console.log(response);
-
             const newAccessToken = response.data.access;
             setAccessToken(newAccessToken);
             setIsAuthenticated(true);

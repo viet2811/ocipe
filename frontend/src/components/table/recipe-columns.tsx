@@ -21,6 +21,8 @@ import type { Recipe } from "@/types/recipes";
 import { deleteSingleRecipe } from "@/api/recipes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
+import RecipeContent from "./recipe-sheet-content";
 
 const accuracyNode = (accuracy: number) => {
   let colorStyling = "";
@@ -49,15 +51,7 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
     accessorKey: "name",
     header: ({ column }) => <SortButton column={column} label="Recipe" />,
     cell: ({ row }) => {
-      const accuracy = row.original.accuracy;
-      return (
-        <div className="px-3 font-medium">
-          <Link to={`/recipes/${row.original.id}`} className="hover:underline">
-            {row.getValue("name")}
-          </Link>
-          {accuracy !== undefined && accuracyNode(accuracy)}
-        </div>
-      );
+      return <RecipeContent {...row.original}></RecipeContent>;
     },
     enableGlobalFilter: true,
   },
