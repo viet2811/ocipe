@@ -1,5 +1,6 @@
 import { axiosInstance } from "@/api/axios";
 import { localStoragePersister, queryClient } from "@/main";
+import { Axios } from "axios";
 import {
   createContext,
   type ReactNode,
@@ -68,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Embed the bearer token before making a request
     const requestInterceptor = axiosInstance.interceptors.request.use(
       (config) => {
-        if (accessToken) {
+        if (!config.headers["Authorization"] && accessToken) {
           config.headers["Authorization"] = `Bearer ${accessToken}`;
         }
         return config;
@@ -82,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
-        if (error.response.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry) {
           // First time getting 401 message, attempt to refresh token
           console.log("Retry here");
           originalRequest._retry = true;
@@ -100,7 +101,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             originalRequest.headers[
               "Authorization"
             ] = `Bearer ${newAccessToken}`;
-            return axiosInstance(originalRequest);
+
+            // Retry original request
+            return axiosInstance.request(originalRequest);
           } catch (error) {
             // Refresh token expires
             await logout();
