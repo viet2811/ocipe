@@ -57,16 +57,18 @@ const recipeSchema = z.object({
     .min(1, "Surely a recipe has an ingredient right?"),
 });
 
+const defaultFormValues: RecipeInput = {
+  name: "",
+  meat_type: "",
+  longevity: 1,
+  frequency: "weekday",
+  note: "",
+  state: "active",
+  ingredients: [{ name: "", quantity: "" }],
+};
+
 export default function RecipeAdd() {
-  const [formValues, setFormValues] = useState<RecipeInput>({
-    name: "",
-    meat_type: "",
-    longevity: 1,
-    frequency: "weekday",
-    note: "",
-    state: "active",
-    ingredients: [{ name: "", quantity: "" }],
-  });
+  const [formValues, setFormValues] = useState<RecipeInput>(defaultFormValues);
 
   const form = useForm<z.infer<typeof recipeSchema>>({
     resolver: zodResolver(recipeSchema),
@@ -85,10 +87,10 @@ export default function RecipeAdd() {
   const queryClient = useQueryClient();
   const postMutation = useMutation({
     mutationFn: postRecipe,
-    onSuccess: (newRecipe) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recipes"] });
       toast.success("Recipes is successfully added");
-      console.log(newRecipe);
+      setFormValues(defaultFormValues);
     },
     onError: (e) => {
       toast.error("Something went wrong. Please retry");
@@ -100,7 +102,6 @@ export default function RecipeAdd() {
     // Use Query for post
     // Mutation for post, invalid ["recipes"]
     postMutation.mutate(values);
-    console.log(values);
   }
 
   const onAutofillSuccess = (data: RecipeInput) => {
@@ -256,7 +257,7 @@ export default function RecipeAdd() {
             ></FormField>
           </div>
           {/* Ingredients */}
-          <FormItem className="lg:ml-15 lg:space-y-2">
+          <FormItem className="lg:ml-15 lg:space-y-2 mt-4 lg:mt-0">
             <FormLabel>Ingredients</FormLabel>
             <FormItem>
               {fields.map((field, index) => (
@@ -316,7 +317,7 @@ export default function RecipeAdd() {
 
             <FormMessage />
           </FormItem>
-          <div className="flex justify-between mt-4 col-span-2">
+          <div className="flex justify-between my-4 col-span-2">
             {/* Gemini autofill */}
             <GeminiAutofillDialog onAutofillSuccess={onAutofillSuccess} />
             <Button type="submit">Submit</Button>

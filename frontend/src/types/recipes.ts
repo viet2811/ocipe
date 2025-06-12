@@ -6,7 +6,7 @@ export interface Recipe {
   frequency: "weekday" | "weekend" | "rarely";
   note: string;
   state: "active" | "used";
-  ingredients: {
+  ingredient_list: {
     name: string;
     quantity?: string;
   }[];

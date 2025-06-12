@@ -17,6 +17,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ScrollArea } from "../ui/scroll-area";
 
 const accuracyNode = (accuracy: number) => {
   let colorStyling = "";
@@ -44,21 +45,43 @@ export default function RecipeContent(recipeData: Recipe) {
   const accuracy = recipeData.accuracy;
   const contentTrigger = (
     <div className="px-3 font-medium flex">
-      <div
-        className="hover:underline cursor-pointer"
-        // onClick={() => console.log(row.original)}
-      >
-        {recipeData.name}
-      </div>
+      <div className="hover:underline cursor-pointer">{recipeData.name}</div>
 
       {accuracy !== undefined && accuracyNode(accuracy)}
     </div>
   );
   const detailContents = (
     <>
-      <div>
-        <label>Frequency</label>
-        <span>{recipeData.frequency}</span>
+      <div className="flex flex-col mx-4">
+        <label className="font-semibold text-sm flex-1">Frequency</label>
+        <span className="text-muted-foreground">{recipeData.frequency}</span>
+      </div>
+      <div className="flex flex-col mx-4">
+        <label className="font-semibold text-sm flex-1">Longevity</label>
+        <span className="text-muted-foreground">{recipeData.longevity}</span>
+      </div>
+      <div className="flex flex-col mx-4 my-2">
+        <label className="font-semibold text-sm flex-1">Note</label>
+        <ScrollArea className="max-h-[200px] overflow-auto">
+          <blockquote className="my-2 border-l-2 px-4 italic whitespace-pre-wrap">
+            {recipeData.note || "No note"}
+          </blockquote>
+        </ScrollArea>
+      </div>
+      <div className="flex flex-col mx-4 mb-6">
+        <label className="font-semibold text-sm flex-1">Ingredients</label>
+        <ul className="ml-6 list-disc [&>li]:mt-2">
+          {recipeData.ingredient_list?.map((item, index) => (
+            <li key={`ingredient${index}`}>
+              {item.name}
+              {item.quantity ? (
+                <span className="font-medium"> — {item.quantity}</span>
+              ) : (
+                ""
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
     </>
   );
@@ -66,7 +89,7 @@ export default function RecipeContent(recipeData: Recipe) {
   return isMobile ? (
     <Drawer>
       <DrawerTrigger asChild>{contentTrigger}</DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="max-h-max">
         <DrawerHeader>
           <DrawerTitle className="scroll-m-20 text-xl font-extrabold tracking-tight text-balance">
             {recipeData.name}
