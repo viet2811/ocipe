@@ -3,7 +3,6 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { SortButton } from "./sort-column";
 import { CircleCheck, NotepadText, Utensils } from "lucide-react";
-import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +16,25 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
-import type { Recipe } from "@/types/recipes";
-import { deleteSingleRecipe } from "@/api/recipes";
+import type { Recipe, RecipeInput } from "@/types/recipes";
+import { deleteSingleRecipe, updateSingleRecipe } from "@/api/recipes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import RecipeContent from "./recipe-sheet-content";
 import { ScrollArea } from "../ui/scroll-area";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import type { RecipeFormValues } from "../RecipeForm";
+import RecipeForm from "../RecipeForm";
+import { useRef } from "react";
 
 export const recipeColumns: ColumnDef<Recipe>[] = [
   {
@@ -100,6 +112,12 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
     id: "actions",
     cell: ({ row }) => {
       const recipe = row.original;
+      const recipeInput: RecipeInput = {
+        ...recipe,
+        ingredients: recipe.ingredient_list,
+      };
+      delete (recipeInput as any).ingredient_list;
+
       const queryClient = useQueryClient();
 
       const deleteMutation = useMutation({
@@ -112,6 +130,26 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
           toast.error("Failed to delete recipe");
         },
       });
+
+      const closeDialogRef = useRef<HTMLButtonElement>(null);
+      const updateMutation = useMutation({
+        mutationFn: updateSingleRecipe,
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["recipes"] });
+          toast.success("Recipes is successfully saved");
+          closeDialogRef.current?.click();
+        },
+        onError: (e) => {
+          toast.error("Something went wrong. Please retry");
+          console.log(e);
+        },
+      });
+
+      function onSubmit(values: RecipeFormValues) {
+        let id = recipe.id;
+        updateMutation.mutate({ id, data: values });
+      }
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -125,12 +163,38 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem asChild>
-              <Link
-                to={`/recipes/${recipe.id}/edit`}
-                className="flex items-center cursor-pointer hover:bg-muted"
-              >
-                <Pencil className="mr-2 h-4 w-4" /> Edit
-              </Link>
+              <Dialog>
+                <DialogTrigger className="hover:bg-muted w-full focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none">
+                  <Pencil className="mr-2 h-4 w-4" /> Edit
+                </DialogTrigger>
+                <DialogContent className="lg:!max-w-4/5">
+                  <DialogHeader>
+                    <DialogTitle>Edit recipe</DialogTitle>
+                    <DialogDescription>
+                      Make changes to your recipe here. Click save when you are
+                      done
+                    </DialogDescription>
+                  </DialogHeader>
+                  <RecipeForm
+                    onSubmit={onSubmit}
+                    formType="update"
+                    defaultFormValues={recipeInput}
+                    className="-m-4"
+                  ></RecipeForm>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      {/* You can make this button invisible or just keep it simple */}
+                      <Button
+                        variant="ghost"
+                        ref={closeDialogRef}
+                        className="sr-only"
+                      >
+                        Close
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer text-red-600 hover:bg-muted"

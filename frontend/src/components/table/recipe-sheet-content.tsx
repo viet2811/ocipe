@@ -104,7 +104,7 @@ export default function RecipeContent(recipeData: Recipe) {
       <SheetTrigger asChild>{contentTrigger}</SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle className="scroll-m-20 text-xl font-extrabold tracking-tight text-balance">
+          <SheetTitle className="scroll-m-20 text-xl font-extrabold tracking-tight text-wrap mr-2">
             {recipeData.name}
           </SheetTitle>
           <SheetDescription>{recipeData.meat_type}</SheetDescription>

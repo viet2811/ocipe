@@ -11,6 +11,17 @@ export async function postRecipe(data: RecipeInput) {
   return response.data;
 }
 
+export async function updateSingleRecipe({
+  id,
+  data,
+}: {
+  id: number;
+  data: RecipeInput;
+}) {
+  const response = await axiosInstance.put(`/recipes/${id}/`, data);
+  return response.data;
+}
+
 export async function getRecipeFromURL(url: string) {
   const response = await axiosInstance.post("/recipes/genai/", { url });
   return response.data;
