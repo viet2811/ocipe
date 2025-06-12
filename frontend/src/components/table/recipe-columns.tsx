@@ -23,6 +23,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
 import RecipeContent from "./recipe-sheet-content";
+import { ScrollArea } from "../ui/scroll-area";
 
 const accuracyNode = (accuracy: number) => {
   let colorStyling = "";
@@ -110,7 +111,9 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
             </span>
           </PopoverTrigger>
           <PopoverContent className="max-w-56 w-max text-xs">
-            {note ? String(note) : "No note"}
+            <ScrollArea className="max-h-[150px] overflow-auto whitespace-pre-wrap">
+              {note ? String(note) : "No note"}
+            </ScrollArea>
           </PopoverContent>
         </Popover>
       );
