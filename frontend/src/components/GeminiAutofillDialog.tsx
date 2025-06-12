@@ -62,10 +62,10 @@ export default function GeminiAutofillDialog({
       <DialogTrigger asChild>
         <Button
           type="button"
-          className="bg-blue-500 hover:bg-blue-600 cursor-pointer"
+          className="bg-[#8beeff] dark:bg-blue-600 hover:bg-[#7ad1ff] cursor-pointer"
         >
           <Sparkles />
-          Autofill with Gemini
+          Autofill with AI
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
