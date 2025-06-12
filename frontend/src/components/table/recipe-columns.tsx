@@ -21,31 +21,8 @@ import type { Recipe } from "@/types/recipes";
 import { deleteSingleRecipe } from "@/api/recipes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
 import RecipeContent from "./recipe-sheet-content";
 import { ScrollArea } from "../ui/scroll-area";
-
-const accuracyNode = (accuracy: number) => {
-  let colorStyling = "";
-  // I love u tailwind but this is abyssmal
-  if (accuracy < 33) {
-    colorStyling = "bg-red-400 dark:bg-red-900 text-red-900 dark:text-red-400";
-  } else if (accuracy < 66) {
-    colorStyling =
-      "bg-yellow-400 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-400";
-  } else if (accuracy < 100) {
-    colorStyling =
-      "bg-orange-400 dark:bg-orange-900 text-orange-900 dark:text-orange-400";
-  } else {
-    colorStyling =
-      "bg-green-400 dark:bg-green-900 text-green-900 dark:text-green-400";
-  }
-  return (
-    <span className={`text-xs ${colorStyling} ml-1 px-2 py-0.5 rounded`}>
-      {accuracy}%
-    </span>
-  );
-};
 
 export const recipeColumns: ColumnDef<Recipe>[] = [
   {

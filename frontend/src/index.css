@@ -192,10 +192,10 @@
     letter-spacing: var(--tracking-normal);
   }
   input::placeholder {
-    @apply text-sm;
+    @apply text-xs md:text-sm;
   }
   textarea::placeholder {
-    @apply text-sm;
+    @apply text-xs md:text-sm;
   }
 }
 

@@ -143,7 +143,9 @@ export default function RecipeAdd() {
                       Frequency
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <CircleHelp size={16} />
+                          <button type="button">
+                            <CircleHelp size={16} />
+                          </button>
                         </TooltipTrigger>
                         <TooltipContent side="right">
                           <ul className="list-disc list-inside">
@@ -200,7 +202,9 @@ export default function RecipeAdd() {
                       Longevity
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <CircleHelp size={14} />
+                          <button type="button">
+                            <CircleHelp size={14} />
+                          </button>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Portion/Day(s) whatever u think would fit...</p>
