@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Fridge, FridgeIngredient, Ingredient
+from collections import OrderedDict
 
 class FridgeSerializer(serializers.ModelSerializer):
     ingredient_list = serializers.SerializerMethodField(read_only=True)
@@ -11,9 +12,9 @@ class FridgeSerializer(serializers.ModelSerializer):
 
     def get_ingredient_list(self, obj):
         # Get all FridgeIngredient objects for this fridge
-        fridge_ingredients = FridgeIngredient.objects.filter(fridge=obj)
+        fridge_ingredients = FridgeIngredient.objects.filter(fridge=obj).order_by('-group', '-id')
         # Serialize as a list of dicts by group
-        grouped = {}
+        grouped = OrderedDict()
         for fi in fridge_ingredients:
             group = fi.group
             if group not in grouped:

@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EditableTextInput } from "@/components/editable-text-input";
 
 export default function Fridge() {
   const queryClient = useQueryClient();
@@ -37,6 +38,10 @@ export default function Fridge() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["fridge"] });
       toast.success("Ingredient updated!");
+    },
+    onError: (e) => {
+      console.log(e);
+      toast.error("Something went wrong. Please retry");
     },
   });
 
@@ -85,14 +90,19 @@ export default function Fridge() {
     <DndContext onDragEnd={handleDragEnd}>
       <div className="m-6 grid grid-cols-4 gap-4">
         {Object.entries(ingredientList).map(([groupName, ingredients]) => (
-          <DroppableList id={groupName}>
+          <DroppableList id={groupName} key={groupName}>
             {ingredients.map((ingredient) => (
               <DraggableItem
                 key={ingredient.id}
                 id={`${groupName}-${ingredient.id}`}
-              >
-                {ingredient.name}
-              </DraggableItem>
+                onUpdate={(newName) =>
+                  updateMutation.mutate({
+                    id: ingredient.id,
+                    data: { name: newName, group: groupName },
+                  })
+                }
+                name={ingredient.name}
+              ></DraggableItem>
             ))}
             <Button
               variant="ghost"

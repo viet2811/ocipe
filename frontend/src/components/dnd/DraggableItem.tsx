@@ -1,12 +1,15 @@
 import { useDraggable } from "@dnd-kit/core";
 import { GripVertical } from "lucide-react";
+import { EditableTextInput } from "../editable-text-input";
 
 export const DraggableItem = ({
   id,
-  children,
+  name,
+  onUpdate,
 }: {
   id: string;
-  children: React.ReactNode;
+  name: string;
+  onUpdate: (newValue: string) => void;
 }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
 
@@ -18,14 +21,16 @@ export const DraggableItem = ({
     <li
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
       className="flex items-center space-x-2 px-2 py-1 pl-0 -ml-1 rounded hover:bg-muted transition-colors"
     >
-      <span className="flex items-center justify-center w-4">
+      <span
+        className="flex items-center justify-center w-4"
+        {...listeners}
+        {...attributes}
+      >
         <GripVertical size={16} className="text-muted-foreground cursor-move" />
       </span>
-      <span className="text-sm">{children}</span>
+      <EditableTextInput baseValue={name} onUpdate={onUpdate} />
     </li>
   );
 };
