@@ -25,3 +25,21 @@ export interface RecipeInput {
     quantity?: string;
   }[];
 }
+
+type Ingredient = {
+  id: number;
+  name: string;
+};
+
+export type IngredientInput = {
+  name: string;
+  group: string;
+};
+
+export type IngredientGroup = {
+  [groupName: string]: Ingredient[];
+};
+
+export type FridgeResponse = {
+  ingredient_list: IngredientGroup;
+};

@@ -2,12 +2,12 @@ from rest_framework import generics, permissions
 from .serializers import FridgeSerializer, FridgeIngredientSerializer
 from .models import Fridge, FridgeIngredient
 
-class FridgeList(generics.ListAPIView):
+class FridgeList(generics.RetrieveAPIView):
     serializer_class = FridgeSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return Fridge.objects.filter(user=self.request.user)
+    def get_object(self):
+        return Fridge.objects.get(user=self.request.user)
     
 
 # GET, UPDATE, DELETE
