@@ -16,3 +16,12 @@ export async function updateSingleIngredient({
   const response = await axiosInstance.put(`/fridge/ingredient/${id}/`, data);
   return response.data;
 }
+
+export async function addAnIngredient(data: IngredientInput) {
+  const response = await axiosInstance.post("/fridge/ingredient/", data);
+  return response.data;
+}
+
+export async function deleteSingleIngredient(id: number) {
+  await axiosInstance.delete(`/fridge/ingredient/${id}/`);
+}

@@ -1,4 +1,9 @@
-import { getFridge, updateSingleIngredient } from "@/api/fridge";
+import {
+  addAnIngredient,
+  deleteSingleIngredient,
+  getFridge,
+  updateSingleIngredient,
+} from "@/api/fridge";
 import Loading from "@/components/loading";
 import { type FridgeResponse, type IngredientGroup } from "@/types/recipes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,7 +14,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EditableTextInput } from "@/components/editable-text-input";
 
 export default function Fridge() {
   const queryClient = useQueryClient();
@@ -18,6 +22,7 @@ export default function Fridge() {
     queryFn: getFridge,
   });
   const [ingredientList, setIngredientList] = useState<IngredientGroup>({});
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
 
   useEffect(() => {
     if (data) {
@@ -32,13 +37,32 @@ export default function Fridge() {
   if (!data) {
     return <div>Hmm nothing here. Will add option here later</div>;
   }
-
+  // Mutation area
+  const onSuccessMutation = (successMessage: string) => {
+    queryClient.invalidateQueries({ queryKey: ["fridge"] });
+    toast.success(successMessage);
+  };
   const updateMutation = useMutation({
     mutationFn: updateSingleIngredient,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fridge"] });
-      toast.success("Ingredient updated!");
+    onSuccess: () => onSuccessMutation("Ingredient updated!"),
+    onError: (e) => {
+      console.log(e);
+      toast.error("Something went wrong. Please retry");
     },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteSingleIngredient,
+    onSuccess: () => onSuccessMutation("Ingredient deleted!"),
+    onError: (e) => {
+      console.log(e);
+      toast.error("Something went wrong. Please retry");
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: addAnIngredient,
+    onSuccess: () => onSuccessMutation("Ingredient added!"),
     onError: (e) => {
       console.log(e);
       toast.error("Something went wrong. Please retry");
@@ -86,28 +110,81 @@ export default function Fridge() {
     );
   };
 
+  const handleAddIngredient = (groupName: string) => {
+    setIngredientList((prev) => {
+      const newList = { ...prev };
+      newList[groupName] = [
+        ...newList[groupName],
+        {
+          id: -1,
+          name: "",
+        },
+      ];
+      return newList;
+    });
+  };
+
+  const removeIngredient = (groupName: string, id: number) => {
+    setIngredientList((prev) => {
+      const updated = { ...prev };
+      updated[groupName] = updated[groupName].filter((item) => item.id !== id);
+      return updated;
+    });
+  };
+
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext
+      onDragOver={(event) => {
+        const overId = event.over?.id;
+        if (overId && overId !== activeGroup) {
+          setActiveGroup(overId.toString());
+        }
+      }}
+      onDragCancel={() => setActiveGroup(null)}
+      onDragEnd={(event) => {
+        handleDragEnd(event);
+        setActiveGroup(null);
+      }}
+    >
       <div className="m-6 grid grid-cols-4 gap-4">
         {Object.entries(ingredientList).map(([groupName, ingredients]) => (
-          <DroppableList id={groupName} key={groupName}>
+          <DroppableList
+            id={groupName}
+            key={groupName}
+            isHighlighted={activeGroup === groupName}
+          >
             {ingredients.map((ingredient) => (
               <DraggableItem
+                name={ingredient.name}
                 key={ingredient.id}
                 id={`${groupName}-${ingredient.id}`}
-                onUpdate={(newName) =>
-                  updateMutation.mutate({
-                    id: ingredient.id,
-                    data: { name: newName, group: groupName },
-                  })
-                }
-                name={ingredient.name}
+                onUpdate={(newName) => {
+                  if (ingredient.id !== -1) {
+                    updateMutation.mutate({
+                      id: ingredient.id,
+                      data: { name: newName, group: groupName },
+                    });
+                  } else {
+                    // create mutation
+                    console.log("Send create request to API");
+                    createMutation.mutate({ name: newName, group: groupName });
+                  }
+                }}
+                onDelete={() => {
+                  if (ingredient.id !== -1) {
+                    // delete mutate
+                    console.log("Send a delete request to API");
+                    deleteMutation.mutate(ingredient.id);
+                  }
+                  removeIngredient(groupName, ingredient.id);
+                }}
               ></DraggableItem>
             ))}
             <Button
               variant="ghost"
               type="button"
               className="text-muted-foreground hover:bg-transparent hover:shadow-none hover:text-inherit cursor-pointer -ml-2"
+              onClick={() => handleAddIngredient(groupName)}
             >
               <Plus /> Add an ingredient
             </Button>

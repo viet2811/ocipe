@@ -12,7 +12,7 @@ class FridgeSerializer(serializers.ModelSerializer):
 
     def get_ingredient_list(self, obj):
         # Get all FridgeIngredient objects for this fridge
-        fridge_ingredients = FridgeIngredient.objects.filter(fridge=obj).order_by('-group', '-id')
+        fridge_ingredients = FridgeIngredient.objects.filter(fridge=obj).order_by('-group', 'id')
         # Serialize as a list of dicts by group
         grouped = OrderedDict()
         for fi in fridge_ingredients:

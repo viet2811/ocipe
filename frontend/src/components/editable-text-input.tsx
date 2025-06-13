@@ -4,9 +4,11 @@ import { Input } from "./ui/input";
 export function EditableTextInput({
   baseValue,
   onUpdate,
+  onDelete,
 }: {
   baseValue: string;
   onUpdate: (newValue: string) => void;
+  onDelete: () => void;
 }) {
   const [inputValue, setInputValue] = useState(baseValue);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -15,10 +17,15 @@ export function EditableTextInput({
     const trimmed = inputValue.trim();
 
     if (trimmed === "") {
-      setInputValue(baseValue); // fallback if empty
+      if (baseValue !== "") {
+        setInputValue(baseValue); // fallback if empty
+      } else {
+        onDelete();
+      }
       return;
     }
 
+    // If unchanged
     if (trimmed !== baseValue) {
       onUpdate(trimmed);
     }
@@ -28,8 +35,15 @@ export function EditableTextInput({
     if (e.key === "Enter") {
       inputRef.current?.blur();
     } else if (e.key === "Escape") {
-      setInputValue(inputValue);
-      inputRef.current?.blur();
+      if (baseValue !== "") {
+        setInputValue(baseValue);
+        // Set timeout so inputValue are synced and wont mismatched
+        setTimeout(() => {
+          inputRef.current?.blur();
+        }, 0);
+      } else {
+        onDelete();
+      }
     }
   }
 
@@ -37,6 +51,7 @@ export function EditableTextInput({
     <Input
       ref={inputRef}
       value={inputValue}
+      autoFocus={baseValue === ""}
       onChange={(e) => setInputValue(e.target.value)}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
