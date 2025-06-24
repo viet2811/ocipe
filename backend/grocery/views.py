@@ -8,6 +8,8 @@ from .models import History
 from .serializers import HistorySerializer
 
 class GroceryList(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request):
         recipe_ids = request.data.get('recipe_ids', [])
         

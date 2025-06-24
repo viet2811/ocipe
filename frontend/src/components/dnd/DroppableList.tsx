@@ -1,15 +1,20 @@
 import { useDroppable } from "@dnd-kit/core";
 import { Card } from "../ui/card";
 import { cn } from "@/lib/utils";
+import { EditableTextInput } from "../editable-text-input";
 
 export const DroppableList = ({
   id,
   children,
   isHighlighted,
+  onUpdate,
+  onDelete,
 }: {
   id: string;
   children: React.ReactNode;
   isHighlighted?: boolean;
+  onUpdate: (newValue: string) => void;
+  onDelete: () => void;
 }) => {
   const { setNodeRef } = useDroppable({ id });
   return (
@@ -21,7 +26,12 @@ export const DroppableList = ({
       )}
       ref={setNodeRef}
     >
-      <h3 className="font-semibold text-lg ml-2">{id}</h3>
+      <EditableTextInput
+        baseValue={id}
+        onUpdate={onUpdate}
+        onDelete={onDelete}
+        className="font-semibold !text-lg"
+      />
       <ul className="-mt-4">{children}</ul>
     </Card>
   );

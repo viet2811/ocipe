@@ -2,6 +2,7 @@ import {
   addAnIngredient,
   deleteSingleIngredient,
   getFridge,
+  renameIngredientGroup,
   updateSingleIngredient,
 } from "@/api/fridge";
 import Loading from "@/components/loading";
@@ -27,6 +28,7 @@ export default function Fridge() {
   useEffect(() => {
     if (data) {
       setIngredientList(data.ingredient_list);
+      console.log(data.ingredient_list);
     }
   }, [data]);
 
@@ -42,31 +44,39 @@ export default function Fridge() {
     queryClient.invalidateQueries({ queryKey: ["fridge"] });
     toast.success(successMessage);
   };
-  const updateMutation = useMutation({
+  const onErrorMutation = (e: Error) => {
+    console.log(e);
+    toast.error("Something went wrong. Please retry");
+  };
+
+  const updateIngredientMutation = useMutation({
     mutationFn: updateSingleIngredient,
     onSuccess: () => onSuccessMutation("Ingredient updated!"),
-    onError: (e) => {
-      console.log(e);
-      toast.error("Something went wrong. Please retry");
-    },
+    onError: (e) => onErrorMutation(e),
   });
 
-  const deleteMutation = useMutation({
+  const deleteIngredientMutation = useMutation({
     mutationFn: deleteSingleIngredient,
     onSuccess: () => onSuccessMutation("Ingredient deleted!"),
-    onError: (e) => {
-      console.log(e);
-      toast.error("Something went wrong. Please retry");
-    },
+    onError: (e) => onErrorMutation(e),
   });
 
-  const createMutation = useMutation({
+  const createIngredientMutation = useMutation({
     mutationFn: addAnIngredient,
     onSuccess: () => onSuccessMutation("Ingredient added!"),
-    onError: (e) => {
-      console.log(e);
-      toast.error("Something went wrong. Please retry");
-    },
+    onError: (e) => onErrorMutation(e),
+  });
+
+  const renameGroupMutation = useMutation({
+    mutationFn: ({
+      old_name,
+      new_name,
+    }: {
+      old_name: string;
+      new_name: string;
+    }) => renameIngredientGroup(old_name, new_name),
+    onSuccess: () => onSuccessMutation("Group renamed successfully!"),
+    onError: (e) => onErrorMutation(e),
   });
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -96,7 +106,7 @@ export default function Fridge() {
       return newList;
     });
 
-    updateMutation.mutate(
+    updateIngredientMutation.mutate(
       {
         id: ingredientId,
         data: { name: movedItem.name, group: `${toGroup}` },
@@ -152,6 +162,15 @@ export default function Fridge() {
             id={groupName}
             key={groupName}
             isHighlighted={activeGroup === groupName}
+            onUpdate={(newName) =>
+              renameGroupMutation.mutate({
+                old_name: groupName,
+                new_name: newName,
+              })
+            }
+            onDelete={() =>
+              console.log("Delete this droppable list and call delete api")
+            }
           >
             {ingredients.map((ingredient) => (
               <DraggableItem
@@ -160,21 +179,20 @@ export default function Fridge() {
                 id={`${groupName}-${ingredient.id}`}
                 onUpdate={(newName) => {
                   if (ingredient.id !== -1) {
-                    updateMutation.mutate({
+                    updateIngredientMutation.mutate({
                       id: ingredient.id,
                       data: { name: newName, group: groupName },
                     });
                   } else {
-                    // create mutation
-                    console.log("Send create request to API");
-                    createMutation.mutate({ name: newName, group: groupName });
+                    createIngredientMutation.mutate({
+                      name: newName,
+                      group: groupName,
+                    });
                   }
                 }}
                 onDelete={() => {
                   if (ingredient.id !== -1) {
-                    // delete mutate
-                    console.log("Send a delete request to API");
-                    deleteMutation.mutate(ingredient.id);
+                    deleteIngredientMutation.mutate(ingredient.id);
                   }
                   removeIngredient(groupName, ingredient.id);
                 }}

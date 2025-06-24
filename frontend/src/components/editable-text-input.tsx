@@ -5,10 +5,12 @@ export function EditableTextInput({
   baseValue,
   onUpdate,
   onDelete,
+  className,
 }: {
   baseValue: string;
   onUpdate: (newValue: string) => void;
   onDelete: () => void;
+  className?: string;
 }) {
   const [inputValue, setInputValue] = useState(baseValue);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -55,7 +57,7 @@ export function EditableTextInput({
       onChange={(e) => setInputValue(e.target.value)}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
-      className="shadow-none border-0 h-6"
+      className={`shadow-none border-0 h-6 ${className}`}
     />
   );
 }

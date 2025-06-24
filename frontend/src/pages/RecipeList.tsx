@@ -43,6 +43,7 @@ export default function RecipeList() {
     queryFn: getAllRecipes,
   });
 
+  // Custom sorted data by ingredients
   const { data: filteredRecipes, isFetching: ingredientFetching } = useQuery<
     Recipe[]
   >({
@@ -53,7 +54,7 @@ export default function RecipeList() {
   });
 
   // Side buttons
-  const deleteMutation = useMutation({
+  const deleteAllMutation = useMutation({
     mutationFn: deleteAllRecipes,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recipes"] });
@@ -92,7 +93,7 @@ export default function RecipeList() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Oops, misclick</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteMutation.mutate()}>
+            <AlertDialogAction onClick={() => deleteAllMutation.mutate()}>
               Pretty sure
             </AlertDialogAction>
           </AlertDialogFooter>
