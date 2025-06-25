@@ -2,7 +2,7 @@ from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .serializers import FridgeSerializer, FridgeIngredientSerializer, RenameIngredientGroupSerializer
+from .serializers import FridgeSerializer, FridgeIngredientSerializer
 from .models import Fridge, FridgeIngredient
 
 class FridgeList(generics.RetrieveAPIView):

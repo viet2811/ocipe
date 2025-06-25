@@ -26,9 +26,8 @@ export default function Fridge() {
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
 
   useEffect(() => {
-    if (data) {
+    if (data?.ingredient_list) {
       setIngredientList(data.ingredient_list);
-      console.log(data.ingredient_list);
     }
   }, [data]);
 
@@ -36,7 +35,7 @@ export default function Fridge() {
   if (isLoading) {
     return <Loading label="fridge" />;
   }
-  if (!data) {
+  if (!data?.ingredient_list) {
     return <div>Hmm nothing here. Will add option here later</div>;
   }
   // Mutation area
@@ -208,6 +207,14 @@ export default function Fridge() {
             </Button>
           </DroppableList>
         ))}
+        <Button
+          variant="ghost"
+          type="button"
+          className="text-muted-foreground hover:bg-muted hover:shadow-none hover:text-inherit cursor-pointer justify-start w-max"
+          onClick={() => console.log("Add an empty group")}
+        >
+          <Plus /> Add a group
+        </Button>
       </div>
     </DndContext>
   );
