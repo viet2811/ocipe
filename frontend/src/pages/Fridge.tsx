@@ -18,16 +18,23 @@ import { Button } from "@/components/ui/button";
 
 export default function Fridge() {
   const queryClient = useQueryClient();
+
+  // Fridge fetch data
   const { data, isLoading } = useQuery<FridgeResponse>({
     queryKey: ["fridge"],
     queryFn: getFridge,
   });
+
+  // Local data for drag and drop
   const [ingredientList, setIngredientList] = useState<IngredientGroup>({});
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
 
+  // This here to set state when data is there
   useEffect(() => {
-    if (data?.ingredient_list) {
+    if (data && Object.keys(data.ingredient_list).length !== 0) {
       setIngredientList(data.ingredient_list);
+    } else {
+      setIngredientList({ General: [] });
     }
   }, [data]);
 
@@ -35,10 +42,9 @@ export default function Fridge() {
   if (isLoading) {
     return <Loading label="fridge" />;
   }
-  if (!data?.ingredient_list) {
-    return <div>Hmm nothing here. Will add option here later</div>;
-  }
+
   // Mutation area
+  // Helper onSuccess and onError function
   const onSuccessMutation = (successMessage: string) => {
     queryClient.invalidateQueries({ queryKey: ["fridge"] });
     toast.success(successMessage);
@@ -78,6 +84,7 @@ export default function Fridge() {
     onError: (e) => onErrorMutation(e),
   });
 
+  // Handle drag and drop
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     const [fromGroup, ingredientIdStr] = (active.id as string).split("-");
@@ -141,6 +148,14 @@ export default function Fridge() {
     });
   };
 
+  const removeIngredientGroup = (groupName: string) => {
+    setIngredientList((prev) => {
+      const updated = { ...prev };
+      delete updated[groupName];
+      return updated;
+    });
+  };
+
   return (
     <DndContext
       onDragOver={(event) => {
@@ -161,15 +176,29 @@ export default function Fridge() {
             id={groupName}
             key={groupName}
             isHighlighted={activeGroup === groupName}
-            onUpdate={(newName) =>
-              renameGroupMutation.mutate({
-                old_name: groupName,
-                new_name: newName,
-              })
-            }
-            onDelete={() =>
-              console.log("Delete this droppable list and call delete api")
-            }
+            onUpdate={(newName) => {
+              // If it's a new group, dont trigger the rename api
+              if (groupName !== "") {
+                renameGroupMutation.mutate({
+                  old_name: groupName,
+                  new_name: newName,
+                });
+              } else {
+                setIngredientList((prev) => {
+                  let updated = { ...prev };
+                  updated[newName] = prev[groupName];
+                  delete updated[groupName];
+                  return updated;
+                });
+              }
+            }}
+            onDelete={() => {
+              if (groupName !== "") {
+                // deleteIngredientMutation.mutate(ingredient.id);
+                //Call delete api
+              }
+              removeIngredientGroup(groupName);
+            }}
           >
             {ingredients.map((ingredient) => (
               <DraggableItem
@@ -211,7 +240,12 @@ export default function Fridge() {
           variant="ghost"
           type="button"
           className="text-muted-foreground hover:bg-muted hover:shadow-none hover:text-inherit cursor-pointer justify-start w-max"
-          onClick={() => console.log("Add an empty group")}
+          onClick={() =>
+            setIngredientList((prev) => ({
+              ...prev,
+              [""]: [],
+            }))
+          }
         >
           <Plus /> Add a group
         </Button>
