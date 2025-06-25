@@ -26,7 +26,7 @@ export interface RecipeInput {
   }[];
 }
 
-type Ingredient = {
+export type Ingredient = {
   id: number;
   name: string;
 };

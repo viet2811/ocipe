@@ -2,6 +2,17 @@ import { useDraggable } from "@dnd-kit/core";
 import { GripVertical, X } from "lucide-react";
 import { EditableTextInput } from "../editable-text-input";
 
+/**
+ * DraggableItem component represents a single draggable list item with editable text and delete functionality.
+ *
+ * @param id - Unique identifier for the draggable item.
+ * @param name - The display name or value of the item.
+ * @param onUpdate - Callback function invoked when the item's value is updated.
+ * @param onDelete - Callback function invoked when the item is deleted.
+ *
+ * Utilizes `useDraggable` for drag-and-drop capabilities and renders a grip icon for dragging,
+ * an editable text input for the item's name, and a delete icon for removing the item.
+ */
 export const DraggableItem = ({
   id,
   name,
@@ -36,6 +47,7 @@ export const DraggableItem = ({
         baseValue={name}
         onUpdate={onUpdate}
         onDelete={onDelete}
+        placeholder="Enter your ingredient here"
       />
       <span className="flex items-center justify-center w-4">
         <X
