@@ -48,6 +48,7 @@ export const DraggableItem = ({
         onUpdate={onUpdate}
         onDelete={onDelete}
         placeholder="Enter your ingredient here"
+        forceLower={true}
       />
       <span className="flex items-center justify-center w-4">
         <X

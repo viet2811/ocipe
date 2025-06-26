@@ -38,7 +38,7 @@ export default function RecipeAdd() {
     // Mutation for post, invalid ["recipes"]
     postMutation.mutate(values, {
       onSuccess: () => {
-        form.reset();
+        form.reset(defaultFormValues);
       },
     });
   }

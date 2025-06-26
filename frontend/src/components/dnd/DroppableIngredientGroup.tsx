@@ -15,7 +15,13 @@ import {
 import { useState } from "react";
 import { DraggableItem } from "./DraggableItem";
 import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
+import { Ellipsis, Plus, Trash } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 type IngredientGroupProps = {
   groupId: string; // For Node ref
@@ -138,18 +144,39 @@ export default function DroppableIngredientGroup({
     <Card
       key={groupId}
       className={cn(
-        "p-4 h-max transition-colors",
+        "p-4 h-max transition-colors mb-4",
         isHighlighted ? "border-primary" : "border-transparent"
       )}
       ref={setNodeRef}
     >
-      <EditableTextInput
-        baseValue={groupId}
-        onUpdate={(newName) => onGroupUpdate(newName)}
-        onDelete={onGroupDelete}
-        className="font-semibold !text-lg"
-        placeholder="Enter an ingredient group.."
-      />
+      <div className="flex space-x-2 items-center px-2 py-1 pl-0">
+        <EditableTextInput
+          baseValue={groupId}
+          onUpdate={(newName) => onGroupUpdate(newName)}
+          onDelete={onGroupDelete}
+          className="font-semibold !text-lg"
+          placeholder="Enter an ingredient group.."
+        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <span className="flex items-center justify-center w-4">
+              <Ellipsis
+                size={16}
+                className="text-muted-foreground cursor-pointer"
+              />
+            </span>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-max">
+            <DropdownMenuItem
+              className="cursor-pointer px-2 text-destructive hover:!text-destructive hover:!bg-destructive/10"
+              onClick={() => onGroupDelete()}
+            >
+              Delete
+              <Trash className="h-4 w-4 text-destructive" />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <ul className="-mt-4">
         {ingredients.map((ingredient) => (
           <DraggableItem

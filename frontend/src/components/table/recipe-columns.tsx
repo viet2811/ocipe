@@ -197,13 +197,13 @@ export const recipeColumns: ColumnDef<Recipe>[] = [
               </Dialog>
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="cursor-pointer text-red-600 hover:bg-muted"
+              className="cursor-pointer text-destructive hover:!text-destructive hover:!bg-destructive/10"
               onClick={() => {
                 deleteMutation.mutate(recipe.id);
               }}
               disabled={deleteMutation.isPending}
             >
-              <Trash className="mr-2 h-4 w-4" />
+              <Trash className="mr-2 h-4 w-4 text-destructive" />
               {deleteMutation.isPending ? "Deleting..." : "Delete"}
             </DropdownMenuItem>
           </DropdownMenuContent>

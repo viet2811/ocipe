@@ -21,12 +21,14 @@ export function EditableTextInput({
   onDelete,
   className,
   placeholder,
+  forceLower = false,
 }: {
   baseValue: string;
   onUpdate: (newValue: string) => void;
   onDelete: () => void;
   className?: string;
   placeholder?: string;
+  forceLower?: boolean;
 }) {
   const [inputValue, setInputValue] = useState(baseValue);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -70,10 +72,15 @@ export function EditableTextInput({
       ref={inputRef}
       value={inputValue}
       autoFocus={baseValue === ""}
-      onChange={(e) => setInputValue(e.target.value)}
+      onChange={(e) => {
+        const changed = forceLower
+          ? e.target.value.toLocaleLowerCase()
+          : e.target.value;
+        setInputValue(changed);
+      }}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
-      className={`shadow-none border-0 h-6 ${className}`}
+      className={`shadow-none border-0 !bg-transparent h-6 ${className}`}
       placeholder={placeholder}
     />
   );
