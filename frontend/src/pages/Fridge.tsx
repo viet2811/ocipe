@@ -9,11 +9,11 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
+import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getFridge, updateSingleIngredient } from "@/api/fridge";
-import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import DroppableIngredientGroup from "@/components/dnd/DroppableIngredientGroup";
@@ -37,7 +37,7 @@ export default function Fridge() {
   });
 
   // Fridge fetch data
-  const { data, isLoading } = useQuery<FridgeResponse>({
+  const { data } = useQuery<FridgeResponse>({
     queryKey: ["fridge"],
     queryFn: getFridge,
   });
@@ -50,10 +50,6 @@ export default function Fridge() {
       setIngredientList({ General: [] });
     }
   }, [data]);
-  // Handle loading state
-  if (isLoading) {
-    return <Loading label="fridge" />;
-  }
 
   // Local data for drag and drop
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
@@ -108,9 +104,11 @@ export default function Fridge() {
     425: 1,
   };
   const isMobile = useIsMobile();
+
   return (
     <DndContext
       sensors={sensors}
+      modifiers={[restrictToWindowEdges]}
       onDragOver={(event) => {
         const overId = event.over?.id;
         if (overId && overId !== activeGroup) {
@@ -123,40 +121,42 @@ export default function Fridge() {
         setActiveGroup(null);
       }}
     >
-      <Button
-        variant="ghost"
-        type="button"
-        className="text-muted-foreground hover:bg-muted hover:shadow-none hover:text-inherit cursor-pointer justify-start w-max mx-6"
-        onClick={() =>
-          isMobile
-            ? setIngredientList((prev) => ({
-                [""]: [],
-                ...prev,
-              }))
-            : setIngredientList((prev) => ({
-                ...prev,
-                [""]: [],
-              }))
-        }
-      >
-        <Plus /> Add an ingredient group
-      </Button>
-      <div className="mx-6 mt-3">
-        <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className="flex w-auto bg-clip-padding space-x-4"
+      <div className="mx-6 max-w-screen">
+        <Button
+          variant="ghost"
+          type="button"
+          className="text-muted-foreground hover:bg-muted hover:shadow-none hover:text-inherit cursor-pointer justify-start w-max"
+          onClick={() =>
+            isMobile
+              ? setIngredientList((prev) => ({
+                  [""]: [],
+                  ...prev,
+                }))
+              : setIngredientList((prev) => ({
+                  ...prev,
+                  [""]: [],
+                }))
+          }
         >
-          {Object.entries(ingredientList).map(([groupName, ingredients]) => (
-            <DroppableIngredientGroup
-              key={groupName}
-              groupId={groupName}
-              name={groupName}
-              ingredients={ingredients}
-              isHighlighted={activeGroup === groupName}
-              setIngredientList={setIngredientList}
-            />
-          ))}
-        </Masonry>
+          <Plus /> Add an ingredient group
+        </Button>
+        <div className="mt-3">
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className="flex w-auto bg-clip-padding space-x-4"
+          >
+            {Object.entries(ingredientList).map(([groupName, ingredients]) => (
+              <DroppableIngredientGroup
+                key={groupName}
+                groupId={groupName}
+                name={groupName}
+                ingredients={ingredients}
+                isHighlighted={activeGroup === groupName}
+                setIngredientList={setIngredientList}
+              />
+            ))}
+          </Masonry>
+        </div>
       </div>
     </DndContext>
   );
