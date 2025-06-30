@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Input } from "./ui/input";
 
 /**
@@ -38,6 +38,9 @@ export function EditableTextInput({
 
     if (trimmed === "") {
       if (baseValue !== "") {
+        if (inputRef.current) {
+          inputRef.current.textContent = baseValue;
+        }
         setInputValue(baseValue); // fallback if empty
       } else {
         onDelete();
@@ -57,6 +60,10 @@ export function EditableTextInput({
     } else if (e.key === "Escape") {
       if (baseValue !== "") {
         setInputValue(baseValue);
+
+        if (inputRef.current) {
+          inputRef.current.textContent = baseValue;
+        }
         // Set timeout so inputValue are synced and wont mismatched
         setTimeout(() => {
           inputRef.current?.blur();
@@ -67,23 +74,26 @@ export function EditableTextInput({
     }
   }
 
+  useEffect(() => {
+    // only push to DOM when the parent tells us to
+    if (inputRef.current) {
+      inputRef.current.textContent = baseValue;
+    }
+  }, [baseValue]);
+
   return (
-    <Input
-      name="editable-text-field"
-      ref={inputRef}
-      value={inputValue}
-      autoFocus={baseValue === ""}
-      onChange={(e) => {
-        const changed = forceLower
-          ? e.target.value.toLocaleLowerCase()
-          : e.target.value;
-        setInputValue(changed);
+    <div
+      ref={inputRef as React.RefObject<HTMLDivElement>}
+      contentEditable
+      suppressContentEditableWarning
+      onInput={(e) => {
+        const text = (e.currentTarget.textContent ?? "").slice(0, 30); // enforce maxLength
+        setInputValue(forceLower ? text.toLowerCase() : text);
       }}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
-      className={`shadow-none border-0 !bg-transparent h-6 text-wrap ${className}`}
-      placeholder={placeholder}
-      maxLength={30}
-    />
+      className={`w-full px-1 py-0 bg-transparent outline-none break-words whitespace-pre-wrap ${className}`}
+      data-placeholder={placeholder}
+    ></div>
   );
 }

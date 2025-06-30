@@ -50,7 +50,7 @@ export const DraggableItem = ({
         placeholder="Enter your ingredient here"
         forceLower={true}
       />
-      <span className="flex items-center justify-center w-4">
+      <span className="flex items-center justify-center ml-auto w-4">
         <X
           size={16}
           className="text-muted-foreground cursor-pointer"

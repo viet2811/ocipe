@@ -159,7 +159,7 @@ export default function DroppableIngredientGroup({
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <span className="flex items-center justify-center w-4">
+            <span className="flex items-center justify-center w-4 ml-auto">
               <Ellipsis
                 size={16}
                 className="text-muted-foreground cursor-pointer"

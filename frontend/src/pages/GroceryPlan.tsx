@@ -9,7 +9,7 @@ const steps = [
   {
     title: "Check fridge",
     content: (
-      <ScrollArea className="mt-4 mx-auto max-h-3/4 overflow-auto p-6 rounded-xl border">
+      <ScrollArea className="mt-4 mx-auto max-h-4/5 overflow-auto p-6 rounded-xl border">
         <Fridge></Fridge>
       </ScrollArea>
     ),
