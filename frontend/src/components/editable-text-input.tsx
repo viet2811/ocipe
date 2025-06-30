@@ -83,6 +83,7 @@ export function EditableTextInput({
       onKeyDown={handleKeyDown}
       className={`shadow-none border-0 !bg-transparent h-6 text-wrap ${className}`}
       placeholder={placeholder}
+      maxLength={30}
     />
   );
 }

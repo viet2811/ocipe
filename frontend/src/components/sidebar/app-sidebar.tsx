@@ -76,7 +76,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         children: [
           {
             title: "Plan meals",
-            url: "#",
+            url: "/grocery/plan-meals",
           },
           {
             title: "Grocery list",
