@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { Input } from "./ui/input";
 
 /**
  * An editable text input component that allows inline editing of a string value.
@@ -33,14 +32,18 @@ export function EditableTextInput({
   const [inputValue, setInputValue] = useState(baseValue);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const resetToBase = () => {
+    if (inputRef.current) {
+      inputRef.current.textContent = baseValue;
+    }
+  };
+
   function handleBlur() {
     const trimmed = inputValue.trim();
 
     if (trimmed === "") {
       if (baseValue !== "") {
-        if (inputRef.current) {
-          inputRef.current.textContent = baseValue;
-        }
+        resetToBase();
         setInputValue(baseValue); // fallback if empty
       } else {
         onDelete();
@@ -60,10 +63,8 @@ export function EditableTextInput({
     } else if (e.key === "Escape") {
       if (baseValue !== "") {
         setInputValue(baseValue);
-
-        if (inputRef.current) {
-          inputRef.current.textContent = baseValue;
-        }
+        // Reset the editable input to baseValue
+        resetToBase();
         // Set timeout so inputValue are synced and wont mismatched
         setTimeout(() => {
           inputRef.current?.blur();
@@ -74,12 +75,15 @@ export function EditableTextInput({
     }
   }
 
+  //
+  useEffect(() => resetToBase(), [baseValue]);
+
+  // Auto focus
   useEffect(() => {
-    // only push to DOM when the parent tells us to
-    if (inputRef.current) {
-      inputRef.current.textContent = baseValue;
+    if (baseValue === "" && inputRef.current) {
+      inputRef.current.focus();
     }
-  }, [baseValue]);
+  }, []);
 
   return (
     <div
