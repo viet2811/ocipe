@@ -97,8 +97,8 @@ export default function Fridge() {
   };
 
   const breakpointColumnsObj = {
-    default: 4,
-    1280: 4,
+    default: 6,
+    1440: 4,
     1024: 3,
     768: 2,
     425: 1,
@@ -113,6 +113,10 @@ export default function Fridge() {
         const overId = event.over?.id;
         if (overId && overId !== activeGroup) {
           setActiveGroup(overId.toString());
+        } else {
+          // Set active group as original group
+          const [fromGroup, _] = (event.active.id as string).split("-");
+          setActiveGroup(fromGroup);
         }
       }}
       onDragCancel={() => setActiveGroup(null)}
