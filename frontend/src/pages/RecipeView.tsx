@@ -1,8 +1,5 @@
-import { getRecipeColumns } from "@/components/table/recipe-columns";
-import { DataTable } from "@/components/table/recipe-table";
-import { useState } from "react";
+import { deleteAllRecipes, refreshRecipes } from "@/api/recipes";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Trash } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,49 +11,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import Loading from "@/components/loading";
-import {
-  keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { RefreshCw, Trash } from "lucide-react";
 import { toast } from "sonner";
-import type { Recipe } from "@/types/recipes";
-import {
-  deleteAllRecipes,
-  getAllRecipes,
-  getRecipesByIngredient,
-  refreshRecipes,
-} from "@/api/recipes";
-import { useDebounce } from "@/hooks/useDebounce";
 import { queryClient } from "@/lib/queryClient";
 
-export default function RecipeList() {
-  // const columns = useMemo(() => recipeColumns, []);
-  // test const, later be parameter
-  const rowSelectionEnabled = false;
-
-  const columns = getRecipeColumns(rowSelectionEnabled);
-  const [searchType, setSearchType] = useState("default");
-  const [ingredientInput, setIngredientInput] = useState("");
-  const debouncedIngredient = useDebounce(ingredientInput, 700);
-
-  const { data: recipes, isLoading } = useQuery<Recipe[]>({
-    queryKey: ["recipes"],
-    queryFn: getAllRecipes,
-  });
-
-  // Custom sorted data by ingredients
-  const { data: filteredRecipes, isFetching: ingredientFetching } = useQuery<
-    Recipe[]
-  >({
-    queryKey: ["recipes-by-ingredients", debouncedIngredient],
-    queryFn: () => getRecipesByIngredient(debouncedIngredient),
-    enabled: searchType === "ingredients" && !!debouncedIngredient,
-    placeholderData: keepPreviousData,
-  });
-
+export default function RecipeView() {
   // Side buttons
   const deleteAllMutation = useMutation({
     mutationFn: deleteAllRecipes,
@@ -111,33 +71,6 @@ export default function RecipeList() {
       >
         <RefreshCw /> Reset all states
       </Button>
-    </div>
-  );
-
-  // Handle loading state
-  if (isLoading) {
-    return <Loading label="recipes" />;
-  }
-
-  const recipesData =
-    searchType === "ingredients" &&
-    debouncedIngredient &&
-    (!ingredientFetching || filteredRecipes)
-      ? filteredRecipes || []
-      : recipes || [];
-
-  return (
-    <div className="m-6">
-      <DataTable
-        columns={columns}
-        data={recipesData}
-        LeftComponent={LeftSideButtons}
-        searchType={searchType}
-        setSearchType={setSearchType}
-        ingredientInput={ingredientInput}
-        setIngredientInput={setIngredientInput}
-        rowSelectionEnabled={rowSelectionEnabled}
-      />
     </div>
   );
 }

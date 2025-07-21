@@ -1,6 +1,5 @@
 import { axiosInstance } from "@/api/axios";
-import { localStoragePersister, queryClient } from "@/main";
-import { Axios } from "axios";
+import { localStoragePersister, queryClient } from "@/lib/queryClient";
 import {
   createContext,
   type ReactNode,

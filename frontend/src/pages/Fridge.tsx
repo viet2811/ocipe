@@ -19,11 +19,11 @@ import { Plus } from "lucide-react";
 import DroppableIngredientGroup from "@/components/dnd/DroppableIngredientGroup";
 import Masonry from "react-masonry-css";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { queryClient } from "@/lib/queryClient";
 
 // The main container with DnD context along handle drag end.
 // Also need a local state to hold fetch data in order to manipulate changing group, and deletion/change
 export default function Fridge() {
-  const queryClient = useQueryClient();
   const updateIngredientMutation = useMutation({
     mutationFn: updateSingleIngredient,
     onSuccess: () => {

@@ -3,7 +3,7 @@ import { Card } from "../ui/card";
 import { cn } from "@/lib/utils";
 import { EditableTextInput } from "../editable-text-input";
 import type { Ingredient, IngredientGroup } from "@/types/recipes";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   addAnIngredient,
@@ -22,6 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { queryClient } from "@/lib/queryClient";
 
 type IngredientGroupProps = {
   groupId: string; // For Node ref
@@ -42,8 +43,6 @@ export default function DroppableIngredientGroup({
   isHighlighted,
   setIngredientList,
 }: IngredientGroupProps) {
-  const queryClient = useQueryClient();
-
   // Helper function
   // Invalidate query key and toast a success
   const onSuccessMutation = (successMessage: string) => {

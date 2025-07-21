@@ -5,6 +5,7 @@ import { type RecipeInput } from "@/types/recipes";
 import type { RecipeFormValues } from "@/components/RecipeForm";
 import RecipeForm from "@/components/RecipeForm";
 import type { UseFormReturn } from "react-hook-form";
+import { queryClient } from "@/lib/queryClient";
 
 const defaultFormValues: RecipeInput = {
   name: "",
@@ -17,7 +18,6 @@ const defaultFormValues: RecipeInput = {
 };
 
 export default function RecipeAdd() {
-  const queryClient = useQueryClient();
   const postMutation = useMutation({
     mutationFn: postRecipe,
     onSuccess: () => {

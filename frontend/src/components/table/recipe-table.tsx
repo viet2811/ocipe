@@ -38,6 +38,7 @@ interface DataTableProps<TData, TValue> {
   setSearchType: (s: string) => void;
   ingredientInput: string;
   setIngredientInput: (s: string) => void;
+  rowSelectionEnabled: boolean;
 }
 
 export function DataTable<TData extends { id: number }, TValue>({
@@ -48,9 +49,11 @@ export function DataTable<TData extends { id: number }, TValue>({
   setSearchType,
   ingredientInput,
   setIngredientInput,
+  rowSelectionEnabled = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
     data,
@@ -61,9 +64,11 @@ export function DataTable<TData extends { id: number }, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: rowSelectionEnabled ? setRowSelection : undefined,
     state: {
       sorting,
       globalFilter,
+      ...(rowSelectionEnabled && { rowSelection }),
     },
     onGlobalFilterChange: setGlobalFilter,
   });
