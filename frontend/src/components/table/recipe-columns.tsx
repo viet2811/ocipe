@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import type { Recipe, RecipeInput } from "@/types/recipes";
 import { deleteSingleRecipe, updateSingleRecipe } from "@/api/recipes";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import RecipeContent from "./recipe-sheet-content";
 import { ScrollArea } from "../ui/scroll-area";

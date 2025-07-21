@@ -15,6 +15,7 @@ import { useMutation } from "@tanstack/react-query";
 import { RefreshCw, Trash } from "lucide-react";
 import { toast } from "sonner";
 import { queryClient } from "@/lib/queryClient";
+import RecipeList from "../components/RecipeList";
 
 export default function RecipeView() {
   // Side buttons
@@ -72,5 +73,8 @@ export default function RecipeView() {
         <RefreshCw /> Reset all states
       </Button>
     </div>
+  );
+  return (
+    <RecipeList rowSelectionEnabled={false} LeftSideButtons={LeftSideButtons} />
   );
 }

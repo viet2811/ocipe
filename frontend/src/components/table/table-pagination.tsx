@@ -17,17 +17,19 @@ import { Button } from "../ui/button";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
+  disabled: boolean;
   LeftComponent?: React.FC;
 }
 
 export function DataTablePagination<TData>({
   table,
   LeftComponent,
+  disabled = false,
 }: DataTablePaginationProps<TData>) {
   return (
     <div className="grid gap-2 items-center grid-cols-1 md:flex md:justify-between">
       {LeftComponent && <LeftComponent />}
-      <div className="flex items-center space-x-6 lg:space-x-8 ml-auto">
+      <div className="flex items-center space-x-6 lg:space-x-8 min-w-0 ml-auto">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
@@ -35,12 +37,13 @@ export function DataTablePagination<TData>({
             onValueChange={(value) => {
               table.setPageSize(Number(value));
             }}
+            disabled={disabled}
           >
             <SelectTrigger className="h-8 w-[70px]">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[5, 10, 20, 30, 40, 50].map((pageSize) => (
+              {[5, 10, 15, 20].map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>

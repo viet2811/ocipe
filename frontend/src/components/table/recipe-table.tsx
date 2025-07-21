@@ -2,6 +2,7 @@
 
 import {
   type ColumnDef,
+  type Table as TableType,
   flexRender,
   type SortingState,
   getSortedRowModel,
@@ -19,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataTablePagination } from "./table-pagination";
 import { Input } from "../ui/input";
 import {
@@ -39,6 +40,9 @@ interface DataTableProps<TData, TValue> {
   ingredientInput: string;
   setIngredientInput: (s: string) => void;
   rowSelectionEnabled: boolean;
+  defaultPaginationSize: number;
+  strictPagination: boolean;
+  onTableChange?: (table: TableType<TData>) => void;
 }
 
 export function DataTable<TData extends { id: number }, TValue>({
@@ -49,7 +53,10 @@ export function DataTable<TData extends { id: number }, TValue>({
   setSearchType,
   ingredientInput,
   setIngredientInput,
-  rowSelectionEnabled = false,
+  rowSelectionEnabled,
+  defaultPaginationSize,
+  strictPagination,
+  onTableChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -71,8 +78,16 @@ export function DataTable<TData extends { id: number }, TValue>({
       ...(rowSelectionEnabled && { rowSelection }),
     },
     onGlobalFilterChange: setGlobalFilter,
+    initialState: {
+      pagination: {
+        pageSize: defaultPaginationSize, // <-- Set your default page size here
+      },
+    },
   });
 
+  useEffect(() => {
+    if (onTableChange) onTableChange(table);
+  }, [table, table.getState().rowSelection]);
   return (
     <div>
       <div id="searchFields" className="mb-3 flex items-center">
@@ -164,7 +179,11 @@ export function DataTable<TData extends { id: number }, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} LeftComponent={LeftComponent} />
+      <DataTablePagination
+        table={table}
+        LeftComponent={LeftComponent}
+        disabled={strictPagination}
+      />
     </div>
   );
 }

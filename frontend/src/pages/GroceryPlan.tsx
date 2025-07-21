@@ -4,6 +4,44 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import RecipeList from "@/components/RecipeList";
+import type { Table } from "@tanstack/react-table";
+import type { Recipe } from "@/types/recipes";
+
+const RecipeSelectionDesktop: React.FC = () => {
+  const [tableInstance, setTableInstance] = useState<Table<Recipe> | null>(
+    null
+  );
+
+  const leftSideButtons: React.FC = () => (
+    <div className="grid grid-cols-2 md:flex">
+      <Button
+        type="button"
+        disabled={tableInstance?.getSelectedRowModel().rows.length === 0}
+        onClick={() => {
+          const selectedRows = tableInstance?.getSelectedRowModel().rows;
+          const originalRows = selectedRows?.map((row) => row.original);
+          console.log(originalRows);
+        }}
+      >
+        Add to Board
+      </Button>
+    </div>
+  );
+  return (
+    <div className="w-2/3 p-1">
+      <div className="rounded-xl border min-h-4/5">
+        <RecipeList
+          rowSelectionEnabled
+          defaultPaginationSize={10}
+          LeftSideButtons={leftSideButtons}
+          strictPagination
+          onTableChange={setTableInstance}
+        />
+      </div>
+    </div>
+  );
+};
 
 const steps = [
   {
@@ -16,7 +54,7 @@ const steps = [
   },
   {
     title: "Select recipe",
-    content: <span>Recipe list yippie</span>,
+    content: <RecipeSelectionDesktop />,
   },
   {
     title: "Grocery list",
@@ -29,7 +67,10 @@ export default function GroceryPlan() {
   const [currentStep, setCurrentStep] = useState(0);
   return (
     <div className="mx-6 mt-3 max-h-screen">
-      <ol className="list-inside font-medium flex md:grid md:grid-cols-5 md:place-items-center w-full items-center justify-center text-center gap-3 text-sm md:text-base mb-4">
+      <ol
+        id="stepper"
+        className="list-inside font-medium flex md:grid md:grid-cols-5 md:place-items-center w-full items-center justify-center text-center gap-3 text-sm md:text-base mb-4"
+      >
         {steps.map((step, index) => (
           <>
             <li

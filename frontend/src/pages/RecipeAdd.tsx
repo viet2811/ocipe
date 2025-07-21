@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { postRecipe } from "@/api/recipes";
 import { toast } from "sonner";
 import { type RecipeInput } from "@/types/recipes";

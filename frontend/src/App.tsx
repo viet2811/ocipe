@@ -11,11 +11,11 @@ import PublicOnlyRoute from "./components/PublicOnlyRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import RecipeList from "./pages/RecipeList";
 import RecipeAdd from "./pages/RecipeAdd";
 import { Toaster } from "sonner";
 import Fridge from "./pages/Fridge";
 import GroceryPlan from "./pages/GroceryPlan";
+import RecipeView from "./pages/RecipeView";
 
 const AppContent = () => {
   return (
@@ -29,7 +29,7 @@ const AppContent = () => {
         <Route element={<DashboardLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/recipes">
-            <Route index element={<RecipeList />} />
+            <Route index element={<RecipeView />} />
             <Route path="add-a-recipe" element={<RecipeAdd />} />
           </Route>
           <Route path="/fridge" element={<Fridge />} />
