@@ -1,4 +1,10 @@
-import { CircleCheck } from "lucide-react";
+import {
+  CircleCheck,
+  GripVertical,
+  NotepadText,
+  Shuffle,
+  X,
+} from "lucide-react";
 import Fridge from "./Fridge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -12,32 +18,94 @@ const RecipeSelectionDesktop: React.FC = () => {
   const [tableInstance, setTableInstance] = useState<Table<Recipe> | null>(
     null
   );
+  const [recipeBoard, setRecipeBoard] = useState<Recipe[]>([]);
 
   const leftSideButtons: React.FC = () => (
-    <div className="grid grid-cols-2 md:flex">
+    <div className="grid grid-cols-2 md:flex gap-2">
       <Button
         type="button"
+        className="cursor-pointer"
         disabled={tableInstance?.getSelectedRowModel().rows.length === 0}
         onClick={() => {
           const selectedRows = tableInstance?.getSelectedRowModel().rows;
           const originalRows = selectedRows?.map((row) => row.original);
           console.log(originalRows);
+          tableInstance?.resetRowSelection();
+          setRecipeBoard((prev) => [...prev, ...(originalRows ?? [])]);
         }}
       >
         Add to Board
       </Button>
+      <Button
+        type="button"
+        variant="outline"
+        className="cursor-pointer"
+        onClick={() => {
+          const tableRows = tableInstance?.getCoreRowModel().rows; // filtered will be only within the range
+
+          if (tableRows) {
+            const randomRow =
+              tableRows[Math.floor(Math.random() * tableRows.length)];
+            setRecipeBoard((prev) => [...prev, randomRow.original]);
+            console.log(randomRow.original);
+          }
+        }}
+      >
+        <Shuffle></Shuffle>
+        Random pick
+      </Button>
     </div>
   );
   return (
-    <div className="w-2/3 p-1">
-      <div className="rounded-xl border min-h-4/5">
+    <div className="flex gap-3">
+      <div className="rounded-xl border min-h-4/5 min-w-0 flex-7 p-1">
         <RecipeList
           rowSelectionEnabled
-          defaultPaginationSize={10}
           LeftSideButtons={leftSideButtons}
           strictPagination
           onTableChange={setTableInstance}
         />
+      </div>
+      <div
+        className="rounded-xl border flex-3 flex flex-col p-6"
+        id="recipe-board"
+      >
+        <h1 className="scroll-m-20 mt-2 text-4xl flex items-center font-extrabold tracking-tight text-balance">
+          The Recipe Board
+          <NotepadText className="ml-1" />
+        </h1>
+        {/* Example */}
+        <ul className="list-disc my-4 space-y-3">
+          {recipeBoard.map((recipe, index) => (
+            <li
+              key={`recipe${index}`}
+              className="flex justify-between items-center -ml-4"
+            >
+              <GripVertical
+                size={16}
+                className="text-muted-foreground cursor-move mr-1"
+              />
+              <span>{recipe.name}</span>
+              <span className="ml-2 text-xs py-0.5 px-1.5 -mb-1 text-muted-foreground border font-medium rounded-md w-max">
+                {recipe.meat_type}
+              </span>
+              <span className="ml-auto">{recipe.longevity}</span>
+              <X
+                size={16}
+                className="-mr-2 ml-2 text-muted-foreground cursor-pointer -mb-0.5"
+                onClick={() => {
+                  setRecipeBoard((prev) =>
+                    prev.filter((_, curIndex) => curIndex !== index)
+                  );
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+        <div className="border-t pt-3 text-right text-lg font-semibold mt-auto">
+          Total Longevity:{" "}
+          {recipeBoard.reduce((sum, r) => sum + (Number(r.longevity) || 0), 0)}
+        </div>
       </div>
     </div>
   );
@@ -47,7 +115,7 @@ const steps = [
   {
     title: "Check fridge",
     content: (
-      <ScrollArea className="mt-4 mx-auto max-h-4/5 overflow-auto p-6 rounded-xl border">
+      <ScrollArea className="mt-4 w-full mx-auto max-h-4/5 overflow-auto p-6 rounded-xl border">
         <Fridge></Fridge>
       </ScrollArea>
     ),
