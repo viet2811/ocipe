@@ -6,7 +6,7 @@ import {
   X,
 } from "lucide-react";
 import Fridge from "./Fridge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Fragment, useState } from "react";
@@ -22,7 +22,6 @@ const RecipeSelection: React.FC<{
   const [tableInstance, setTableInstance] = useState<Table<Recipe> | null>(
     null
   );
-
   const isMobile = useIsMobile();
   const defaultPaginationSize = isMobile ? 5 : 10;
   const leftSideButtons: React.FC = () => (
@@ -60,8 +59,10 @@ const RecipeSelection: React.FC<{
   );
   return (
     <div className="flex flex-col lg:flex-row gap-3 w-full mx-auto @container">
-      {/* RecipeList takes 70% width on medium screens and above, full width on small screens */}
-      <div className="rounded-xl border min-h-4/5 w-full lg:w-7/10 flex-shrink-0 p-1">
+      <div
+        id="recipe-list"
+        className="rounded-xl border min-h-4/5 w-full lg:w-7/10 flex-shrink-0 p-1"
+      >
         <RecipeList
           key={defaultPaginationSize}
           rowSelectionEnabled
@@ -71,7 +72,6 @@ const RecipeSelection: React.FC<{
           onTableChange={setTableInstance}
         />
       </div>
-      {/* Recipe Board takes 30% width on medium screens and above, full width on small screens */}
       <div
         className="rounded-xl border w-full lg:w-3/10 flex-shrink-0 flex flex-col p-6"
         id="recipe-board"
@@ -80,7 +80,6 @@ const RecipeSelection: React.FC<{
           The Recipe Board
           <NotepadText className="ml-1" />
         </h1>
-        {/* Example */}
         <ul className="list-disc my-4 space-y-3">
           {recipeBoard.map((recipe, index) => (
             <li
@@ -126,8 +125,9 @@ export default function GroceryPlan() {
     {
       title: "Check fridge",
       content: (
-        <ScrollArea className="mt-4 flex-row @container w-full mx-auto max-h-3/4 lg:max-h-4/5 overflow-auto justify-center py-4 rounded-xl border">
+        <ScrollArea className="mt-4 flex-row @container w-full mx-auto max-h-3/4 lg:max-h-4/5 overflow-auto overscroll-auto justify-center py-4 rounded-xl border">
           <Fridge></Fridge>
+          <ScrollBar orientation="vertical" />
         </ScrollArea>
       ),
     },
@@ -157,26 +157,41 @@ export default function GroceryPlan() {
             <li
               key={`prevButton-step${index}`}
               className={cn(
-                index < currentStep && "inline-flex items-center text-chart-5",
+                "transition-colors duration-300 inline-flex items-center",
+                index < currentStep && "text-chart-5",
                 index > currentStep && "text-muted-foreground"
               )}
             >
               {index < currentStep ? (
-                <CircleCheck className="mr-1.5 fill-chart-5 text-background w-5 h-5" />
+                <CircleCheck className="mr-1.5 fill-chart-5 text-background w-5 h-5 transition-all duration-300" />
               ) : (
                 `${index + 1}. `
               )}
               {step.title}
             </li>
+
             {index < steps.length - 1 && (
               <li
                 key={`nextButton-step${index}`}
                 className={cn(
-                  "after:content-['/'] text-muted md:after:content-[''] md:w-full md:border-b md:h-1 md:border-1 md:rounded",
-                  index < currentStep &&
-                    "border-chart-5 md:bg-chart-5 after:text-chart-5"
+                  // Base styles for both views
+                  "relative text-muted after:content-['/'] md:after:content-[''] md:w-full md:h-1 md:rounded-md overflow-hidden",
+
+                  // Background color for desktop
+                  "md:bg-muted",
+
+                  // Completed step styling
+                  index < currentStep && "after:text-chart-5 md:bg-transparent"
                 )}
-              ></li>
+              >
+                {/* Animate line only on desktop */}
+                <div
+                  className={cn(
+                    "hidden md:block absolute inset-0 bg-chart-5 transition-all duration-700 origin-left",
+                    index < currentStep ? "w-full scale-x-100" : "w-0 scale-x-0"
+                  )}
+                />
+              </li>
             )}
           </Fragment>
         ))}

@@ -213,3 +213,23 @@ h1 {
   @apply hover:bg-input/30 focus-visible:bg-background border-transparent bg-transparent shadow-none focus-visible:border 
   dark:hover:bg-input/30 dark:focus-visible:bg-input/30 dark:bg-transparent;
 }
+
+@layer utilities {
+  /* Custom scrollbar for light/dark mode */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply !bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply !bg-gray-200 rounded-md;
+  }
+
+  html.dark ::-webkit-scrollbar-thumb {
+    @apply !bg-muted-foreground/30;
+  }
+}
