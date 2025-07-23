@@ -9,17 +9,22 @@ import Fridge from "./Fridge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import RecipeList from "@/components/RecipeList";
 import type { Table } from "@tanstack/react-table";
 import type { Recipe } from "@/types/recipes";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-const RecipeSelectionDesktop: React.FC = () => {
+const RecipeSelection: React.FC<{
+  recipeBoard: Recipe[];
+  setRecipeBoard: React.Dispatch<React.SetStateAction<Recipe[]>>;
+}> = ({ recipeBoard, setRecipeBoard }) => {
   const [tableInstance, setTableInstance] = useState<Table<Recipe> | null>(
     null
   );
-  const [recipeBoard, setRecipeBoard] = useState<Recipe[]>([]);
 
+  const isMobile = useIsMobile();
+  const defaultPaginationSize = isMobile ? 5 : 10;
   const leftSideButtons: React.FC = () => (
     <div className="grid grid-cols-2 md:flex gap-2">
       <Button
@@ -29,7 +34,6 @@ const RecipeSelectionDesktop: React.FC = () => {
         onClick={() => {
           const selectedRows = tableInstance?.getSelectedRowModel().rows;
           const originalRows = selectedRows?.map((row) => row.original);
-          console.log(originalRows);
           tableInstance?.resetRowSelection();
           setRecipeBoard((prev) => [...prev, ...(originalRows ?? [])]);
         }}
@@ -42,12 +46,10 @@ const RecipeSelectionDesktop: React.FC = () => {
         className="cursor-pointer"
         onClick={() => {
           const tableRows = tableInstance?.getCoreRowModel().rows; // filtered will be only within the range
-
           if (tableRows) {
             const randomRow =
               tableRows[Math.floor(Math.random() * tableRows.length)];
             setRecipeBoard((prev) => [...prev, randomRow.original]);
-            console.log(randomRow.original);
           }
         }}
       >
@@ -57,20 +59,24 @@ const RecipeSelectionDesktop: React.FC = () => {
     </div>
   );
   return (
-    <div className="flex gap-3">
-      <div className="rounded-xl border min-h-4/5 min-w-0 flex-7 p-1">
+    <div className="flex flex-col lg:flex-row gap-3 w-full mx-auto @container">
+      {/* RecipeList takes 70% width on medium screens and above, full width on small screens */}
+      <div className="rounded-xl border min-h-4/5 w-full lg:w-7/10 flex-shrink-0 p-1">
         <RecipeList
+          key={defaultPaginationSize}
           rowSelectionEnabled
+          defaultPaginationSize={defaultPaginationSize}
           LeftSideButtons={leftSideButtons}
           strictPagination
           onTableChange={setTableInstance}
         />
       </div>
+      {/* Recipe Board takes 30% width on medium screens and above, full width on small screens */}
       <div
-        className="rounded-xl border flex-3 flex flex-col p-6"
+        className="rounded-xl border w-full lg:w-3/10 flex-shrink-0 flex flex-col p-6"
         id="recipe-board"
       >
-        <h1 className="scroll-m-20 mt-2 text-4xl flex items-center font-extrabold tracking-tight text-balance">
+        <h1 className="scroll-m-20 mt-2 text-xl md:text-2xl lg:text-4xl flex items-center font-extrabold tracking-tight text-balance">
           The Recipe Board
           <NotepadText className="ml-1" />
         </h1>
@@ -111,28 +117,35 @@ const RecipeSelectionDesktop: React.FC = () => {
   );
 };
 
-const steps = [
-  {
-    title: "Check fridge",
-    content: (
-      <ScrollArea className="mt-4 w-full mx-auto max-h-4/5 overflow-auto p-6 rounded-xl border">
-        <Fridge></Fridge>
-      </ScrollArea>
-    ),
-  },
-  {
-    title: "Select recipe",
-    content: <RecipeSelectionDesktop />,
-  },
-  {
-    title: "Grocery list",
-    content: <span>Grocery list yippie</span>,
-  },
-];
-
 export default function GroceryPlan() {
   //   "text-blue-600 dark:text-blue-500";
   const [currentStep, setCurrentStep] = useState(0);
+  const [recipeBoard, setRecipeBoard] = useState<Recipe[]>([]);
+
+  const steps = [
+    {
+      title: "Check fridge",
+      content: (
+        <ScrollArea className="mt-4 flex-row @container w-full mx-auto max-h-3/4 lg:max-h-4/5 overflow-auto justify-center py-4 rounded-xl border">
+          <Fridge></Fridge>
+        </ScrollArea>
+      ),
+    },
+    {
+      title: "Select recipe",
+      content: (
+        <RecipeSelection
+          recipeBoard={recipeBoard}
+          setRecipeBoard={setRecipeBoard}
+        />
+      ),
+    },
+    {
+      title: "Grocery list",
+      content: <span>Grocery list yippie</span>,
+    },
+  ];
+
   return (
     <div className="mx-6 mt-3 max-h-screen">
       <ol
@@ -140,8 +153,9 @@ export default function GroceryPlan() {
         className="list-inside font-medium flex md:grid md:grid-cols-5 md:place-items-center w-full items-center justify-center text-center gap-3 text-sm md:text-base mb-4"
       >
         {steps.map((step, index) => (
-          <>
+          <Fragment key={`step${index}-buttons`}>
             <li
+              key={`prevButton-step${index}`}
               className={cn(
                 index < currentStep && "inline-flex items-center text-chart-5",
                 index > currentStep && "text-muted-foreground"
@@ -156,18 +170,20 @@ export default function GroceryPlan() {
             </li>
             {index < steps.length - 1 && (
               <li
+                key={`nextButton-step${index}`}
                 className={cn(
                   "after:content-['/'] text-muted md:after:content-[''] md:w-full md:border-b md:h-1 md:border-1 md:rounded",
-                  index < currentStep && "border-chart-5 bg-chart-5"
+                  index < currentStep &&
+                    "border-chart-5 md:bg-chart-5 after:text-chart-5"
                 )}
               ></li>
             )}
-          </>
+          </Fragment>
         ))}
       </ol>
       {/* For 1st step-Check fridge */}
       {steps[currentStep].content}
-      <div className="w-full mt-4 flex justify-between">
+      <div className="w-full my-4 flex justify-between">
         {currentStep > 0 ? (
           <Button type="button" onClick={() => setCurrentStep(currentStep - 1)}>
             Prev
@@ -176,7 +192,11 @@ export default function GroceryPlan() {
           <div className="invisible">Prev</div>
         )}
         {currentStep < steps.length - 1 ? (
-          <Button type="button" onClick={() => setCurrentStep(currentStep + 1)}>
+          <Button
+            type="button"
+            disabled={currentStep === 1 && recipeBoard.length === 0}
+            onClick={() => setCurrentStep(currentStep + 1)}
+          >
             Next
           </Button>
         ) : (
