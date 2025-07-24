@@ -3,7 +3,7 @@ import { GripVertical, X } from "lucide-react";
 import { EditableTextInput } from "../editable-text-input";
 
 /**
- * DraggableItem component represents a single draggable list item with editable text and delete functionality.
+ * DraggableIngredient component represents a single draggable list item with editable text and delete functionality.
  *
  * @param id - Unique identifier for the draggable item.
  * @param name - The display name or value of the item.
@@ -13,7 +13,7 @@ import { EditableTextInput } from "../editable-text-input";
  * Utilizes `useDraggable` for drag-and-drop capabilities and renders a grip icon for dragging,
  * an editable text input for the item's name, and a delete icon for removing the item.
  */
-export const DraggableItem = ({
+export const DraggableIngredient = ({
   id,
   name,
   onUpdate,

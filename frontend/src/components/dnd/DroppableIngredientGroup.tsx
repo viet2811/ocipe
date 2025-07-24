@@ -13,7 +13,7 @@ import {
   updateSingleIngredient,
 } from "@/api/fridge";
 import { useState } from "react";
-import { DraggableItem } from "./DraggableItem";
+import { DraggableIngredient } from "./DraggableIngredient";
 import { Button } from "../ui/button";
 import { Ellipsis, Plus, Trash } from "lucide-react";
 import {
@@ -178,7 +178,7 @@ export default function DroppableIngredientGroup({
       </div>
       <ul className="-mt-4">
         {ingredients.map((ingredient) => (
-          <DraggableItem
+          <DraggableIngredient
             id={`${groupId}-${ingredient.id}`}
             key={ingredient.id}
             name={ingredient.name}

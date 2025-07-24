@@ -1,12 +1,6 @@
-import {
-  CircleCheck,
-  GripVertical,
-  NotepadText,
-  Shuffle,
-  X,
-} from "lucide-react";
+import { CircleCheck, NotepadText, Shuffle } from "lucide-react";
 import Fridge from "./Fridge";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Fragment, useState } from "react";
@@ -14,6 +8,22 @@ import RecipeList from "@/components/RecipeList";
 import type { Table } from "@tanstack/react-table";
 import type { Recipe } from "@/types/recipes";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { SortableRecipe } from "@/components/dnd/SortableRecipe";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import {
+  closestCenter,
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { restrictToParentElement } from "@dnd-kit/modifiers";
 
 const RecipeSelection: React.FC<{
   recipeBoard: Recipe[];
@@ -57,6 +67,21 @@ const RecipeSelection: React.FC<{
       </Button>
     </div>
   );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over) return;
+
+    if (active.id !== over.id) {
+      setRecipeBoard((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  }
+  const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
   return (
     <div className="flex flex-col lg:flex-row gap-3 w-full mx-auto @container">
       <div
@@ -80,33 +105,28 @@ const RecipeSelection: React.FC<{
           The Recipe Board
           <NotepadText className="ml-1" />
         </h1>
-        <ul className="list-disc my-4 space-y-3">
-          {recipeBoard.map((recipe, index) => (
-            <li
-              key={`recipe${index}`}
-              className="flex justify-between items-center -ml-4"
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          modifiers={[restrictToParentElement]}
+        >
+          <ul className="list-disc my-4 -ml-4 -mr-3.5">
+            <SortableContext
+              items={recipeBoard.map((r) => r.id)}
+              strategy={verticalListSortingStrategy}
             >
-              <GripVertical
-                size={16}
-                className="text-muted-foreground cursor-move mr-1"
-              />
-              <span>{recipe.name}</span>
-              <span className="ml-2 text-xs py-0.5 px-1.5 -mb-1 text-muted-foreground border font-medium rounded-md w-max">
-                {recipe.meat_type}
-              </span>
-              <span className="ml-auto">{recipe.longevity}</span>
-              <X
-                size={16}
-                className="-mr-2 ml-2 text-muted-foreground cursor-pointer -mb-0.5"
-                onClick={() => {
-                  setRecipeBoard((prev) =>
-                    prev.filter((_, curIndex) => curIndex !== index)
-                  );
-                }}
-              />
-            </li>
-          ))}
-        </ul>
+              {recipeBoard.map((recipe) => (
+                <SortableRecipe
+                  id={recipe.id}
+                  key={recipe.id}
+                  recipe={recipe}
+                  setRecipeBoard={setRecipeBoard}
+                />
+              ))}
+            </SortableContext>
+          </ul>
+        </DndContext>
         <div className="border-t pt-3 text-right text-lg font-semibold mt-auto">
           Total Longevity:{" "}
           {recipeBoard.reduce((sum, r) => sum + (Number(r.longevity) || 0), 0)}
@@ -127,7 +147,6 @@ export default function GroceryPlan() {
       content: (
         <ScrollArea className="mt-4 flex-row @container w-full mx-auto max-h-3/4 lg:max-h-4/5 overflow-auto overscroll-auto justify-center py-4 rounded-xl border">
           <Fridge></Fridge>
-          <ScrollBar orientation="vertical" />
         </ScrollArea>
       ),
     },
