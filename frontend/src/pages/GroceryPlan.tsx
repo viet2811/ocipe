@@ -72,13 +72,11 @@ const RecipeSelection: React.FC<{
     const { active, over } = event;
     if (!over) return;
 
-    if (active.id !== over.id) {
-      setRecipeBoard((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
+    const oldIndex = active.id as number;
+    const newIndex = over.id as number;
 
-        return arrayMove(items, oldIndex, newIndex);
-      });
+    if (oldIndex !== newIndex) {
+      setRecipeBoard((items) => arrayMove(items, oldIndex, newIndex));
     }
   }
   const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
@@ -113,13 +111,13 @@ const RecipeSelection: React.FC<{
         >
           <ul className="list-disc my-4 -ml-4 -mr-3.5">
             <SortableContext
-              items={recipeBoard.map((r) => r.id)}
+              items={recipeBoard.map((_, index) => index)}
               strategy={verticalListSortingStrategy}
             >
-              {recipeBoard.map((recipe) => (
+              {recipeBoard.map((recipe, index) => (
                 <SortableRecipe
-                  id={recipe.id}
-                  key={recipe.id}
+                  id={index}
+                  key={index}
                   recipe={recipe}
                   setRecipeBoard={setRecipeBoard}
                 />
