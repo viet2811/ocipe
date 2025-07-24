@@ -1,6 +1,7 @@
 import { useDraggable } from "@dnd-kit/core";
 import { GripVertical, X } from "lucide-react";
 import { EditableTextInput } from "../editable-text-input";
+import { useState } from "react";
 
 /**
  * DraggableIngredient component represents a single draggable list item with editable text and delete functionality.
@@ -25,7 +26,7 @@ export const DraggableIngredient = ({
   onDelete: () => void;
 }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
-
+  const [isTouching, setIsTouching] = useState(false);
   const style = transform
     ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
     : undefined;
@@ -34,7 +35,12 @@ export const DraggableIngredient = ({
     <li
       ref={setNodeRef}
       style={style}
-      className="flex items-center space-x-2 px-2 py-1 pl-0 -ml-1 rounded hover:bg-muted transition-colors"
+      className={`flex items-center space-x-2 px-2 py-1 pl-0 -ml-1 rounded transition-colors ${
+        isTouching ? "bg-muted" : "hover:bg-muted"
+      }`}
+      onTouchStart={() => setIsTouching(true)}
+      onTouchEnd={() => setIsTouching(false)}
+      onTouchCancel={() => setIsTouching(false)}
     >
       <span
         className="flex items-center justify-center w-4"

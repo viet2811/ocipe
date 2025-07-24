@@ -3,7 +3,7 @@
 import type { FridgeResponse, IngredientGroup } from "@/types/recipes";
 import {
   DndContext,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
@@ -54,7 +54,7 @@ export default function Fridge() {
   // Local data for drag and drop
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
   // Sensor for both touch and mouse user
-  const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     const [fromGroup, ingredientIdStr] = (active.id as string).split("-");

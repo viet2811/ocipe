@@ -17,7 +17,7 @@ import {
 import {
   closestCenter,
   DndContext,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
@@ -33,7 +33,7 @@ const RecipeSelection: React.FC<{
     null
   );
   const isMobile = useIsMobile();
-  const defaultPaginationSize = isMobile ? 5 : 10;
+  const defaultPaginationSize = isMobile ? 5 : 8;
   const leftSideButtons: React.FC = () => (
     <div className="grid grid-cols-2 md:flex gap-2">
       <Button
@@ -79,12 +79,13 @@ const RecipeSelection: React.FC<{
       setRecipeBoard((items) => arrayMove(items, oldIndex, newIndex));
     }
   }
-  const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
+
   return (
-    <div className="flex flex-col lg:flex-row gap-3 w-full mx-auto @container">
+    <div className="flex flex-col lg:flex-row gap-3 w-full mx-auto min-h-[78vh] @container">
       <div
         id="recipe-list"
-        className="rounded-xl border min-h-4/5 w-full lg:w-7/10 flex-shrink-0 p-1"
+        className="rounded-xl border w-full lg:w-7/10 flex-shrink-0 p-1"
       >
         <RecipeList
           key={defaultPaginationSize}
@@ -135,7 +136,6 @@ const RecipeSelection: React.FC<{
 };
 
 export default function GroceryPlan() {
-  //   "text-blue-600 dark:text-blue-500";
   const [currentStep, setCurrentStep] = useState(0);
   const [recipeBoard, setRecipeBoard] = useState<Recipe[]>([]);
 
