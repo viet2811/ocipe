@@ -1,5 +1,5 @@
 import type { Recipe, RecipeBoardItems } from "@/types/recipes";
-import { useSortable } from "@dnd-kit/sortable";
+import { defaultAnimateLayoutChanges, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, X } from "lucide-react";
 
@@ -13,7 +13,7 @@ export function SortableRecipe({
   setRecipeBoard: React.Dispatch<React.SetStateAction<RecipeBoardItems[]>>;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id, animateLayoutChanges: () => true });
+    useSortable({ id, animateLayoutChanges: defaultAnimateLayoutChanges });
 
   const style = {
     transform: CSS.Translate.toString(transform),
@@ -22,8 +22,7 @@ export function SortableRecipe({
 
   return (
     <li
-      key={`recipe${id}`}
-      className="flex items-center pb-2 pt-1"
+      className="flex items-center pb-2 pt-1 touch-none"
       style={style}
       ref={setNodeRef}
     >
