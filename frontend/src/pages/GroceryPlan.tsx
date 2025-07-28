@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Fragment, useState } from "react";
 import RecipeList from "@/components/RecipeList";
 import type { Table } from "@tanstack/react-table";
-import type { Recipe } from "@/types/recipes";
+import type { Recipe, RecipeBoardItems } from "@/types/recipes";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SortableRecipe } from "@/components/dnd/SortableRecipe";
 import {
@@ -24,14 +24,16 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
+import { nanoid } from "nanoid";
 
 const RecipeSelection: React.FC<{
-  recipeBoard: Recipe[];
-  setRecipeBoard: React.Dispatch<React.SetStateAction<Recipe[]>>;
+  recipeBoard: RecipeBoardItems[];
+  setRecipeBoard: React.Dispatch<React.SetStateAction<RecipeBoardItems[]>>;
 }> = ({ recipeBoard, setRecipeBoard }) => {
   const [tableInstance, setTableInstance] = useState<Table<Recipe> | null>(
     null
   );
+
   const isMobile = useIsMobile();
   const defaultPaginationSize = isMobile ? 5 : 8;
   const leftSideButtons: React.FC = () => (
@@ -42,9 +44,14 @@ const RecipeSelection: React.FC<{
         disabled={tableInstance?.getSelectedRowModel().rows.length === 0}
         onClick={() => {
           const selectedRows = tableInstance?.getSelectedRowModel().rows;
-          const originalRows = selectedRows?.map((row) => row.original);
           tableInstance?.resetRowSelection();
-          setRecipeBoard((prev) => [...prev, ...(originalRows ?? [])]);
+          setRecipeBoard((prev) => [
+            ...prev,
+            ...(selectedRows?.map((row) => ({
+              ...row.original,
+              instanceID: nanoid(),
+            })) ?? []),
+          ]);
         }}
       >
         Add to Board
@@ -58,7 +65,10 @@ const RecipeSelection: React.FC<{
           if (tableRows) {
             const randomRow =
               tableRows[Math.floor(Math.random() * tableRows.length)];
-            setRecipeBoard((prev) => [...prev, randomRow.original]);
+            setRecipeBoard((prev) => [
+              ...prev,
+              { ...randomRow.original, instanceID: nanoid() },
+            ]);
           }
         }}
       >
@@ -70,12 +80,13 @@ const RecipeSelection: React.FC<{
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-    if (!over) return;
-
-    const oldIndex = active.id as number;
-    const newIndex = over.id as number;
-
-    if (oldIndex !== newIndex) {
+    if (over && active.id !== over.id) {
+      const oldIndex = recipeBoard.findIndex(
+        (item) => item.instanceID === active.id
+      );
+      const newIndex = recipeBoard.findIndex(
+        (item) => item.instanceID === over.id
+      );
       setRecipeBoard((items) => arrayMove(items, oldIndex, newIndex));
     }
   }
@@ -97,7 +108,7 @@ const RecipeSelection: React.FC<{
         />
       </div>
       <div
-        className="rounded-xl border w-full lg:w-3/10 flex-shrink-0 flex flex-col p-6"
+        className="rounded-xl border w-full lg:w-3/10 flex flex-col p-6"
         id="recipe-board"
       >
         <h1 className="scroll-m-20 mt-2 text-xl md:text-2xl lg:text-4xl flex items-center font-extrabold tracking-tight text-balance">
@@ -110,21 +121,21 @@ const RecipeSelection: React.FC<{
           onDragEnd={handleDragEnd}
           modifiers={[restrictToParentElement]}
         >
-          <ul className="list-disc my-4 -ml-4 -mr-3.5">
-            <SortableContext
-              items={recipeBoard.map((_, index) => index)}
-              strategy={verticalListSortingStrategy}
-            >
-              {recipeBoard.map((recipe, index) => (
+          <SortableContext
+            items={recipeBoard.map((recipe) => recipe.instanceID)}
+            strategy={verticalListSortingStrategy}
+          >
+            <ul className="list-disc my-4 -ml-4 -mr-3.5">
+              {recipeBoard.map((recipe) => (
                 <SortableRecipe
-                  id={index}
-                  key={index}
+                  id={recipe.instanceID}
+                  key={recipe.instanceID}
                   recipe={recipe}
                   setRecipeBoard={setRecipeBoard}
                 />
               ))}
-            </SortableContext>
-          </ul>
+            </ul>
+          </SortableContext>
         </DndContext>
         <div className="border-t pt-3 text-right text-lg font-semibold mt-auto">
           Total Longevity:{" "}
@@ -137,7 +148,7 @@ const RecipeSelection: React.FC<{
 
 export default function GroceryPlan() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [recipeBoard, setRecipeBoard] = useState<Recipe[]>([]);
+  const [recipeBoard, setRecipeBoard] = useState<RecipeBoardItems[]>([]);
 
   const steps = [
     {

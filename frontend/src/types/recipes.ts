@@ -43,3 +43,7 @@ export type IngredientGroup = {
 export type FridgeResponse = {
   ingredient_list: IngredientGroup;
 };
+
+export interface RecipeBoardItems extends Recipe {
+  instanceID: string;
+}
