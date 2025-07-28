@@ -148,7 +148,7 @@ export default function DroppableIngredientGroup({
       )}
       ref={setNodeRef}
     >
-      <div className="flex space-x-2 items-center px-2 py-1 pl-0">
+      <div className="flex space-x-4 items-center px-2 py-1 pl-0">
         <EditableTextInput
           baseValue={groupId}
           onUpdate={(newName) => onGroupUpdate(newName)}
@@ -176,7 +176,7 @@ export default function DroppableIngredientGroup({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <ul className="-mt-4">
+      <ul className="-mt-6">
         {ingredients.map((ingredient) => (
           <DraggableIngredient
             id={`${groupId}-${ingredient.id}`}
@@ -216,7 +216,7 @@ export default function DroppableIngredientGroup({
         <Button
           variant="ghost"
           type="button"
-          className="text-muted-foreground hover:bg-transparent hover:shadow-none hover:text-inherit cursor-pointer -ml-2"
+          className="text-muted-foreground hover:bg-transparent hover:shadow-none hover:text-inherit cursor-pointer -ml-2 w-full justify-start"
           onClick={() => handleAddIngredient(groupName)}
         >
           <Plus /> Add an ingredient

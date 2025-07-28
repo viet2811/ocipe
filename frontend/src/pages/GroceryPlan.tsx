@@ -96,7 +96,7 @@ const RecipeSelection: React.FC<{
     <div className="flex flex-col lg:flex-row gap-3 w-full mx-auto min-h-[78vh] @container">
       <div
         id="recipe-list"
-        className="rounded-xl border w-full lg:w-7/10 flex-shrink-0 p-1"
+        className="rounded-xl border w-full lg:w-7/10 flex-shrink-0 p-1 pt-6"
       >
         <RecipeList
           key={defaultPaginationSize}
@@ -175,7 +175,7 @@ export default function GroceryPlan() {
   ];
 
   return (
-    <div className="mx-6 mt-3 max-h-screen">
+    <div className="mx-6 mt-3 max-h-[calc(100vh-64px)] lg:max-h-screen">
       <ol
         id="stepper"
         className="list-inside font-medium flex md:grid md:grid-cols-5 md:place-items-center w-full items-center justify-center text-center gap-3 text-sm md:text-base mb-4"
@@ -224,9 +224,8 @@ export default function GroceryPlan() {
           </Fragment>
         ))}
       </ol>
-      {/* For 1st step-Check fridge */}
       {steps[currentStep].content}
-      <div className="w-full my-4 flex justify-between">
+      <div className="w-full mt-4 pb-16 md:pb-0 flex justify-between">
         {currentStep > 0 ? (
           <Button type="button" onClick={() => setCurrentStep(currentStep - 1)}>
             Prev

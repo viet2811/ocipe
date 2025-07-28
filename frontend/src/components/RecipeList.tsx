@@ -58,7 +58,7 @@ export default function RecipeList({
       : recipes || [];
 
   return (
-    <div className="m-6">
+    <div className="mx-6 mb-6">
       <DataTable
         columns={columns}
         data={recipesData}

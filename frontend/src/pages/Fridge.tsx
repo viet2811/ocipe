@@ -97,7 +97,7 @@ export default function Fridge() {
   };
 
   const breakpointColumnsObj = {
-    default: 6,
+    default: 5,
     1440: 4,
     1024: 3,
     768: 2,
@@ -144,7 +144,7 @@ export default function Fridge() {
         >
           <Plus /> Add an ingredient group
         </Button>
-        <div className="mt-3">
+        <div className="my-3">
           <Masonry
             breakpointCols={breakpointColumnsObj}
             className="flex w-auto bg-clip-padding space-x-4"
