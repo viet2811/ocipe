@@ -6,6 +6,7 @@ from recipes.models import Recipe, RecipeIngredient, Ingredient
 from fridge.models import Fridge, FridgeIngredient
 from .models import History
 from .serializers import HistorySerializer
+from collections import Counter
 
 class GroceryList(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -21,18 +22,44 @@ class GroceryList(APIView):
         userIngredient = Ingredient.objects.filter(user=user)
         fridge = Fridge.objects.get(user=user)  
         
-        # All ingredients needed for all recipes listed
-        recipeIngredients = userIngredient.filter(
-            recipeingredient__recipe__id__in=recipe_ids
-        ).distinct()
-        recipeIngredientSet = set(ingredient.name for ingredient in recipeIngredients)
+        recipe_ids_counts = Counter(recipe_ids)
+
+        # All ingredients needed for given recipeIds
+        recipeIngredients = RecipeIngredient.objects.filter(
+            recipe__id__in=recipe_ids,
+            ingredient__user=user
+        )
+
+        ingredients_quantities = {}
+        for ri in recipeIngredients:
+            name = ri.ingredient.name
+            quantity = ri.quantity
+            repeat_count = recipe_ids_counts[ri.recipe_id]
+            for _ in range(repeat_count):
+                if name not in ingredients_quantities:
+                    ingredients_quantities[name] = quantity
+                elif quantity:
+                    ingredients_quantities[name] += " + " + quantity
 
         # Fridge ingredients
         fridgeIngredients = FridgeIngredient.objects.filter(fridge=fridge)
         fridgeIngredientSet = set(fi.ingredient.name for fi in fridgeIngredients)
 
         # Grocery list
-        groceryList = recipeIngredientSet - fridgeIngredientSet
+        # groceryList = recipeIngredientSet - fridgeIngredientSet
+        groceryList = []
+        others = []
+
+        for name, agg_quantity in ingredients_quantities.items():
+            item = {
+                "name": name,
+                "quantity": agg_quantity
+            }
+            if name not in fridgeIngredientSet:
+                groceryList.append(item) 
+            else:
+                others.append(item)
+            
 
         # Save recipes to history
         recipes = Recipe.objects.filter(id__in=recipe_ids).values_list('id', 'name', 'meat_type')
@@ -43,7 +70,10 @@ class GroceryList(APIView):
         Recipe.objects.filter(id__in=recipe_ids).update(state='used')
         
         return Response(
-            {'grocery_list': groceryList}
+            {
+             'grocery_list': groceryList,
+             'others': others
+            }
         )
 
 class HistoryList(generics.ListAPIView):

@@ -233,3 +233,7 @@ h1 {
     @apply !bg-muted-foreground/30;
   }
 }
+
+button {
+  cursor: pointer;
+}

@@ -1,16 +1,9 @@
-import {
-  CircleCheck,
-  ClipboardCopy,
-  NotepadText,
-  Save,
-  Shuffle,
-  X,
-} from "lucide-react";
+import { CircleCheck, Copy, NotepadText, Save, Shuffle } from "lucide-react";
 import Fridge from "./Fridge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import RecipeList from "@/components/RecipeList";
 import type { Table } from "@tanstack/react-table";
 import type { Recipe, RecipeBoardItems } from "@/types/recipes";
@@ -169,19 +162,39 @@ const RecipeSelection: React.FC<{
   );
 };
 
+type IngredientDetails = {
+  name: string;
+  quantity: string;
+};
+
+type GroceryList = {
+  grocery_list: IngredientDetails[];
+  others: IngredientDetails[];
+};
+
 export default function GroceryPlan() {
   const [currentStep, setCurrentStep] = useState(0);
   const [recipeBoard, setRecipeBoard] = useState<RecipeBoardItems[]>([]);
-  const [grocery, setGrocery] = useState<string[]>([]);
+
+  // For grocery list results
+  const [grocery, setGrocery] = useState<IngredientDetails[]>([]);
+  const [existGroceryItem, setExistGroceryItem] = useState<IngredientDetails[]>(
+    []
+  );
+  const [fullDetails, setFullDetails] = useState<boolean>(false);
+  const [quantity, setQuantity] = useState<boolean>(false);
 
   const { mutate: groceryList, isPending } = useMutation({
     mutationFn: getGroceryList,
-    onSuccess: (data) => {
+    onSuccess: (data: GroceryList) => {
       toast.success("Recipe fetched!");
+      console.log(data);
       setGrocery(data.grocery_list);
+      setExistGroceryItem(data.others);
     },
     onError: () => toast.error("Something went wrong. Please try again"),
   });
+  const listRef = useRef<HTMLUListElement>(null);
 
   const steps = [
     {
@@ -241,24 +254,58 @@ export default function GroceryPlan() {
                     Ingredient(s) need to be bought
                   </DialogDescription>
                 </DialogHeader>
-                <div className="">
+                <div id="grocery-list-content">
                   {isPending ? (
                     <Loading label="your grocery list..." />
                   ) : (
                     <div className="space-y-4">
                       <div>
-                        <ul className="list-disc list-inside">
+                        <ul className="list-disc list-inside" ref={listRef}>
+                          {grocery.length === 0 &&
+                            "Congrats. You don't need to buy anything"}
                           {grocery.map((item) => (
-                            <li>{item}</li>
+                            <li className="font-semibold">
+                              {item.name}
+                              {quantity &&
+                                item.quantity &&
+                                ` (${item.quantity})`}
+                            </li>
                           ))}
+                          {fullDetails &&
+                            existGroceryItem.map((item) => (
+                              <li className="text-muted-foreground italic">
+                                {item.name}
+                                {quantity &&
+                                  item.quantity &&
+                                  ` (${item.quantity})`}
+                              </li>
+                            ))}
                         </ul>
                       </div>
                       <div className="flex items-center gap-3">
-                        <Checkbox id="quantity" />
+                        <Checkbox
+                          id="quantity"
+                          checked={quantity}
+                          onCheckedChange={() => {
+                            setQuantity((prev) => !prev);
+                          }}
+                        />
                         <Label htmlFor="terms">Show aggregated quantity</Label>
                       </div>
                       <div className="flex items-start gap-3">
-                        <Checkbox id="terms-2" />
+                        <Checkbox
+                          checked={fullDetails}
+                          id="terms-2"
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFullDetails(true);
+                              setQuantity(true);
+                            } else {
+                              setFullDetails(false);
+                              setQuantity(false);
+                            }
+                          }}
+                        />
                         <div className="grid gap-2">
                           <Label htmlFor="terms-2">Show full details</Label>
                           <p className="text-muted-foreground text-sm">
@@ -271,8 +318,24 @@ export default function GroceryPlan() {
                   )}
                 </div>
                 <DialogFooter>
-                  <Button variant="outline">
-                    <ClipboardCopy /> Copy list
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer"
+                    onClick={() => {
+                      if (listRef.current) {
+                        const textToCopy = listRef.current.innerText;
+                        navigator.clipboard
+                          .writeText(textToCopy)
+                          .then(() => {
+                            toast.success("List copied to clipboard!");
+                          })
+                          .catch((err) => {
+                            console.error("Failed to copy: ", err);
+                          });
+                      }
+                    }}
+                  >
+                    <Copy /> Copy list
                   </Button>
                   <DialogClose asChild>
                     <Button>
