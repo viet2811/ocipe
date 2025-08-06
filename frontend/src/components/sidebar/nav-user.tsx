@@ -1,17 +1,8 @@
-"use client"
+"use client";
 
-import {
-  BadgeCheck,
-  ChevronsUpDown,
-  LogOut,
-  Sun,
-  Moon,
-} from "lucide-react"
+import { BadgeCheck, ChevronsUpDown, LogOut, Sun, Moon } from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,28 +11,28 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { useAuth } from "@/contexts/AuthContext"
-import { Switch } from "@/components/ui/switch"
-import { useTheme } from "@/contexts/ThemeContext"
+} from "@/components/ui/sidebar";
+import { useAuth } from "@/contexts/AuthContext";
+import { Switch } from "@/components/ui/switch";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    avatar: string
-  }
+    name: string;
+    avatar: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
-  const {logout} = useAuth()
-  const {theme, toggleTheme} = useTheme()
+  const { isMobile } = useSidebar();
+  const { logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -52,7 +43,9 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="rounded-lg">{user.avatar}</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {user.avatar}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -69,7 +62,9 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg">{user.avatar}</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user.avatar}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -78,12 +73,12 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={(e)=> e.preventDefault()}>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                 <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                Theme
-                <Switch 
-                  checked={theme === 'dark'}
+                Dark Mode
+                <Switch
+                  checked={theme === "dark"}
                   onCheckedChange={toggleTheme}
                   aria-label="Toggle theme"
                   className="ml-auto"
@@ -102,5 +97,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

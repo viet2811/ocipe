@@ -1,4 +1,11 @@
-import { CircleCheck, NotepadText, Shuffle } from "lucide-react";
+import {
+  CircleCheck,
+  ClipboardCopy,
+  NotepadText,
+  Save,
+  Shuffle,
+  X,
+} from "lucide-react";
 import Fridge from "./Fridge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -25,6 +32,22 @@ import {
 } from "@dnd-kit/core";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { nanoid } from "nanoid";
+import { useMutation } from "@tanstack/react-query";
+import { getGroceryList } from "@/api/grocery";
+import { toast } from "sonner";
+import Loading from "@/components/loading";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const RecipeSelection: React.FC<{
   recipeBoard: RecipeBoardItems[];
@@ -149,36 +172,195 @@ const RecipeSelection: React.FC<{
 export default function GroceryPlan() {
   const [currentStep, setCurrentStep] = useState(0);
   const [recipeBoard, setRecipeBoard] = useState<RecipeBoardItems[]>([]);
+  const [grocery, setGrocery] = useState<string[]>([]);
+
+  const { mutate: groceryList, isPending } = useMutation({
+    mutationFn: getGroceryList,
+    onSuccess: (data) => {
+      toast.success("Recipe fetched!");
+      setGrocery(data.grocery_list);
+    },
+    onError: () => toast.error("Something went wrong. Please try again"),
+  });
 
   const steps = [
     {
       title: "Check fridge",
       content: (
-        <ScrollArea className="mt-4 flex-row @container w-full mx-auto max-h-3/4 lg:max-h-4/5 overflow-auto overscroll-auto justify-center py-4 rounded-xl border">
-          <Fridge></Fridge>
-        </ScrollArea>
+        <Fragment>
+          <ScrollArea className="mt-4 flex-row @container w-full mx-auto max-h-3/4 lg:max-h-4/5 overflow-auto overscroll-auto justify-center py-4 rounded-xl border">
+            <Fridge></Fridge>
+          </ScrollArea>
+          <div className="w-full mt-4 pb-16 md:pb-0 flex justify-end">
+            <Button
+              type="button"
+              onClick={() => {
+                setCurrentStep(currentStep + 1);
+              }}
+            >
+              Next
+            </Button>
+          </div>
+        </Fragment>
       ),
     },
     {
       title: "Select recipe",
       content: (
-        <RecipeSelection
-          recipeBoard={recipeBoard}
-          setRecipeBoard={setRecipeBoard}
-        />
+        <Fragment>
+          <RecipeSelection
+            recipeBoard={recipeBoard}
+            setRecipeBoard={setRecipeBoard}
+          />
+          <div className="w-full mt-4 pb-16 md:pb-0 flex justify-between">
+            <Button
+              type="button"
+              onClick={() => setCurrentStep(currentStep - 1)}
+            >
+              Prev
+            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  disabled={recipeBoard.length === 0}
+                  onClick={() => {
+                    if (recipeBoard.length > 0) {
+                      let ids = recipeBoard.map((recipe) => recipe.id);
+                      groceryList(ids);
+                    }
+                  }}
+                >
+                  Get grocery list
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Grocery list</DialogTitle>
+                  <DialogDescription>
+                    Ingredient(s) need to be bought
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="">
+                  {isPending ? (
+                    <Loading label="your grocery list..." />
+                  ) : (
+                    <div className="space-y-4">
+                      <div>
+                        <ul className="list-disc list-inside">
+                          {grocery.map((item) => (
+                            <li>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Checkbox id="quantity" />
+                        <Label htmlFor="terms">Show aggregated quantity</Label>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Checkbox id="terms-2" />
+                        <div className="grid gap-2">
+                          <Label htmlFor="terms-2">Show full details</Label>
+                          <p className="text-muted-foreground text-sm">
+                            Every ingredients needed, including ones you already
+                            have
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <DialogFooter>
+                  <Button variant="outline">
+                    <ClipboardCopy /> Copy list
+                  </Button>
+                  <DialogClose asChild>
+                    <Button>
+                      <Save /> Save list
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </Fragment>
       ),
     },
-    {
-      title: "Grocery list",
-      content: <span>Grocery list yippie</span>,
-    },
+    // {
+    //   title: "Grocery list",
+    //   content: (
+    //     <div className="flex flex-col justify-center items-center w-full">
+    //       {isPending ? (
+    //         <Loading label="your grocery list..." />
+    //       ) : (
+    //         <>
+    //           <svg
+    //             version="1.0"
+    //             xmlns="http://www.w3.org/2000/svg"
+    //             viewBox="0 0 1080 1080"
+    //             preserveAspectRatio="xMidYMid meet"
+    //             className="w-32 h-32 -my-8"
+    //           >
+    //             <g
+    //               transform="translate(0.000000,1080.000000) scale(0.100000,-0.100000)"
+    //               fill="currentColor"
+    //               stroke="none"
+    //             >
+    //               <path
+    //                 d="M5365 8270 c-255 -24 -494 -114 -735 -275 -63 -42 -117 -78 -119 -80
+    // -7 -8 63 -95 73 -92 6 3 56 35 111 72 181 121 396 210 580 241 146 24 377 15
+    // 502 -20 188 -52 318 -111 491 -222 45 -30 84 -54 86 -54 6 0 66 83 66 91 0 7
+    // -146 103 -221 146 -65 37 -222 105 -310 133 -155 51 -367 75 -524 60z"
+    //               />
+    //               <path
+    //                 d="M4200 7769 c-456 -196 -560 -528 -297 -946 28 -46 56 -83 60 -83 5 0
+    // 28 14 52 31 l43 31 -43 67 c-62 97 -92 160 -116 248 -66 238 48 412 356 543
+    // 44 19 81 35 82 35 4 2 -29 99 -36 107 -3 4 -49 -11 -101 -33z"
+    //               />
+    //               <path
+    //                 d="M6611 7760 c-14 -65 -14 -70 3 -70 34 0 198 -54 272 -90 197 -95 276
+    // -239 230 -420 -20 -81 -79 -204 -139 -293 l-45 -67 46 -36 47 -35 21 26 c41
+    // 52 117 188 150 269 90 223 63 400 -83 543 -49 49 -87 75 -175 118 -89 43 -271
+    // 105 -310 105 -3 0 -11 -23 -17 -50z"
+    //               />
+    //               <path d="M4402 6018 l3 -613 58 -3 57 -3 0 616 0 615 -60 0 -60 0 2 -612z" />
+    //               <path d="M6402 6018 l3 -613 58 -3 57 -3 0 616 0 615 -60 0 -60 0 2 -612z" />
+    //               <path
+    //                 d="M1783 4579 c-63 -31 -97 -87 -101 -168 -3 -80 20 -129 86 -176 87
+    // -60 224 -31 277 60 84 142 -6 305 -167 305 -33 0 -68 -8 -95 -21z"
+    //               />
+    //               <path
+    //                 d="M8835 4583 c-76 -40 -108 -92 -109 -178 -2 -119 79 -199 201 -200 52
+    // 0 68 4 105 30 66 47 89 96 86 176 -4 81 -38 138 -102 169 -51 24 -138 26 -181
+    // 3z"
+    //               />
+    //               <path
+    //                 d="M5060 4029 l-45 -39 45 -46 c69 -70 168 -141 240 -171 56 -23 79 -27
+    // 170 -28 101 0 108 1 184 38 43 20 97 51 120 69 59 45 136 120 136 133 0 5 -19
+    // 25 -41 43 l-40 34 -52 -49 c-211 -199 -393 -203 -597 -15 l-75 69 -45 -38z"
+    //               />
+    //             </g>
+    //           </svg>
+    //           <div>
+    //             <h1>Grocery list</h1>
+    //             <ul className="list-disc list-inside">
+    //               {grocery.map((item) => (
+    //                 <li>{item}</li>
+    //               ))}
+    //             </ul>
+    //           </div>
+    //         </>
+    //       )}
+    //     </div>
+    //   ),
+    // },
   ];
 
   return (
     <div className="mx-6 mt-3 max-h-[calc(100vh-64px)] lg:max-h-screen">
       <ol
         id="stepper"
-        className="list-inside font-medium flex md:grid md:grid-cols-5 md:place-items-center w-full items-center justify-center text-center gap-3 text-sm md:text-base mb-4"
+        className="list-inside font-medium flex md:grid md:grid-cols-3 md:place-items-center w-full items-center justify-center text-center gap-3 text-sm md:text-base mb-4"
       >
         {steps.map((step, index) => (
           <Fragment key={`step${index}-buttons`}>
@@ -225,26 +407,6 @@ export default function GroceryPlan() {
         ))}
       </ol>
       {steps[currentStep].content}
-      <div className="w-full mt-4 pb-16 md:pb-0 flex justify-between">
-        {currentStep > 0 ? (
-          <Button type="button" onClick={() => setCurrentStep(currentStep - 1)}>
-            Prev
-          </Button>
-        ) : (
-          <div className="invisible">Prev</div>
-        )}
-        {currentStep < steps.length - 1 ? (
-          <Button
-            type="button"
-            disabled={currentStep === 1 && recipeBoard.length === 0}
-            onClick={() => setCurrentStep(currentStep + 1)}
-          >
-            Next
-          </Button>
-        ) : (
-          <div className="invisible">Next</div>
-        )}
-      </div>
     </div>
   );
 }
