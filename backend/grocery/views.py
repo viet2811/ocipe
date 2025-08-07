@@ -62,7 +62,11 @@ class GroceryIngredientRetrieve(APIView):
 
         # Save recipes to history
         recipes = Recipe.objects.filter(id__in=recipe_ids).values_list('id', 'name', 'meat_type')
-        recipes_data = {id:(name, mt) for id, name, mt in recipes}
+        recipes_data = [{
+            "id": id,
+            "name": name,
+            "meat-type": mt
+        } for id, name, mt in recipes]
         History.objects.create(user=user, recipes=recipes_data)
 
         # Update those recipe state to 'used'
@@ -80,7 +84,12 @@ class HistoryList(generics.ListAPIView):
     serializer_class =  HistorySerializer
 
     def get_queryset(self):
-        return History.objects.filter(user=self.request.user).order_by('-created_at')
+        return History.objects.filter(user=self.request.user).order_by('-created_at')[:5]
+    
+    # DELETE
+    def delete(self, request, *args, **kwargs):
+        History.objects.filter(user=request.user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
 
 class GroceryListView(generics.ListAPIView):
@@ -117,3 +126,7 @@ class GroceryListRetrieveCreate(APIView):
         ])
 
         return Response(status.HTTP_201_CREATED)
+    
+    def delete(self, request):
+        GroceryList.objects.filter(user=request.user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
