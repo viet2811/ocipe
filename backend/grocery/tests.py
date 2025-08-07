@@ -34,7 +34,7 @@ class GroceryTests(AuthenticatedAPITestCase):
             self.client.post(fridge_url, data)
 
     def test_get_grocery_list(self):
-        url = reverse('grocery-list-retrieval')
+        url = reverse('grocery-ingredient-retrieve')
         data = {
             'recipe_ids': self.chosen_id
         }
@@ -49,7 +49,7 @@ class GroceryTests(AuthenticatedAPITestCase):
         self.assertEqual(len(used), 2)
 
     def test_get_grocery_history(self):
-        url = reverse('grocery-list-retrieval')
+        url = reverse('grocery-ingredient-retrieve')
         datas = [
             {
                 'recipe_ids': self.chosen_id

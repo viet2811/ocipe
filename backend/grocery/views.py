@@ -4,11 +4,11 @@ from rest_framework.response import Response
 
 from recipes.models import Recipe, RecipeIngredient, Ingredient
 from fridge.models import Fridge, FridgeIngredient
-from .models import History
-from .serializers import HistorySerializer
+from .models import GroceryListItem, History, GroceryList
+from .serializers import HistorySerializer, GroceryListSerializer, GroceryListItemSerializer
 from collections import Counter
 
-class GroceryList(APIView):
+class GroceryIngredientRetrieve(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
@@ -46,7 +46,6 @@ class GroceryList(APIView):
         fridgeIngredientSet = set(fi.ingredient.name for fi in fridgeIngredients)
 
         # Grocery list
-        # groceryList = recipeIngredientSet - fridgeIngredientSet
         groceryList = []
         others = []
 
@@ -82,3 +81,39 @@ class HistoryList(generics.ListAPIView):
 
     def get_queryset(self):
         return History.objects.filter(user=self.request.user).order_by('-created_at')
+    
+
+class GroceryListView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = GroceryListSerializer
+
+    def get_queryset(self):
+        return GroceryList.objects.filter(user=self.request.user)
+    
+class GroceryListRetrieveCreate(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request):
+        grocery_list, _ = GroceryList.objects.get_or_create(user=self.request.user)
+        items = grocery_list.items.all()
+        serializer = GroceryListItemSerializer(items, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        items_string = request.data.get('items', "")
+        
+        # Bad request
+        if not items_string.strip():
+            return Response({'error': 'No items provided'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        item_names = [line.strip() for line in items_string.strip().split('\n') if line.strip()]
+
+        grocery_list, _ = GroceryList.objects.get_or_create(user=self.request.user)
+
+        # Create new items
+        GroceryListItem.objects.bulk_create([
+            GroceryListItem(grocery=grocery_list, item=name)
+            for name in item_names
+        ])
+
+        return Response(status.HTTP_201_CREATED)

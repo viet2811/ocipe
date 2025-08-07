@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     # All recipes
-    path('', views.GroceryList.as_view(), name="grocery-list-retrieval"),
-    path('history/', views.HistoryList.as_view(), name="recipe-history-list")
+    path('', views.GroceryIngredientRetrieve.as_view(), name="grocery-ingredient-retrieve"),
+    path('history/', views.HistoryList.as_view(), name="recipe-history-list"),
+    path('list/', views.GroceryListRetrieveCreate.as_view(), name="grocery-list")
 ]

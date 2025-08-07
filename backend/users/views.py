@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import UserRegistrationSerializer
 from fridge.models import Fridge
+from grocery.models import GroceryList
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
@@ -14,8 +15,9 @@ class UserRegistrationView(APIView):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            # Each user is provided with ONE fridge object 
+            # Each user is provided with ONE fridge object and ONE groceryList
             Fridge.objects.create(user=user)
+            GroceryList.objects.create(user=user)
             return Response({
               "message": "User registered successfully"
             }, status=status.HTTP_201_CREATED)
@@ -38,22 +40,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             )
         return response
 
-# class CookieTokenRefreshView(APIView):
-#     def post(self, request):
-#         if 'refresh' not in request.data:
-#             refresh_cookie = request.COOKIES.get("refresh_token")
-#         try:
-#             token = RefreshToken(refresh_cookie)
-#             access = str(token.access_token)
-#         except TokenError as e:
-#             return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
-
-#         return Response({
-#             'access': access
-#         })
 class CookieTokenRefreshView(TokenRefreshView):
-    # authentication_classes = [JWTStatelessUserAuthentication]
-
     def post(self, request, *args, **kwargs):
         # Get refresh token from cookie if not in body
         if 'refresh' not in request.data:
