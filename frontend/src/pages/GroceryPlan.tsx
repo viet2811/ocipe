@@ -275,7 +275,7 @@ export default function GroceryPlan() {
                           {grocery.map((item, index) => (
                             <li
                               key={`groceryItem${index}`}
-                              className="font-semibold relative list-none pl-5 before:content-['•'] before:absolute before:left-0 before:text-black before:text-lg"
+                              className="font-semibold relative list-none pl-5 before:content-['•'] before:absolute before:left-0 before:text-lg"
                             >
                               <span className="inline space-x-1">
                                 <AnimatedText text={`\u00A0${item.name} `} />
@@ -290,10 +290,10 @@ export default function GroceryPlan() {
                           {fullDetails &&
                             existGroceryItem.map((item, index) => (
                               <li
-                                className="text-muted-foreground italic relative list-none pl-5 before:content-['•'] before:absolute before:left-0 before:text-black before:text-lg"
+                                className="text-muted-foreground relative list-none pl-5 before:content-['•'] before:absolute before:left-0 before:text-lg"
                                 key={`others${index}`}
                               >
-                                <span className="inline space-x-1">
+                                <span className="inline space-x-1 italic">
                                   <AnimatedText text={item.name} />
                                   {quantity && item.quantity && (
                                     <AnimatedText
