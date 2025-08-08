@@ -3,7 +3,7 @@ import Fridge from "./Fridge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, memo, useRef, useState } from "react";
 import RecipeList from "@/components/RecipeList";
 import type { Table } from "@tanstack/react-table";
 import type { Recipe, RecipeBoardItems } from "@/types/recipes";
@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import SplitText from "@/components/SplitText";
 
 const RecipeSelection: React.FC<{
   recipeBoard: RecipeBoardItems[];
@@ -172,6 +173,10 @@ type GroceryList = {
   others: IngredientDetails[];
 };
 
+const AnimatedText = memo(({ text }: { text: string }) => {
+  return <SplitText text={text} duration={0.6} delay={25} splitType="chars" />;
+});
+
 export default function GroceryPlan() {
   const [currentStep, setCurrentStep] = useState(0);
   const [recipeBoard, setRecipeBoard] = useState<RecipeBoardItems[]>([]);
@@ -264,24 +269,38 @@ export default function GroceryPlan() {
                   ) : (
                     <div className="space-y-4">
                       <div>
-                        <ul className="list-disc list-inside" ref={listRef}>
+                        <ul ref={listRef} className="list-inside">
                           {grocery.length === 0 &&
                             "Congrats. You don't need to buy anything"}
-                          {grocery.map((item) => (
-                            <li className="font-semibold">
-                              {item.name}
-                              {quantity &&
-                                item.quantity &&
-                                ` (${item.quantity})`}
+                          {grocery.map((item, index) => (
+                            <li
+                              key={`groceryItem${index}`}
+                              className="font-semibold relative list-none pl-5 before:content-['•'] before:absolute before:left-0 before:text-black before:text-lg"
+                            >
+                              <span className="inline space-x-1">
+                                <AnimatedText text={`\u00A0${item.name} `} />
+                                {quantity && item.quantity && (
+                                  <AnimatedText
+                                    text={`\u00A0(${item.quantity})`}
+                                  />
+                                )}
+                              </span>
                             </li>
                           ))}
                           {fullDetails &&
-                            existGroceryItem.map((item) => (
-                              <li className="text-muted-foreground italic">
-                                {item.name}
-                                {quantity &&
-                                  item.quantity &&
-                                  ` (${item.quantity})`}
+                            existGroceryItem.map((item, index) => (
+                              <li
+                                className="text-muted-foreground italic relative list-none pl-5 before:content-['•'] before:absolute before:left-0 before:text-black before:text-lg"
+                                key={`others${index}`}
+                              >
+                                <span className="inline space-x-1">
+                                  <AnimatedText text={item.name} />
+                                  {quantity && item.quantity && (
+                                    <AnimatedText
+                                      text={`\u00A0(${item.quantity})`}
+                                    />
+                                  )}
+                                </span>
                               </li>
                             ))}
                         </ul>
@@ -328,6 +347,7 @@ export default function GroceryPlan() {
                     onClick={() => {
                       if (listRef.current) {
                         const textToCopy = listRef.current.innerText;
+                        console.log(textToCopy);
                         navigator.clipboard
                           .writeText(textToCopy)
                           .then(() => {
