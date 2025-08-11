@@ -4,6 +4,6 @@ from . import views
 urlpatterns = [
     # All recipes
     path('', views.GroceryIngredientRetrieve.as_view(), name="grocery-ingredient-retrieve"),
-    path('history/', views.HistoryList.as_view(), name="recipe-history-list"),
+    path('history/', views.MostRecentHistoryList.as_view(), name="recipe-history-list"),
     path('list/', views.GroceryListRetrieveCreate.as_view(), name="grocery-list")
 ]

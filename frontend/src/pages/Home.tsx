@@ -4,9 +4,14 @@ import {
   getGroceryList,
   getRecentGroceryPlan,
 } from "@/api/grocery";
+import RecipeContent from "@/components/table/recipe-sheet-content";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { useRecipes } from "@/hooks/useRecipes";
 import { queryClient } from "@/lib/queryClient";
+import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   type LucideIcon,
@@ -14,7 +19,6 @@ import {
   Utensils,
   NotebookPen,
   Hamburger,
-  Car,
   X,
   Clipboard,
   History,
@@ -79,16 +83,20 @@ const quickButton = (data: quickButtonDataType) => {
   );
 };
 
+type History = {
+  created_at: string;
+  recipes: number[];
+};
+
 const Home = () => {
   const user = localStorage.getItem("name");
-  const { data: groceryList, isLoading: listIsLoading } = useQuery<
-    groceryListItem[]
-  >({
+
+  const { data: groceryListData } = useQuery<groceryListItem[]>({
     queryKey: ["grocery-list"],
     queryFn: getGroceryList,
   });
-
-  const { data: recentPlans, isLoading: planIsLoading } = useQuery<any>({
+  const { data: recipes } = useRecipes();
+  const { data: recentPlans } = useQuery<History[]>({
     queryKey: ["plan"],
     queryFn: getRecentGroceryPlan,
   });
@@ -105,21 +113,82 @@ const Home = () => {
     },
   });
 
-  const clearHistoryMutation = useMutation({
-    mutationFn: clearHistory,
-    onSuccess: () => {
-      toast.success("History is cleared");
-      queryClient.invalidateQueries({ queryKey: ["plan"] });
-    },
-    onError: (e) => {
-      toast.error("Something went wrong. Sorry mate");
-      console.log(e);
-    },
-  });
+  const groceryList = (
+    <Card className="p-6 gap-2 w-full" id="grocery-list">
+      <div className="flex">
+        <h1 className="flex items-center">
+          Grocery List
+          <Clipboard className="ml-2" />
+        </h1>
+        <Button
+          variant="ghost"
+          className="ml-auto"
+          onClick={() => clearAllGroceryList.mutate()}
+        >
+          <X /> Clear all
+        </Button>
+      </div>
+      <ul className="list-disc list-inside">
+        {groceryListData && groceryListData.map((item) => <li>{item.item}</li>)}
+      </ul>
+    </Card>
+  );
+
+  const recentPlan = (
+    <Card className="p-6 gap-2 w-full" id="recent-plan">
+      <h1 className="flex items-center">
+        Recent Plan
+        <History className="ml-2" />
+      </h1>
+      {recentPlans &&
+        recentPlans.map((item) => {
+          const date = new Date(item.created_at);
+          const formatted_date = date.toLocaleDateString("en-GB", {
+            weekday: "short",
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          });
+          return (
+            <>
+              <h2>{formatted_date}</h2>
+              <ScrollArea className="max-h-[210px] -mx-4 px-4">
+                <ul className="mt-1 border border-gray-200 rounded-lg">
+                  {item.recipes.map((item_id, index) => {
+                    if (recipes) {
+                      const recipe = recipes.filter(
+                        (recipe) => recipe.id === item_id
+                      )[0];
+
+                      return (
+                        <li
+                          className={cn(
+                            "flex w-full pr-3 pl-2 py-3",
+                            index < item.recipes.length - 1 && "border-b"
+                          )}
+                        >
+                          <div className="flex items-center">
+                            <RecipeContent {...recipe} />
+                            <span className="text-xs py-0.5 px-1.5 text-muted-foreground border font-medium rounded-md text-nowrap">
+                              {recipe.meat_type}
+                            </span>
+                          </div>
+                          <span className="ml-auto">{recipe.longevity}</span>
+                        </li>
+                      );
+                    }
+                  })}
+                </ul>
+              </ScrollArea>
+            </>
+          );
+        })}
+    </Card>
+  );
 
   return (
     //
-    <div className="h-[calc(100vh-64px)] w-full">
+    <div className="h-[calc(100vh-64px)]">
       <div className="flex flex-col items-center justify-center">
         <svg
           version="1.0"
@@ -171,53 +240,16 @@ const Home = () => {
         <h1>Hi {user}, how are we feeling?</h1>
       </div>
       <div className="flex justify-center my-4 h-100 flex-grow">
-        <div id="divA" className="flex flex-col h-full space-y-3">
-          <Card className="flex-grow p-6">
-            <h1>Current Meal</h1>
-          </Card>
-          {quickButton(quickButtonData[0])}
-        </div>
-        <div id="divB" className="flex flex-col w-max ml-2 space-y-2">
+        <div id="divB" className="flex flex-col ml-2 space-y-2">
           <div id="divC" className="flex space-x-2">
+            {/* {quickButton(quickButtonData[0])} */}
             {quickButton(quickButtonData[1])}
             {quickButton(quickButtonData[2])}
             {quickButton(quickButtonData[3])}
           </div>
-          <div id="divC" className="grid grid-cols-2 gap-2 w-full grow">
-            <Card className="p-6">
-              <div className="flex">
-                <h1 className="flex items-center">
-                  Grocery List
-                  <Clipboard className="ml-2" />
-                </h1>
-                <Button
-                  variant="ghost"
-                  className="ml-auto"
-                  onClick={() => clearAllGroceryList.mutate()}
-                >
-                  <X /> Clear all
-                </Button>
-              </div>
-              <ul className="list-disc list-inside">
-                {groceryList && groceryList.map((item) => <li>{item.item}</li>)}
-              </ul>
-            </Card>
-            <Card className="p-6">
-              <div className="flex">
-                <h1 className="flex items-center">
-                  Recent Plan
-                  <History className="ml-2" />
-                </h1>
-                <Button
-                  variant="ghost"
-                  className="ml-auto"
-                  onClick={() => clearHistoryMutation.mutate()}
-                >
-                  <X /> Clear all
-                </Button>
-              </div>
-              <Button onClick={() => console.log(recentPlans)}>Test</Button>
-            </Card>
+          <div id="divD" className="grid grid-cols-1 md:grid-cols-2 gap-2 grow">
+            {groceryList}
+            {recentPlan}
           </div>
         </div>
       </div>
