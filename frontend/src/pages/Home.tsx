@@ -59,7 +59,7 @@ const quickButtonData: quickButtonDataType[] = [
     url: "/grocery",
   },
   {
-    title: "Too busy to buy grocery?",
+    title: "Too lazy?",
     description: "Find something to cook with your current fridge",
     logo: Hamburger,
     url: "/fridge",
@@ -70,13 +70,15 @@ const quickButton = (data: quickButtonDataType) => {
   const Icon = data.logo;
   return (
     <Link to={data.url} key={data.title}>
-      <Card className="lg:w-70 h-20 p-1 md:p-4 flex flex-row items-center !gap-3">
+      <Card className="flex flex-row items-center max-w-70 h-20 flex-1 p-2 @md:p-4 !gap-3">
         <Icon className="min-h-6 min-w-6 ml-1"></Icon>
         <div className="w-max">
-          <div className="text-xs md:text-sm lg:text-base font-semibold">
+          <div className="text-xs md:text-sm @lg:text-base font-semibold">
             {data.title}
           </div>
-          <div className="md:text-xs text-[10px]">{data.description}</div>
+          <div className="hidden @md:block @md:text-xs text-[10px] text-wrap">
+            {data.description}
+          </div>
         </div>
       </Card>
     </Link>
@@ -114,7 +116,7 @@ const Home = () => {
   });
 
   const groceryList = (
-    <Card className="p-6 gap-2 w-full" id="grocery-list">
+    <>
       <div className="flex">
         <h1 className="flex items-center">
           Grocery List
@@ -131,11 +133,11 @@ const Home = () => {
       <ul className="list-disc list-inside">
         {groceryListData && groceryListData.map((item) => <li>{item.item}</li>)}
       </ul>
-    </Card>
+    </>
   );
 
   const recentPlan = (
-    <Card className="p-6 gap-2 w-full" id="recent-plan">
+    <>
       <h1 className="flex items-center">
         Recent Plan
         <History className="ml-2" />
@@ -183,13 +185,13 @@ const Home = () => {
             </>
           );
         })}
-    </Card>
+    </>
   );
 
   return (
     //
-    <div className="h-[calc(100vh-64px)]">
-      <div className="flex flex-col items-center justify-center">
+    <div className="h-[calc(100vh-64px)] @container">
+      <div className="flex flex-col items-center">
         <svg
           version="1.0"
           xmlns="http://www.w3.org/2000/svg"
@@ -239,17 +241,23 @@ const Home = () => {
         </svg>
         <h1>Hi {user}, how are we feeling?</h1>
       </div>
-      <div className="flex justify-center my-4 h-100 flex-grow">
+      <div className="flex mx-auto max-w-max my-4 max-h-100 flex-grow px-4">
         <div id="divB" className="flex flex-col ml-2 space-y-2">
-          <div id="divC" className="flex space-x-2">
-            {/* {quickButton(quickButtonData[0])} */}
+          <div id="divC" className="grid grid-cols-3 space-x-2">
             {quickButton(quickButtonData[1])}
             {quickButton(quickButtonData[2])}
             {quickButton(quickButtonData[3])}
           </div>
-          <div id="divD" className="grid grid-cols-1 md:grid-cols-2 gap-2 grow">
-            {groceryList}
-            {recentPlan}
+          <div
+            id="divD"
+            className="flex flex-col space-y-2 @md:space-y-0 @md:mx-0 @md:grid @md:grid-cols-2 gap-2 grow"
+          >
+            <Card className="p-6 gap-2 flex" id="grocery-list">
+              {groceryList}
+            </Card>
+            <Card className="p-6 gap-2 w-full" id="recent-plan">
+              {recentPlan}
+            </Card>
           </div>
         </div>
       </div>
