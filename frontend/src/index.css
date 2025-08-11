@@ -199,11 +199,11 @@
   }
 }
 
-/* @theme {
-  --font-mono: "Geist Mono Variable";
-  --font-sans: "Geist Variable";
-  --color-ivory: #fef9f4;
-} */
+@theme {
+  --container-sm: 40rem;
+  --container-md: 45rem;
+  --container-lg: 64rem;
+}
 
 h1 {
   @apply font-bold text-2xl;

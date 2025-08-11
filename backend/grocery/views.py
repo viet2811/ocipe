@@ -19,10 +19,8 @@ class GroceryIngredientRetrieve(APIView):
             return Response({'error': 'recipe_ids must be a non-empty list.'}, status=status.HTTP_400_BAD_REQUEST)
         
         user = self.request.user
-        userIngredient = Ingredient.objects.filter(user=user)
         fridge = Fridge.objects.get(user=user)  
         
-        recipe_ids_counts = Counter(recipe_ids)
 
         # All ingredients needed for given recipeIds
         recipeIngredients = RecipeIngredient.objects.filter(
@@ -30,6 +28,9 @@ class GroceryIngredientRetrieve(APIView):
             ingredient__user=user
         )
 
+        # Count to allow repeated recipe has x times its ingredients
+        recipe_ids_counts = Counter(recipe_ids)
+        # Aggregated the quantity from multiple recipes    
         ingredients_quantities = {}
         for ri in recipeIngredients:
             name = ri.ingredient.name
@@ -61,13 +62,13 @@ class GroceryIngredientRetrieve(APIView):
             
 
         # Save recipes to history
-        recipes = Recipe.objects.filter(id__in=recipe_ids).values_list('id', 'name', 'meat_type')
-        recipes_data = [{
-            "id": id,
-            "name": name,
-            "meat-type": mt
-        } for id, name, mt in recipes]
-        History.objects.create(user=user, recipes=recipes_data)
+        # recipes = Recipe.objects.filter(id__in=recipe_ids).values_list('id', 'name', 'meat_type')
+        # recipes_data = [{
+        #     "id": id,
+        #     "name": name,
+        #     "meat-type": mt
+        # } for id, name, mt in recipes]
+        History.objects.create(user=user, recipes=recipe_ids)
 
         # Update those recipe state to 'used'
         Recipe.objects.filter(id__in=recipe_ids).update(state='used')
@@ -79,18 +80,21 @@ class GroceryIngredientRetrieve(APIView):
             }
         )
 
-class HistoryList(generics.ListAPIView):
+class MostRecentHistoryList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class =  HistorySerializer
 
     def get_queryset(self):
-        return History.objects.filter(user=self.request.user).order_by('-created_at')[:5]
+        return History.objects.filter(user=self.request.user).order_by('-created_at')[:1]
+        
     
     # DELETE
     def delete(self, request, *args, **kwargs):
         History.objects.filter(user=request.user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+
+
 
 class GroceryListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]

@@ -4,9 +4,14 @@ import {
   getGroceryList,
   getRecentGroceryPlan,
 } from "@/api/grocery";
+import RecipeContent from "@/components/table/recipe-sheet-content";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { useRecipes } from "@/hooks/useRecipes";
 import { queryClient } from "@/lib/queryClient";
+import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   type LucideIcon,
@@ -14,7 +19,6 @@ import {
   Utensils,
   NotebookPen,
   Hamburger,
-  Car,
   X,
   Clipboard,
   History,
@@ -55,7 +59,7 @@ const quickButtonData: quickButtonDataType[] = [
     url: "/grocery",
   },
   {
-    title: "Too busy to buy grocery?",
+    title: "Too lazy?",
     description: "Find something to cook with your current fridge",
     logo: Hamburger,
     url: "/fridge",
@@ -66,29 +70,35 @@ const quickButton = (data: quickButtonDataType) => {
   const Icon = data.logo;
   return (
     <Link to={data.url} key={data.title}>
-      <Card className="lg:w-70 h-20 p-1 md:p-4 flex flex-row items-center !gap-3">
+      <Card className="flex flex-row items-center max-w-70 h-20 flex-1 p-2 @md:p-4 !gap-3">
         <Icon className="min-h-6 min-w-6 ml-1"></Icon>
         <div className="w-max">
-          <div className="text-xs md:text-sm lg:text-base font-semibold">
+          <div className="text-xs md:text-sm @lg:text-base font-semibold">
             {data.title}
           </div>
-          <div className="md:text-xs text-[10px]">{data.description}</div>
+          <div className="hidden @md:block @md:text-xs text-[10px] text-wrap">
+            {data.description}
+          </div>
         </div>
       </Card>
     </Link>
   );
 };
 
+type History = {
+  created_at: string;
+  recipes: number[];
+};
+
 const Home = () => {
   const user = localStorage.getItem("name");
-  const { data: groceryList, isLoading: listIsLoading } = useQuery<
-    groceryListItem[]
-  >({
+
+  const { data: groceryListData } = useQuery<groceryListItem[]>({
     queryKey: ["grocery-list"],
     queryFn: getGroceryList,
   });
-
-  const { data: recentPlans, isLoading: planIsLoading } = useQuery<any>({
+  const { data: recipes } = useRecipes();
+  const { data: recentPlans } = useQuery<History[]>({
     queryKey: ["plan"],
     queryFn: getRecentGroceryPlan,
   });
@@ -105,22 +115,83 @@ const Home = () => {
     },
   });
 
-  const clearHistoryMutation = useMutation({
-    mutationFn: clearHistory,
-    onSuccess: () => {
-      toast.success("History is cleared");
-      queryClient.invalidateQueries({ queryKey: ["plan"] });
-    },
-    onError: (e) => {
-      toast.error("Something went wrong. Sorry mate");
-      console.log(e);
-    },
-  });
+  const groceryList = (
+    <>
+      <div className="flex">
+        <h1 className="flex items-center">
+          Grocery List
+          <Clipboard className="ml-2" />
+        </h1>
+        <Button
+          variant="ghost"
+          className="ml-auto"
+          onClick={() => clearAllGroceryList.mutate()}
+        >
+          <X /> Clear all
+        </Button>
+      </div>
+      <ul className="list-disc list-inside">
+        {groceryListData && groceryListData.map((item) => <li>{item.item}</li>)}
+      </ul>
+    </>
+  );
+
+  const recentPlan = (
+    <>
+      <h1 className="flex items-center">
+        Recent Plan
+        <History className="ml-2" />
+      </h1>
+      {recentPlans &&
+        recentPlans.map((item) => {
+          const date = new Date(item.created_at);
+          const formatted_date = date.toLocaleDateString("en-GB", {
+            weekday: "short",
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          });
+          return (
+            <>
+              <h2>{formatted_date}</h2>
+              <ScrollArea className="max-h-[210px] -mx-4 px-4">
+                <ul className="mt-1 border dark:bg-muted  rounded-lg">
+                  {item.recipes.map((item_id, index) => {
+                    if (recipes) {
+                      const recipe = recipes.filter(
+                        (recipe) => recipe.id === item_id
+                      )[0];
+
+                      return (
+                        <li
+                          className={cn(
+                            "flex w-full pr-3 pl-2 py-3",
+                            index < item.recipes.length - 1 && "border-b"
+                          )}
+                        >
+                          <div className="flex items-center">
+                            <RecipeContent {...recipe} />
+                            <span className="text-xs py-0.5 px-1.5 text-muted-foreground border font-medium rounded-md text-nowrap">
+                              {recipe.meat_type}
+                            </span>
+                          </div>
+                          <span className="ml-auto">{recipe.longevity}</span>
+                        </li>
+                      );
+                    }
+                  })}
+                </ul>
+              </ScrollArea>
+            </>
+          );
+        })}
+    </>
+  );
 
   return (
     //
-    <div className="h-[calc(100vh-64px)] w-full">
-      <div className="flex flex-col items-center justify-center">
+    <div className="h-[calc(100vh-64px)] @container">
+      <div className="flex flex-col items-center">
         <svg
           version="1.0"
           xmlns="http://www.w3.org/2000/svg"
@@ -170,53 +241,22 @@ const Home = () => {
         </svg>
         <h1>Hi {user}, how are we feeling?</h1>
       </div>
-      <div className="flex justify-center my-4 h-100 flex-grow">
-        <div id="divA" className="flex flex-col h-full space-y-3">
-          <Card className="flex-grow p-6">
-            <h1>Current Meal</h1>
-          </Card>
-          {quickButton(quickButtonData[0])}
-        </div>
-        <div id="divB" className="flex flex-col w-max ml-2 space-y-2">
-          <div id="divC" className="flex space-x-2">
+      <div className="flex mx-auto max-w-max my-4 max-h-100 flex-grow px-4">
+        <div id="divB" className="flex flex-col ml-2 space-y-2">
+          <div id="divC" className="grid grid-cols-3 space-x-2">
             {quickButton(quickButtonData[1])}
             {quickButton(quickButtonData[2])}
             {quickButton(quickButtonData[3])}
           </div>
-          <div id="divC" className="grid grid-cols-2 gap-2 w-full grow">
-            <Card className="p-6">
-              <div className="flex">
-                <h1 className="flex items-center">
-                  Grocery List
-                  <Clipboard className="ml-2" />
-                </h1>
-                <Button
-                  variant="ghost"
-                  className="ml-auto"
-                  onClick={() => clearAllGroceryList.mutate()}
-                >
-                  <X /> Clear all
-                </Button>
-              </div>
-              <ul className="list-disc list-inside">
-                {groceryList && groceryList.map((item) => <li>{item.item}</li>)}
-              </ul>
+          <div
+            id="divD"
+            className="flex flex-col space-y-2 @md:space-y-0 @md:mx-0 @md:grid @md:grid-cols-2 gap-2 grow"
+          >
+            <Card className="p-6 gap-2 flex" id="grocery-list">
+              {groceryList}
             </Card>
-            <Card className="p-6">
-              <div className="flex">
-                <h1 className="flex items-center">
-                  Recent Plan
-                  <History className="ml-2" />
-                </h1>
-                <Button
-                  variant="ghost"
-                  className="ml-auto"
-                  onClick={() => clearHistoryMutation.mutate()}
-                >
-                  <X /> Clear all
-                </Button>
-              </div>
-              <Button onClick={() => console.log(recentPlans)}>Test</Button>
+            <Card className="p-6 gap-2 w-full" id="recent-plan">
+              {recentPlan}
             </Card>
           </div>
         </div>

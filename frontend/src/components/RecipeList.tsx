@@ -4,9 +4,10 @@ import { useState } from "react";
 import Loading from "@/components/loading";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { Recipe } from "@/types/recipes";
-import { getAllRecipes, getRecipesByIngredient } from "@/api/recipes";
+import { getRecipesByIngredient } from "@/api/recipes";
 import { useDebounce } from "@/hooks/useDebounce";
 import { type Table } from "@tanstack/react-table";
+import { useRecipes } from "@/hooks/useRecipes";
 
 type RecipeListProps = {
   rowSelectionEnabled: boolean;
@@ -30,10 +31,7 @@ export default function RecipeList({
   const [ingredientInput, setIngredientInput] = useState("");
   const debouncedIngredient = useDebounce(ingredientInput, 700);
 
-  const { data: recipes, isLoading } = useQuery<Recipe[]>({
-    queryKey: ["recipes"],
-    queryFn: getAllRecipes,
-  });
+  const { data: recipes, isLoading } = useRecipes();
 
   // Custom sorted data by ingredients
   const { data: filteredRecipes, isFetching: ingredientFetching } = useQuery<
