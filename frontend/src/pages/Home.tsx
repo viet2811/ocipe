@@ -155,7 +155,7 @@ const Home = () => {
             <>
               <h2>{formatted_date}</h2>
               <ScrollArea className="max-h-[210px] -mx-4 px-4">
-                <ul className="mt-1 border border-gray-200 rounded-lg">
+                <ul className="mt-1 border dark:bg-muted  rounded-lg">
                   {item.recipes.map((item_id, index) => {
                     if (recipes) {
                       const recipe = recipes.filter(
