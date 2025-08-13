@@ -1,14 +1,14 @@
 import {
   clearGroceryListAll,
-  clearHistory,
   getGroceryList,
   getRecentGroceryPlan,
 } from "@/api/grocery";
 import RecipeContent from "@/components/table/recipe-sheet-content";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { useRecipes } from "@/hooks/useRecipes";
 import { queryClient } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,7 @@ import {
   Clipboard,
   History,
 } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -32,12 +33,6 @@ interface quickButtonDataType {
   logo: LucideIcon;
   url: string;
 }
-
-type groceryListItem = {
-  id: number;
-  item: string;
-  isChecked: boolean;
-};
 
 const quickButtonData: quickButtonDataType[] = [
   {
@@ -85,23 +80,23 @@ const quickButton = (data: quickButtonDataType) => {
   );
 };
 
+type groceryListItem = {
+  id: number;
+  item: string;
+  isChecked: boolean;
+};
+
 type History = {
   created_at: string;
   recipes: number[];
 };
 
-const Home = () => {
-  const user = localStorage.getItem("name");
-
+const GroceryList: React.FC = () => {
   const { data: groceryListData } = useQuery<groceryListItem[]>({
     queryKey: ["grocery-list"],
     queryFn: getGroceryList,
   });
-  const { data: recipes } = useRecipes();
-  const { data: recentPlans } = useQuery<History[]>({
-    queryKey: ["plan"],
-    queryFn: getRecentGroceryPlan,
-  });
+  const [groceryList, setGroceryList] = useState<groceryListItem[]>([]);
 
   const clearAllGroceryList = useMutation({
     mutationFn: clearGroceryListAll,
@@ -114,8 +109,7 @@ const Home = () => {
       console.log(e);
     },
   });
-
-  const groceryList = (
+  return (
     <>
       <div className="flex">
         <h1 className="flex items-center">
@@ -130,13 +124,33 @@ const Home = () => {
           <X /> Clear all
         </Button>
       </div>
-      <ul className="list-disc list-inside">
-        {groceryListData && groceryListData.map((item) => <li>{item.item}</li>)}
+      <ul className="list-inside">
+        <ScrollArea className="max-h-[180px] -mx-4 px-4 overflow-auto">
+          {groceryListData &&
+            groceryListData.map((item) => (
+              <li className="flex items-center space-x-2 mb-2">
+                <Checkbox
+                  id={`list-item${item.id}`}
+                  className="border-2 border-muted-foreground shadow-none rounded-none"
+                />
+                <Label htmlFor={`list-item${item.id}`} className="text-base">
+                  {item.item}
+                </Label>
+              </li>
+            ))}
+        </ScrollArea>
       </ul>
     </>
   );
+};
 
-  const recentPlan = (
+const RecentPlan: React.FC = () => {
+  const { data: recipes } = useRecipes();
+  const { data: recentPlans } = useQuery<History[]>({
+    queryKey: ["plan"],
+    queryFn: getRecentGroceryPlan,
+  });
+  return (
     <>
       <h1 className="flex items-center">
         Recent Plan
@@ -164,6 +178,7 @@ const Home = () => {
 
                       return (
                         <li
+                          key={`recipe-${index}`}
                           className={cn(
                             "flex w-full pr-3 pl-2 py-3",
                             index < item.recipes.length - 1 && "border-b"
@@ -187,7 +202,10 @@ const Home = () => {
         })}
     </>
   );
+};
 
+const Home = () => {
+  const user = localStorage.getItem("name");
   return (
     //
     <div className="h-[calc(100vh-64px)] @container">
@@ -253,10 +271,10 @@ const Home = () => {
             className="flex flex-col space-y-2 @md:space-y-0 @md:mx-0 @md:grid @md:grid-cols-2 gap-2 grow"
           >
             <Card className="p-6 gap-2 flex" id="grocery-list">
-              {groceryList}
+              <GroceryList />
             </Card>
             <Card className="p-6 gap-2 w-full" id="recent-plan">
-              {recentPlan}
+              <RecentPlan />
             </Card>
           </div>
         </div>

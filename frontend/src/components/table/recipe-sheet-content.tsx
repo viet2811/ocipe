@@ -102,7 +102,7 @@ export default function RecipeContent(recipeData: Recipe) {
   ) : (
     <Sheet>
       <SheetTrigger asChild>{contentTrigger}</SheetTrigger>
-      <SheetContent>
+      <SheetContent className="!max-w-[24rem]">
         <SheetHeader>
           <SheetTitle className="scroll-m-20 text-xl font-extrabold tracking-tight text-wrap mr-2">
             {recipeData.name}
