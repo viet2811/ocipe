@@ -87,7 +87,13 @@ class MostRecentHistoryList(generics.ListAPIView):
     def get_queryset(self):
         return History.objects.filter(user=self.request.user).order_by('-created_at')[:1]
         
-    
+class HistoryList(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class =  HistorySerializer
+
+    def get_queryset(self):
+        return History.objects.filter(user=self.request.user).order_by('-created_at')
+
     # DELETE
     def delete(self, request, *args, **kwargs):
         History.objects.filter(user=request.user).delete()

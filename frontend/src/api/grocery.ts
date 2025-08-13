@@ -24,6 +24,11 @@ export async function clearHistory() {
 }
 
 export async function getRecentGroceryPlan() {
+  const response = await axiosInstance.get("/grocery/history/recent");
+  return response.data;
+}
+
+export async function getHistory() {
   const response = await axiosInstance.get("/grocery/history");
   return response.data;
 }
