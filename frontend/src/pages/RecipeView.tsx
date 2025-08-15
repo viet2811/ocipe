@@ -47,7 +47,7 @@ export default function RecipeView() {
             <Trash /> Delete all
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent className="!max-w-[40rem]">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <img src="/are_u_sure.jpg" alt="Are you sure" />
