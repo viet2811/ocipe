@@ -42,6 +42,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import SplitText from "@/components/SplitText";
+import { redirect, useNavigate } from "react-router-dom";
 
 const RecipeSelection: React.FC<{
   recipeBoard: RecipeBoardItems[];
@@ -198,9 +199,14 @@ export default function GroceryPlan() {
     },
     onError: () => toast.error("Something went wrong. Please try again"),
   });
+
+  const navigate = useNavigate();
+
   const saveGroceryList = useMutation({
     mutationFn: saveGroceryListItems,
-    onSuccess: () => toast.success("Items has been saved to grocery list."),
+    onSuccess: () => {
+      toast.success("Items has been saved to grocery list."), navigate("/home");
+    },
     onError: () => toast.error("Something went wrong. Please try again"),
   });
   const listRef = useRef<HTMLUListElement>(null);
@@ -256,7 +262,7 @@ export default function GroceryPlan() {
                   Get grocery list
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="!max-w-[32rem]">
                 <DialogHeader>
                   <DialogTitle>Grocery list</DialogTitle>
                   <DialogDescription>
