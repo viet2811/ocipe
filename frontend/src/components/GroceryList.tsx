@@ -1,0 +1,164 @@
+import {
+  clearGroceryListAll,
+  deleteSingleGroceryListItem,
+  getGroceryList,
+  updateSingleGroceryListItem,
+} from "@/api/grocery";
+import { queryClient } from "@/lib/queryClient";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Clipboard, Plus, X } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
+import { Checkbox } from "./ui/checkbox";
+import { Label } from "./ui/label";
+import { EditableTextInput } from "./editable-text-input";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion";
+
+type groceryListItem = {
+  id: number;
+  item: string;
+  isChecked: boolean;
+};
+
+function GroceryListItem({ item }: { item: groceryListItem }) {
+  const updateItemMutation = useMutation({
+    mutationFn: updateSingleGroceryListItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["grocery-list"] });
+    },
+    onError: (e) => console.log("Save error" + e),
+  });
+  const deleteItemMutation = useMutation({
+    mutationFn: deleteSingleGroceryListItem,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["grocery-list"] }),
+  });
+
+  const [isChecked, setIsChecked] = useState<boolean>(item.isChecked);
+
+  return (
+    <li
+      className="flex items-center justify-center space-x-2 mb-2"
+      key={`recipe-list-item${item.id}`}
+    >
+      <Checkbox
+        id={`list-item${item.id}`}
+        checked={isChecked}
+        onCheckedChange={(newCheckedState) => {
+          if (typeof newCheckedState === "boolean") {
+            setIsChecked(newCheckedState);
+            updateItemMutation.mutate({
+              id: item.id,
+              data: { isChecked: newCheckedState },
+            });
+          }
+        }}
+        className="border-2 border-muted-foreground shadow-none rounded-none peer"
+      />
+      <Label
+        htmlFor={`list-item${item.id}`}
+        className="text-base peer-[&[data-state=checked]]:line-through peer-[&[data-state=checked]]:text-muted-foreground"
+        onClick={(e) => e.preventDefault()}
+      >
+        <EditableTextInput
+          baseValue={item.item}
+          onUpdate={(newValue) => {
+            updateItemMutation.mutate({
+              id: item.id,
+              data: { item: newValue },
+            });
+          }}
+          onDelete={() => console.log("Delete the temp empty")}
+          className="!w-40"
+        />
+      </Label>
+      <X
+        className="ml-auto cursor-pointer text-muted-foreground"
+        size={16}
+        onClick={() => deleteItemMutation.mutate({ id: item.id })}
+      />
+    </li>
+  );
+}
+
+export default function GroceryList() {
+  const { data: groceryListData } = useQuery<groceryListItem[]>({
+    queryKey: ["grocery-list"],
+    queryFn: getGroceryList,
+  });
+
+  const [groceryList, setGroceryList] = useState<groceryListItem[]>([]);
+
+  const clearAllGroceryList = useMutation({
+    mutationFn: clearGroceryListAll,
+    onSuccess: () => {
+      toast.success("List is cleared");
+      queryClient.invalidateQueries({ queryKey: ["grocery-list"] });
+    },
+    onError: (e) => {
+      toast.error("Something went wrong. Sorry mate");
+      console.log(e);
+    },
+  });
+  return (
+    <>
+      <div className="flex">
+        <h1 className="flex items-center">
+          Grocery List
+          <Clipboard className="ml-2" />
+        </h1>
+        <Button
+          variant="ghost"
+          className="ml-auto"
+          onClick={() => clearAllGroceryList.mutate()}
+        >
+          <X /> Clear all
+        </Button>
+      </div>
+      <Button
+        variant="ghost"
+        type="button"
+        className="text-muted-foreground hover:bg-transparent hover:shadow-none hover:text-inherit cursor-pointer justify-start w-max !p-0"
+      >
+        <Plus /> Add an item
+      </Button>
+      <ul className="list-inside">
+        {/* Unchecked */}
+        <ScrollArea className="max-h-[120px]  @md:max-h-[180px] -mx-4 pl-4 pr-2.5 overflow-auto [scrollbar-gutter:stable]">
+          {groceryListData &&
+            groceryListData.map((item) => {
+              if (!item.isChecked)
+                return <GroceryListItem item={item} key={`item-${item.id}`} />;
+            })}
+        </ScrollArea>
+        {/* Checked */}
+        <Accordion type="single" collapsible>
+          <AccordionItem value="checked-items">
+            <AccordionTrigger className="text-muted-foreground">
+              {groceryListData?.filter((item) => item.isChecked).length ?? 0}{" "}
+              Checked items
+            </AccordionTrigger>
+            <AccordionContent asChild>
+              <ScrollArea className="max-h-[60px] @md:max-h-[100px] -mx-4 pl-4 pr-2.5 overflow-auto [scrollbar-gutter:stable]">
+                {groceryListData &&
+                  groceryListData.map((item) => {
+                    if (item.isChecked)
+                      return (
+                        <GroceryListItem item={item} key={`item-${item.id}`} />
+                      );
+                  })}
+              </ScrollArea>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </ul>
+    </>
+  );
+}

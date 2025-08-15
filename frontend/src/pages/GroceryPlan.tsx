@@ -26,7 +26,7 @@ import {
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { nanoid } from "nanoid";
 import { useMutation } from "@tanstack/react-query";
-import { getGroceryIngredients, updateGroceryListItems } from "@/api/grocery";
+import { getGroceryIngredients, saveGroceryListItems } from "@/api/grocery";
 import { toast } from "sonner";
 import Loading from "@/components/loading";
 import {
@@ -199,7 +199,7 @@ export default function GroceryPlan() {
     onError: () => toast.error("Something went wrong. Please try again"),
   });
   const saveGroceryList = useMutation({
-    mutationFn: updateGroceryListItems,
+    mutationFn: saveGroceryListItems,
     onSuccess: () => toast.success("Items has been saved to grocery list."),
     onError: () => toast.error("Something went wrong. Please try again"),
   });

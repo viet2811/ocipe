@@ -10,9 +10,28 @@ export async function getGroceryList() {
   return response.data;
 }
 
-export async function updateGroceryListItems(items: string) {
+export async function saveGroceryListItems(items: string) {
   const response = await axiosInstance.post("/grocery/list/", { items });
   return response.data;
+}
+
+type GroceryListItemInput = {
+  item?: string;
+  isChecked?: boolean;
+};
+
+export async function updateSingleGroceryListItem({
+  id,
+  data,
+}: {
+  id: number;
+  data: GroceryListItemInput;
+}) {
+  const response = await axiosInstance.patch(`/grocery/list/${id}/`, data);
+  return response.data;
+}
+export async function deleteSingleGroceryListItem({ id }: { id: number }) {
+  await axiosInstance.delete(`/grocery/list/${id}/`);
 }
 
 export async function clearGroceryListAll() {

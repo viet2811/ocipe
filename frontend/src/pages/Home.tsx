@@ -1,31 +1,21 @@
-import {
-  clearGroceryListAll,
-  getGroceryList,
-  getRecentGroceryPlan,
-} from "@/api/grocery";
+import { getRecentGroceryPlan } from "@/api/grocery";
+import GroceryList from "@/components/GroceryList";
 import RecipeContent from "@/components/table/recipe-sheet-content";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRecipes } from "@/hooks/useRecipes";
-import { queryClient } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   type LucideIcon,
   Soup,
   Utensils,
   NotebookPen,
   Hamburger,
-  X,
-  Clipboard,
   History,
 } from "lucide-react";
-import { useState } from "react";
+import { Fragment } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 
 interface quickButtonDataType {
   title: string;
@@ -80,68 +70,9 @@ const quickButton = (data: quickButtonDataType) => {
   );
 };
 
-type groceryListItem = {
-  id: number;
-  item: string;
-  isChecked: boolean;
-};
-
 type History = {
   created_at: string;
   recipes: number[];
-};
-
-const GroceryList: React.FC = () => {
-  const { data: groceryListData } = useQuery<groceryListItem[]>({
-    queryKey: ["grocery-list"],
-    queryFn: getGroceryList,
-  });
-  const [groceryList, setGroceryList] = useState<groceryListItem[]>([]);
-
-  const clearAllGroceryList = useMutation({
-    mutationFn: clearGroceryListAll,
-    onSuccess: () => {
-      toast.success("List is cleared");
-      queryClient.invalidateQueries({ queryKey: ["grocery-list"] });
-    },
-    onError: (e) => {
-      toast.error("Something went wrong. Sorry mate");
-      console.log(e);
-    },
-  });
-  return (
-    <>
-      <div className="flex">
-        <h1 className="flex items-center">
-          Grocery List
-          <Clipboard className="ml-2" />
-        </h1>
-        <Button
-          variant="ghost"
-          className="ml-auto"
-          onClick={() => clearAllGroceryList.mutate()}
-        >
-          <X /> Clear all
-        </Button>
-      </div>
-      <ul className="list-inside">
-        <ScrollArea className="max-h-[180px] -mx-4 px-4 overflow-auto">
-          {groceryListData &&
-            groceryListData.map((item) => (
-              <li className="flex items-center space-x-2 mb-2">
-                <Checkbox
-                  id={`list-item${item.id}`}
-                  className="border-2 border-muted-foreground shadow-none rounded-none"
-                />
-                <Label htmlFor={`list-item${item.id}`} className="text-base">
-                  {item.item}
-                </Label>
-              </li>
-            ))}
-        </ScrollArea>
-      </ul>
-    </>
-  );
 };
 
 const RecentPlan: React.FC = () => {
@@ -166,9 +97,9 @@ const RecentPlan: React.FC = () => {
             year: "numeric",
           });
           return (
-            <>
+            <Fragment key={"recent-plans"}>
               <h2>{formatted_date}</h2>
-              <ScrollArea className="max-h-[210px] -mx-4 px-4">
+              <ScrollArea className="max-h-[150px]  @md:max-h-[250px] -mx-4 px-4">
                 <ul className="mt-1 border dark:bg-muted  rounded-lg">
                   {item.recipes.map((item_id, index) => {
                     if (recipes) {
@@ -184,8 +115,10 @@ const RecentPlan: React.FC = () => {
                             index < item.recipes.length - 1 && "border-b"
                           )}
                         >
-                          <div className="flex items-center">
-                            <RecipeContent {...recipe} />
+                          <div className="flex flex-wrap items-center mr-4 px-3">
+                            <span className="-ml-3">
+                              <RecipeContent {...recipe} />
+                            </span>
                             <span className="text-xs py-0.5 px-1.5 text-muted-foreground border font-medium rounded-md text-nowrap">
                               {recipe.meat_type}
                             </span>
@@ -197,7 +130,7 @@ const RecentPlan: React.FC = () => {
                   })}
                 </ul>
               </ScrollArea>
-            </>
+            </Fragment>
           );
         })}
     </>
@@ -268,7 +201,7 @@ const Home = () => {
           </div>
           <div
             id="divD"
-            className="flex flex-col space-y-2 @md:space-y-0 @md:mx-0 @md:grid @md:grid-cols-2 gap-2 grow"
+            className="flex flex-col space-y-2 pb-10 @md:space-y-0 @md:mx-0 @md:grid @md:grid-cols-2 gap-2 grow"
           >
             <Card className="p-6 gap-2 flex" id="grocery-list">
               <GroceryList />
