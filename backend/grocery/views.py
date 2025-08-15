@@ -140,3 +140,11 @@ class GroceryListRetrieveCreate(APIView):
     def delete(self, request):
         GroceryList.objects.filter(user=request.user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class GroceryListItemUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = GroceryListItemSerializer
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return GroceryListItem.objects.filter(grocery__user=self.request.user).order_by('-isChecked')
