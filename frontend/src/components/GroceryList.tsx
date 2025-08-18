@@ -2,6 +2,7 @@ import {
   clearGroceryListAll,
   deleteSingleGroceryListItem,
   getGroceryList,
+  saveGroceryListItems,
   updateSingleGroceryListItem,
 } from "@/api/grocery";
 import { queryClient } from "@/lib/queryClient";
@@ -35,8 +36,33 @@ function GroceryListItem({ item }: { item: groceryListItem }) {
     },
     onError: (e) => console.log("Save error" + e),
   });
+
+  const onDelete = () => {
+    queryClient.setQueryData<groceryListItem[]>(["grocery-list"], (old) =>
+      old ? old.filter((cur_item) => cur_item.id !== item.id) : []
+    );
+  };
+
   const deleteItemMutation = useMutation({
-    mutationFn: deleteSingleGroceryListItem,
+    mutationFn: () => deleteSingleGroceryListItem({ id: item.id }),
+    onMutate: () => {
+      const previousList = queryClient.getQueryData<groceryListItem[]>([
+        "grocery-list",
+      ]);
+      onDelete();
+      return { previousList };
+    },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["grocery-list"] }),
+    onError: (_err, _id, context) => {
+      if (context?.previousList) {
+        queryClient.setQueryData(["grocery-list"], context.previousList);
+      }
+    },
+  });
+
+  const createNewItemMutation = useMutation({
+    mutationFn: saveGroceryListItems,
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["grocery-list"] }),
   });
@@ -70,19 +96,23 @@ function GroceryListItem({ item }: { item: groceryListItem }) {
         <EditableTextInput
           baseValue={item.item}
           onUpdate={(newValue) => {
-            updateItemMutation.mutate({
-              id: item.id,
-              data: { item: newValue },
-            });
+            if (item.id !== -1) {
+              updateItemMutation.mutate({
+                id: item.id,
+                data: { item: newValue },
+              });
+            } else {
+              createNewItemMutation.mutate(newValue);
+            }
           }}
-          onDelete={() => console.log("Delete the temp empty")}
+          onDelete={onDelete}
           className="!w-40"
         />
       </Label>
       <X
         className="ml-auto cursor-pointer text-muted-foreground"
         size={16}
-        onClick={() => deleteItemMutation.mutate({ id: item.id })}
+        onClick={() => deleteItemMutation.mutate()}
       />
     </li>
   );
@@ -93,8 +123,6 @@ export default function GroceryList() {
     queryKey: ["grocery-list"],
     queryFn: getGroceryList,
   });
-
-  const [groceryList, setGroceryList] = useState<groceryListItem[]>([]);
 
   const clearAllGroceryList = useMutation({
     mutationFn: clearGroceryListAll,
@@ -107,6 +135,19 @@ export default function GroceryList() {
       console.log(e);
     },
   });
+
+  const addNewItemToList = () => {
+    let item: groceryListItem = {
+      id: -1,
+      item: "",
+      isChecked: false,
+    };
+    queryClient.setQueryData<groceryListItem[]>(["grocery-list"], (old) => [
+      item,
+      ...(old ?? []),
+    ]);
+  };
+
   return (
     <>
       <div className="flex">
@@ -126,6 +167,7 @@ export default function GroceryList() {
         variant="ghost"
         type="button"
         className="text-muted-foreground hover:bg-transparent hover:shadow-none hover:text-inherit cursor-pointer justify-start w-max !p-0"
+        onClick={() => addNewItemToList()}
       >
         <Plus /> Add an item
       </Button>
