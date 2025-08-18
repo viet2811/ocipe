@@ -11,6 +11,11 @@ export async function postRecipe(data: RecipeInput) {
   return response.data;
 }
 
+export async function bulkCreateRecipe(list: RecipeInput[]) {
+  const response = await axiosInstance.post("/recipes/bulk/", { list });
+  return response.data;
+}
+
 export async function updateSingleRecipe({
   id,
   data,

@@ -12,6 +12,7 @@ import {
   NotebookPen,
   History,
   Search,
+  FileWarning,
 } from "lucide-react";
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
@@ -99,6 +100,18 @@ const RecentPlan: React.FC = () => {
                       const recipe = recipes.filter(
                         (recipe) => recipe.id === item_id
                       )[0];
+                      if (!recipe)
+                        return (
+                          <li
+                            className={cn(
+                              "flex w-full text-small text-destructive pr-3 items-center pl-2 py-3",
+                              index < item.recipes.length - 1 && "border-b"
+                            )}
+                          >
+                            <FileWarning size={16} className="mr-2" /> Recipe
+                            might be deleted
+                          </li>
+                        );
 
                       return (
                         <li

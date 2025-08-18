@@ -39,9 +39,30 @@ class RecipeListCreate(generics.ListCreateAPIView):
     def delete(self, request, *args, **kwargs):
         Recipe.objects.filter(user=request.user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class RecipeBulkCreate(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        # Expecting a list of recipes
+        recipeList = request.data.get('list')
+        if not recipeList:
+            return Response({"error": "Missing list in request body"}, status=status.HTTP_400_BAD_REQUEST)
+        elif not isinstance(recipeList, list):
+            return Response(
+                {"detail": "Expected a list of recipes."}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = RecipeSerializer(data=recipeList, many=True)
+        if serializer.is_valid():
+            serializer.save(user=request.user)  # pass user to each recipe
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # GET, UPDATE, DELETE
-class RecipeListRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+class SingleRecipeListRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = RecipeSerializer
     lookup_field = "pk"
