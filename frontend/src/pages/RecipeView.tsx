@@ -40,7 +40,7 @@ export default function RecipeView() {
   });
 
   const LeftSideButtons: React.FC = () => (
-    <div className="grid grid-cols-2 gap-2 @md:flex">
+    <div className="grid grid-cols-2 gap-2 mb-2 @md:flex">
       <Button size="sm">
         <Share /> Export
       </Button>
@@ -54,7 +54,7 @@ export default function RecipeView() {
         className="cursor-pointer"
         onClick={() => refreshMutation.mutate()}
       >
-        <RefreshCw /> Reset all status
+        <RefreshCw /> Reset status
       </Button>
       {/* Delete all */}
       <AlertDialog>
@@ -83,6 +83,11 @@ export default function RecipeView() {
     </div>
   );
   return (
-    <RecipeList rowSelectionEnabled={false} LeftSideButtons={LeftSideButtons} />
+    <div className="@container">
+      <RecipeList
+        rowSelectionEnabled={false}
+        LeftSideButtons={LeftSideButtons}
+      />
+    </div>
   );
 }

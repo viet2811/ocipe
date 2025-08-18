@@ -100,7 +100,7 @@ export default function Fridge() {
     default: 5,
     1440: 4,
     1024: 3,
-    768: 2,
+    821: 2,
     520: 1,
   };
   const isMobile = useIsMobile();
