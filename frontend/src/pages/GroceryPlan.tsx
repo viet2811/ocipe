@@ -216,7 +216,7 @@ export default function GroceryPlan() {
       title: "Check fridge",
       content: (
         <Fragment>
-          <ScrollArea className="mt-4 flex-row @container w-full mx-auto max-h-3/4 lg:max-h-4/5 overflow-auto overscroll-auto justify-center py-4 rounded-xl border">
+          <ScrollArea className="mt-4 flex-row @container w-full mx-auto max-h-3/4 lg:max-h-4/5 overflow-auto overflow-x-auto overscroll-auto justify-center py-4 rounded-xl border">
             <Fridge></Fridge>
           </ScrollArea>
           <div className="w-full mt-4 pb-16 md:pb-0 flex justify-end">
@@ -262,7 +262,7 @@ export default function GroceryPlan() {
                   Get grocery list
                 </Button>
               </DialogTrigger>
-              <DialogContent className="!max-w-[32rem]">
+              <DialogContent className="md:!max-w-[32rem]">
                 <DialogHeader>
                   <DialogTitle>Grocery list</DialogTitle>
                   <DialogDescription>

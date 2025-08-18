@@ -77,7 +77,7 @@ export function DataTablePagination<TData>({
   );
 
   const SelectNav: React.FC = () => (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-2 mr-2">
       <p className="text-sm font-medium">Rows per page</p>
       <Select
         value={`${table.getState().pagination.pageSize}`}
@@ -105,8 +105,8 @@ export function DataTablePagination<TData>({
         {LeftComponent && <LeftComponent />}
         <div
           className={cn(
-            "flex items-center space-x-6 min-w-0 @lg:space-x-8",
-            disabled ? "flex-wrap gap-2 justify-end ml-6" : "ml-auto"
+            "flex items-center space-x-6 min-w-0 @lg:space-x-8 flex-wrap gap-2 justify-end",
+            disabled ?? "ml-6"
           )}
         >
           {disabled ? (
