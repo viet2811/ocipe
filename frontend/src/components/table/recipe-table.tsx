@@ -30,6 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { queryClient } from "@/lib/queryClient";
+import { type FridgeResponse } from "@/types/recipes";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -113,10 +115,24 @@ export function DataTable<TData extends { id: number }, TValue>({
         <Select
           defaultValue={searchType}
           onValueChange={(value) => {
-            setSearchType(value);
-            // Prevent bug
+            if (value === "fridge") {
+              setSearchType("ingredients");
+              let fridge_data = queryClient.getQueryData<FridgeResponse>([
+                "fridge",
+              ]);
+              if (fridge_data) {
+                let groups = fridge_data.ingredient_list;
+                let strings = Object.values(groups) // get all ingredient arrays
+                  .flat() // flatten them into one array
+                  .map((ingredient) => ingredient.name) // pick out names
+                  .join(", ");
+                setIngredientInput(strings);
+              }
+            } else {
+              setSearchType(value);
+              setIngredientInput("");
+            }
             table.setGlobalFilter("");
-            setIngredientInput("");
           }}
         >
           <SelectTrigger className="w-max">
@@ -125,6 +141,7 @@ export function DataTable<TData extends { id: number }, TValue>({
           <SelectContent>
             <SelectItem value="default">Name + Meat Type</SelectItem>
             <SelectItem value="ingredients">Ingredient(s)</SelectItem>
+            <SelectItem value="fridge">Your Fridge</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -23,9 +23,6 @@ export default function RecipeList({
   strictPagination = false,
   onTableChange,
 }: RecipeListProps) {
-  // const columns = useMemo(() => recipeColumns, []);
-  // test const, later be parameter
-
   const columns = getRecipeColumns(rowSelectionEnabled);
   const [searchType, setSearchType] = useState("default");
   const [ingredientInput, setIngredientInput] = useState("");

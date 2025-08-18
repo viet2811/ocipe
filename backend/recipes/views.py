@@ -49,26 +49,6 @@ class RecipeListRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Recipe.objects.filter(user=self.request.user)
 
-# Random any recipe
-class RandomAnyRecipeRetrieve(generics.RetrieveAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = RecipeSerializer
-
-    def get_queryset(self):
-        return Recipe.objects.filter(user=self.request.user)
-    
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset().filter(state='active')
-        recipes = list(queryset)
-        
-        if not recipes:
-            return Response({'detail': 'No active recipes found.'}, status=404)
-        
-        random_recipe = random.choice(list(queryset))
-        serializer = self.get_serializer(random_recipe)
-        return Response(serializer.data)
-
-
 # Get stats
 class RecipeStatRetrieve(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
