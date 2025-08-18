@@ -18,8 +18,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [username, setUsername] = React.useState(
     () => localStorage.getItem("name") || ""
@@ -77,10 +75,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           {
             title: "Plan meals",
             url: "/grocery/plan-meals",
-          },
-          {
-            title: "Grocery list",
-            url: "#",
           },
           {
             title: "Previous plan",

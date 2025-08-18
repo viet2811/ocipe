@@ -12,13 +12,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useMutation } from "@tanstack/react-query";
-import { RefreshCw, Trash } from "lucide-react";
+import { Import, RefreshCw, Share, Trash } from "lucide-react";
 import { toast } from "sonner";
 import { queryClient } from "@/lib/queryClient";
 import RecipeList from "../components/RecipeList";
 
 export default function RecipeView() {
-  // Side buttons
   const deleteAllMutation = useMutation({
     mutationFn: deleteAllRecipes,
     onSuccess: () => {
@@ -39,8 +38,25 @@ export default function RecipeView() {
       toast.error("Something went wrong. Please retry");
     },
   });
+
   const LeftSideButtons: React.FC = () => (
-    <div className="grid grid-cols-2 md:flex">
+    <div className="grid grid-cols-2 gap-2 @md:flex">
+      <Button size="sm">
+        <Share /> Export
+      </Button>
+      <Button size="sm" variant="outline">
+        <Import /> Import
+      </Button>
+      {/* Reset status */}
+      <Button
+        variant="secondary"
+        size="sm"
+        className="cursor-pointer"
+        onClick={() => refreshMutation.mutate()}
+      >
+        <RefreshCw /> Reset all status
+      </Button>
+      {/* Delete all */}
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button variant="destructive" size="sm" className="cursor-pointer">
@@ -64,14 +80,6 @@ export default function RecipeView() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <Button
-        variant="secondary"
-        size="sm"
-        className="ml-2 cursor-pointer"
-        onClick={() => refreshMutation.mutate()}
-      >
-        <RefreshCw /> Reset all states
-      </Button>
     </div>
   );
   return (

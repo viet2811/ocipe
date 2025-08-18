@@ -8,11 +8,10 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import {
   type LucideIcon,
-  Soup,
   Utensils,
   NotebookPen,
-  Hamburger,
   History,
+  Search,
 } from "lucide-react";
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
@@ -26,12 +25,6 @@ interface quickButtonDataType {
 
 const quickButtonData: quickButtonDataType[] = [
   {
-    title: "Hungry?",
-    description: "Find something to cook",
-    logo: Soup,
-    url: "/recipes",
-  },
-  {
     title: "Found a new recipe?",
     description: "Add recipe manually or with Gemini",
     logo: Utensils,
@@ -39,15 +32,15 @@ const quickButtonData: quickButtonDataType[] = [
   },
   {
     title: "Grocery time?",
-    description: "Plan meals and grocery",
+    description: "Plan meals and get grocery list",
     logo: NotebookPen,
     url: "/grocery",
   },
   {
-    title: "Too lazy?",
-    description: "Find something to cook with your current fridge",
-    logo: Hamburger,
-    url: "/fridge",
+    title: "Hungry but clueless?",
+    description: "Find something to cook, even with what’s in your fridge",
+    logo: Search,
+    url: "/recipes",
   },
 ];
 
@@ -195,9 +188,9 @@ const Home = () => {
       <div className="flex mx-auto max-w-max my-4 max-h-100 flex-grow px-4">
         <div id="divB" className="flex flex-col ml-2 space-y-2">
           <div id="divC" className="grid grid-cols-3 space-x-2">
+            {quickButton(quickButtonData[0])}
             {quickButton(quickButtonData[1])}
             {quickButton(quickButtonData[2])}
-            {quickButton(quickButtonData[3])}
           </div>
           <div
             id="divD"
