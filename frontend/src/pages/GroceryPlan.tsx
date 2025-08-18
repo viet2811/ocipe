@@ -42,7 +42,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import SplitText from "@/components/SplitText";
-import { redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const RecipeSelection: React.FC<{
   recipeBoard: RecipeBoardItems[];

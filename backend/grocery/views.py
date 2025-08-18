@@ -114,7 +114,7 @@ class GroceryListRetrieveCreate(APIView):
     
     def get(self, request):
         grocery_list, _ = GroceryList.objects.get_or_create(user=self.request.user)
-        items = grocery_list.items.all()
+        items = grocery_list.items.order_by("-id")
         serializer = GroceryListItemSerializer(items, many=True)
         return Response(serializer.data)
     
@@ -147,4 +147,4 @@ class GroceryListItemUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return GroceryListItem.objects.filter(grocery__user=self.request.user).order_by('-isChecked')
+        return GroceryListItem.objects.filter(grocery__user=self.request.user).order_by('id')
