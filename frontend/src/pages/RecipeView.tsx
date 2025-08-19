@@ -1,4 +1,8 @@
-import { deleteAllRecipes, refreshRecipes } from "@/api/recipes";
+import {
+  bulkCreateRecipe,
+  deleteAllRecipes,
+  refreshRecipes,
+} from "@/api/recipes";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -29,7 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 function toRecipeInputs(recipes: Recipe[]): RecipeInput[] {
   return recipes.map((r) => ({
@@ -38,7 +42,7 @@ function toRecipeInputs(recipes: Recipe[]): RecipeInput[] {
     longevity: r.longevity,
     frequency: r.frequency,
     note: r.note, // optional
-    state: r.state,
+    state: "active",
     ingredients: r.ingredient_list.map((ing) => ({
       name: ing.name,
       quantity: ing.quantity,
@@ -57,6 +61,90 @@ function downloadRecipesAsJson(recipes: RecipeInput[]) {
   link.click();
 
   URL.revokeObjectURL(url); // cleanup
+}
+
+function ImportDialog() {
+  const [open, setOpen] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
+
+  const bulkCreateMutation = useMutation({
+    mutationFn: bulkCreateRecipe,
+    onSuccess: (data) => {
+      const count = Array.isArray(data) ? data.length : 0;
+      toast.success(`${count} recipes imported successfully!`);
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
+      setOpen(false);
+    },
+    onError: (e) => {
+      console.log(e);
+      toast.error("File data is not correctly formatted. Please retry.");
+    },
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Import /> Import
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Import recipes</DialogTitle>
+          <DialogDescription>
+            Add the JSON file which was exported from Ocipe
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-3">
+          <Label htmlFor="file">Upload JSON</Label>
+          <Input
+            id="file"
+            type="file"
+            accept=".json"
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => {
+              const inputFile = e.target.files?.[0];
+              if (!inputFile) return;
+
+              if (!inputFile.name.endsWith(".json")) {
+                toast.error("Only .json files are allowed");
+                e.target.value = "";
+                return;
+              }
+
+              setFile(inputFile);
+            }}
+          />
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button
+            type="button"
+            disabled={!file}
+            onClick={() => {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                const text = e.target?.result as string;
+                const parsed = JSON.parse(text);
+                if (!Array.isArray(parsed)) {
+                  toast.error("File does not contain a recipe list");
+                  return;
+                }
+                bulkCreateMutation.mutate(parsed);
+
+                // logs JSON object
+              };
+              file && reader.readAsText(file);
+            }}
+          >
+            Submit
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export default function RecipeView() {
@@ -80,7 +168,6 @@ export default function RecipeView() {
       toast.error("Something went wrong. Please retry");
     },
   });
-  const closeDialogRef = useRef<HTMLButtonElement>(null);
 
   const LeftSideButtons: React.FC = () => (
     <div className="grid grid-cols-2 gap-2 mb-2 @md:flex">
@@ -97,39 +184,7 @@ export default function RecipeView() {
       >
         <Share /> Export
       </Button>
-
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button size="sm" variant="outline">
-            <Import /> Import
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Import recipes</DialogTitle>
-            <DialogDescription>
-              Add the JSON file which was exported from Ocipe
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-3">
-            <Label htmlFor="file">Upload JSON</Label>
-            <Input
-              id="file"
-              type="file"
-              accept=".json"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline" ref={closeDialogRef}>
-                Cancel
-              </Button>
-            </DialogClose>
-            <Button type="button">Submit</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ImportDialog />
       {/* Reset status */}
       <Button
         variant="secondary"
