@@ -1,5 +1,4 @@
 import { clearHistory, getHistory } from "@/api/grocery";
-import RecipeContent from "@/components/table/recipe-sheet-content";
 import {
   Accordion,
   AccordionContent,
