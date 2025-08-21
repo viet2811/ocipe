@@ -1,9 +1,16 @@
-import { CircleCheck, Copy, NotepadText, Save, Shuffle } from "lucide-react";
+import {
+  CircleCheck,
+  Copy,
+  NotepadText,
+  Save,
+  Settings,
+  Shuffle,
+} from "lucide-react";
 import Fridge from "./Fridge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Fragment, memo, useRef, useState } from "react";
+import { Fragment, memo, useEffect, useRef, useState } from "react";
 import RecipeList from "@/components/RecipeList";
 import type { Table } from "@tanstack/react-table";
 import type { Recipe, RecipeBoardItems } from "@/types/recipes";
@@ -43,6 +50,20 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import SplitText from "@/components/SplitText";
 import { useNavigate } from "react-router-dom";
+import { queryClient } from "@/lib/queryClient";
+import PreviousPlansButton from "@/components/PreviousPlans";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
+
+type RandomPreferences = {
+  onlyActive: boolean;
+  randomWithSelected: boolean;
+  unselectRecent: boolean;
+};
 
 const RecipeSelection: React.FC<{
   recipeBoard: RecipeBoardItems[];
@@ -54,8 +75,141 @@ const RecipeSelection: React.FC<{
 
   const isMobile = useIsMobile();
   const defaultPaginationSize = isMobile ? 5 : 8;
+
+  function RandomButton() {
+    const defaultPreferences: RandomPreferences = {
+      onlyActive: true,
+      randomWithSelected: true,
+      unselectRecent: true,
+    };
+    const [preferences, setPreferences] = useState<RandomPreferences>(() => {
+      const saved = localStorage.getItem("preferences");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          return defaultPreferences;
+        }
+      }
+      return defaultPreferences;
+    });
+
+    useEffect(() => {
+      localStorage.setItem("preferences", JSON.stringify(preferences));
+    }, [preferences]);
+    return (
+      <>
+        <Button
+          type="button"
+          variant="outline"
+          className="cursor-pointer"
+          onClick={() => {
+            if (tableInstance) {
+              const selectedRows = tableInstance.getSelectedRowModel().rows;
+              const tableRows = tableInstance.getFilteredRowModel().rows;
+              const randomRows =
+                selectedRows.length !== 0 && preferences.randomWithSelected
+                  ? selectedRows
+                  : tableRows;
+
+              const filteredRandomRows = preferences.onlyActive
+                ? randomRows.filter((row) => row.original.state === "active")
+                : randomRows;
+
+              const randomRow =
+                filteredRandomRows[
+                  Math.floor(Math.random() * filteredRandomRows.length)
+                ];
+
+              if (
+                selectedRows.length !== 0 &&
+                preferences.randomWithSelected &&
+                preferences.unselectRecent
+              ) {
+                randomRow.toggleSelected();
+              }
+
+              setRecipeBoard((prev) => [
+                ...prev,
+                { ...randomRow.original, instanceID: nanoid() },
+              ]);
+            }
+          }}
+        >
+          <Shuffle></Shuffle>
+          Random
+        </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" className="-ml-2" size="icon">
+              <Settings />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent side="top" className="w-48">
+            <div className="grid gap-4">
+              <div className="space-y-2">
+                <h4 className="leading-none font-medium">Random settings</h4>
+                <p className="text-muted-foreground text-sm text-wrap">
+                  Set custom preferences for random.
+                </p>
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Label className="flex-1 text-wrap">Only active</Label>
+                  <Switch
+                    checked={preferences.onlyActive}
+                    onCheckedChange={(val) =>
+                      setPreferences((prev) => ({ ...prev, onlyActive: val }))
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <Label className="flex-1 text-wrap">
+                    Random with Selected Items
+                  </Label>
+                  <Switch
+                    checked={preferences.randomWithSelected}
+                    onCheckedChange={(val) =>
+                      setPreferences((prev) => ({
+                        ...prev,
+                        randomWithSelected: val,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <Label className="flex-1 text-wrap">
+                    Unselect recent random item
+                  </Label>
+                  <Switch
+                    checked={preferences.unselectRecent}
+                    disabled={!preferences.randomWithSelected}
+                    onCheckedChange={(val) =>
+                      setPreferences((prev) => ({
+                        ...prev,
+                        unselectRecent: val,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </>
+    );
+  }
+  const addItemsToBoard = (items: Recipe[]) => {
+    setRecipeBoard((prev) => [
+      ...prev,
+      ...items.map((i) => {
+        // check values
+        return { ...i, instanceID: nanoid() };
+      }),
+    ]);
+  };
   const leftSideButtons: React.FC = () => (
-    <div className="grid grid-cols-2 md:flex gap-2">
+    <div className="flex-wrap flex gap-2">
       <Button
         type="button"
         className="cursor-pointer"
@@ -72,27 +226,10 @@ const RecipeSelection: React.FC<{
           ]);
         }}
       >
-        Add to Board
+        Select
       </Button>
-      <Button
-        type="button"
-        variant="outline"
-        className="cursor-pointer"
-        onClick={() => {
-          const tableRows = tableInstance?.getCoreRowModel().rows; // filtered will be only within the range
-          if (tableRows) {
-            const randomRow =
-              tableRows[Math.floor(Math.random() * tableRows.length)];
-            setRecipeBoard((prev) => [
-              ...prev,
-              { ...randomRow.original, instanceID: nanoid() },
-            ]);
-          }
-        }}
-      >
-        <Shuffle></Shuffle>
-        Random pick
-      </Button>
+      <RandomButton />
+      <PreviousPlansButton setRecipeBoard={addItemsToBoard} />
     </div>
   );
 
@@ -112,12 +249,8 @@ const RecipeSelection: React.FC<{
 
   return (
     <div className="flex flex-col lg:flex-row gap-3 w-full mx-auto min-h-[78vh] @container">
-      <div
-        id="recipe-list"
-        className="rounded-xl border w-full lg:w-7/10 flex-shrink-0 p-1 pt-6"
-      >
+      <div className="rounded-xl border w-full lg:w-7/10 flex-shrink-0 p-1 pt-6">
         <RecipeList
-          key={defaultPaginationSize}
           rowSelectionEnabled
           defaultPaginationSize={defaultPaginationSize}
           LeftSideButtons={leftSideButtons}
@@ -193,7 +326,10 @@ export default function GroceryPlan() {
   const { mutate: groceryList, isPending } = useMutation({
     mutationFn: getGroceryIngredients,
     onSuccess: (data: GroceryList) => {
-      toast.success("Recipe fetched!");
+      toast.success("Ingredients fetched!");
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
+      queryClient.invalidateQueries({ queryKey: ["history"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-plan"] });
       setGrocery(data.grocery_list);
       setExistGroceryItem(data.others);
     },

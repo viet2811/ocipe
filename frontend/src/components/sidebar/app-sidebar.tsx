@@ -76,10 +76,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             title: "Plan meals",
             url: "/grocery/plan-meals",
           },
-          {
-            title: "Previous plan",
-            url: "#",
-          },
         ],
       },
     ],
