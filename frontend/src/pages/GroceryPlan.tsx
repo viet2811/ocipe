@@ -1,4 +1,11 @@
-import { CircleCheck, Copy, NotepadText, Save, Shuffle } from "lucide-react";
+import {
+  CircleCheck,
+  Copy,
+  NotepadText,
+  Save,
+  Settings,
+  Shuffle,
+} from "lucide-react";
 import Fridge from "./Fridge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -43,6 +50,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import SplitText from "@/components/SplitText";
 import { useNavigate } from "react-router-dom";
+import { queryClient } from "@/lib/queryClient";
+import PreviousPlansButton from "@/components/PreviousPlans";
 
 const RecipeSelection: React.FC<{
   recipeBoard: RecipeBoardItems[];
@@ -55,7 +64,7 @@ const RecipeSelection: React.FC<{
   const isMobile = useIsMobile();
   const defaultPaginationSize = isMobile ? 5 : 8;
   const leftSideButtons: React.FC = () => (
-    <div className="grid grid-cols-2 md:flex gap-2">
+    <div className="flex-wrap flex gap-2">
       <Button
         type="button"
         className="cursor-pointer"
@@ -72,7 +81,7 @@ const RecipeSelection: React.FC<{
           ]);
         }}
       >
-        Add to Board
+        Select
       </Button>
       <Button
         type="button"
@@ -91,8 +100,12 @@ const RecipeSelection: React.FC<{
         }}
       >
         <Shuffle></Shuffle>
-        Random pick
+        Random
       </Button>
+      <Button variant="ghost" className="-ml-2" size="icon">
+        <Settings />
+      </Button>
+      <PreviousPlansButton />
     </div>
   );
 
@@ -112,10 +125,7 @@ const RecipeSelection: React.FC<{
 
   return (
     <div className="flex flex-col lg:flex-row gap-3 w-full mx-auto min-h-[78vh] @container">
-      <div
-        id="recipe-list"
-        className="rounded-xl border w-full lg:w-7/10 flex-shrink-0 p-1 pt-6"
-      >
+      <div className="rounded-xl border w-full lg:w-7/10 flex-shrink-0 p-1 pt-6">
         <RecipeList
           key={defaultPaginationSize}
           rowSelectionEnabled
@@ -193,7 +203,10 @@ export default function GroceryPlan() {
   const { mutate: groceryList, isPending } = useMutation({
     mutationFn: getGroceryIngredients,
     onSuccess: (data: GroceryList) => {
-      toast.success("Recipe fetched!");
+      toast.success("Ingredients fetched!");
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
+      queryClient.invalidateQueries({ queryKey: ["history"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-plan"] });
       setGrocery(data.grocery_list);
       setExistGroceryItem(data.others);
     },

@@ -9,7 +9,6 @@ export const queryClient = new QueryClient({
     queries: {
       staleTime: 5 * 60 * 1000,
       refetchOnWindowFocus: false,
-      refetchOnMount: "always",
       refetchOnReconnect: false,
       gcTime: 1000 * 60 * 60 * 24, //24 hours garbage collection(during session)
     },

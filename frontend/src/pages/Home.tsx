@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRecipes } from "@/hooks/useRecipes";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
+import { type HistoryPlans } from "@/types/recipes";
 import {
   type LucideIcon,
   Utensils,
@@ -64,15 +65,10 @@ const quickButton = (data: quickButtonDataType) => {
   );
 };
 
-type History = {
-  created_at: string;
-  recipes: number[];
-};
-
 const RecentPlan: React.FC = () => {
   const { data: recipes } = useRecipes();
-  const { data: recentPlans } = useQuery<History[]>({
-    queryKey: ["plan"],
+  const { data: recentPlans } = useQuery<HistoryPlans[]>({
+    queryKey: ["recent-plan"],
     queryFn: getRecentGroceryPlan,
   });
   return (

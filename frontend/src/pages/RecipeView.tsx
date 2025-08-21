@@ -41,7 +41,7 @@ function toRecipeInputs(recipes: Recipe[]): RecipeInput[] {
     meat_type: r.meat_type,
     longevity: r.longevity,
     frequency: r.frequency,
-    note: r.note, // optional
+    note: r.note,
     state: "active",
     ingredients: r.ingredient_list.map((ing) => ({
       name: ing.name,

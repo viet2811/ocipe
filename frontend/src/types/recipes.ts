@@ -47,3 +47,8 @@ export type FridgeResponse = {
 export interface RecipeBoardItems extends Recipe {
   instanceID: string;
 }
+
+export type HistoryPlans = {
+  created_at: string;
+  recipes: number[];
+};
