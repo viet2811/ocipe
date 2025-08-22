@@ -199,7 +199,15 @@ const RecipeSelection: React.FC<{
       </>
     );
   }
-
+  const addItemsToBoard = (items: Recipe[]) => {
+    setRecipeBoard((prev) => [
+      ...prev,
+      ...items.map((i) => {
+        // check values
+        return { ...i, instanceID: nanoid() };
+      }),
+    ]);
+  };
   const leftSideButtons: React.FC = () => (
     <div className="flex-wrap flex gap-2">
       <Button
@@ -221,7 +229,7 @@ const RecipeSelection: React.FC<{
         Select
       </Button>
       <RandomButton />
-      <PreviousPlansButton />
+      <PreviousPlansButton setRecipeBoard={addItemsToBoard} />
     </div>
   );
 
@@ -243,7 +251,6 @@ const RecipeSelection: React.FC<{
     <div className="flex flex-col lg:flex-row gap-3 w-full mx-auto min-h-[78vh] @container">
       <div className="rounded-xl border w-full lg:w-7/10 flex-shrink-0 p-1 pt-6">
         <RecipeList
-          key={defaultPaginationSize}
           rowSelectionEnabled
           defaultPaginationSize={defaultPaginationSize}
           LeftSideButtons={leftSideButtons}

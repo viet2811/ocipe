@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -17,6 +18,7 @@ import {
 
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -29,18 +31,30 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useRecipes } from "@/hooks/useRecipes";
 import { queryClient } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
-import type { HistoryPlans } from "@/types/recipes";
+import type { HistoryPlans, Recipe, RecipeBoardItems } from "@/types/recipes";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { FileWarning, HistoryIcon, X } from "lucide-react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 
-function PreviousPlansContent() {
+export default function PreviousPlansButton({
+  setRecipeBoard,
+}: {
+  setRecipeBoard: (items: Recipe[]) => void;
+}) {
   const { data: recipes } = useRecipes();
   const { data: history } = useQuery<HistoryPlans[]>({
     queryKey: ["history"],
     queryFn: getHistory,
   });
-  return (
+
+  const handleReuse = (plan: HistoryPlans) => {
+    const found = plan.recipes
+      .map((id) => recipes?.find((r) => r.id === id))
+      .filter((r): r is Recipe => Boolean(r));
+    setRecipeBoard(found);
+  };
+
+  const PreviousPlanContent = (
     <ScrollArea className="max-h-4/5 overflow-auto [scrollbar-gutter:stable] -mt-4">
       <Accordion
         type="single"
@@ -59,17 +73,29 @@ function PreviousPlansContent() {
             });
             return (
               <AccordionItem value={`item-${index}`} key={`item-${index}`}>
-                <AccordionTrigger className="text-muted-foreground">
-                  {/* Date and Combine of longevity */}
-                  <h2>{formatted_date}</h2>
-                  {/* Not very efficient down here cause im super duper lazy :< */}
-                  <span className="ml-auto">
-                    {plan.recipes.reduce((total, recipeID) => {
-                      const recipe = recipes?.find((r) => r.id === recipeID);
-                      return total + (recipe?.longevity ?? 0);
-                    }, 0)}
-                  </span>
-                </AccordionTrigger>
+                <div className="flex items-center">
+                  <Button
+                    variant="link"
+                    className="w-max h-max"
+                    onClick={() => handleReuse(plan)}
+                  >
+                    Reuse
+                  </Button>
+                  <div className="flex-1 min-w-0">
+                    <AccordionTrigger className="text-muted-foreground w-full">
+                      <h2>{formatted_date}</h2>
+                      {/* Not very efficient down here cause im super duper lazy :< */}
+                      <span className="ml-auto">
+                        {plan.recipes.reduce((total, recipeID) => {
+                          const recipe = recipes?.find(
+                            (r) => r.id === recipeID
+                          );
+                          return total + (recipe?.longevity ?? 0);
+                        }, 0)}
+                      </span>
+                    </AccordionTrigger>
+                  </div>
+                </div>
                 <AccordionContent asChild>
                   <ul className="disc-inside">
                     {plan.recipes.map((recipeID, index) => {
@@ -124,9 +150,7 @@ function PreviousPlansContent() {
       </Accordion>
     </ScrollArea>
   );
-}
 
-export default function PreviousPlansButton() {
   const clearAllHistory = useMutation({
     mutationFn: clearHistory,
     onSuccess: () => {
@@ -134,13 +158,13 @@ export default function PreviousPlansButton() {
       queryClient.invalidateQueries({ queryKey: ["recent-plan"] });
     },
   });
+
   const contentTrigger = (
     <Button variant="outline" className="ml-auto">
       <HistoryIcon />
       <span className="hidden md:block">Previous plans</span>
     </Button>
   );
-
   const deleteAllButton = (
     <Button
       variant="destructive"
@@ -162,21 +186,24 @@ export default function PreviousPlansButton() {
           <DrawerTitle>Previous plans</DrawerTitle>
           <DrawerDescription>Recipe planning history</DrawerDescription>
         </DrawerHeader>
-        <PreviousPlansContent />
+        {PreviousPlanContent}
         <DrawerFooter>{deleteAllButton}</DrawerFooter>
       </DrawerContent>
     </Drawer>
   ) : (
     <Sheet>
       <SheetTrigger asChild>{contentTrigger}</SheetTrigger>
-      <SheetContent className="!max-w-[24rem]">
+      <SheetContent
+        className="!max-w-[24rem]"
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <SheetHeader>
           <SheetTitle className="scroll-m-20 text-xl font-extrabold tracking-tight text-wrap mr-2">
             Previous plans
           </SheetTitle>
           <SheetDescription>Recipe planning history</SheetDescription>
         </SheetHeader>
-        <PreviousPlansContent />
+        {PreviousPlanContent}
         <SheetFooter>{deleteAllButton}</SheetFooter>
       </SheetContent>
     </Sheet>
