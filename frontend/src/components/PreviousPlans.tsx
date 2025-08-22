@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/accordion";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -18,7 +17,6 @@ import {
 
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -31,7 +29,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useRecipes } from "@/hooks/useRecipes";
 import { queryClient } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
-import type { HistoryPlans, Recipe, RecipeBoardItems } from "@/types/recipes";
+import type { HistoryPlans, Recipe } from "@/types/recipes";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { FileWarning, HistoryIcon, X } from "lucide-react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
@@ -83,7 +81,7 @@ export default function PreviousPlansButton({
                   </Button>
                   <div className="flex-1 min-w-0">
                     <AccordionTrigger className="text-muted-foreground w-full">
-                      <h2>{formatted_date}</h2>
+                      <h2 className="text-foreground">{formatted_date}</h2>
                       {/* Not very efficient down here cause im super duper lazy :< */}
                       <span className="ml-auto">
                         {plan.recipes.reduce((total, recipeID) => {
@@ -147,6 +145,11 @@ export default function PreviousPlansButton({
               </AccordionItem>
             );
           })}
+        {history?.length === 0 && (
+          <blockquote className="my-2 -ml-2 border-l-2 px-4 italic whitespace-pre-wrap">
+            Start planning to see what you've been cooking
+          </blockquote>
+        )}
       </Accordion>
     </ScrollArea>
   );

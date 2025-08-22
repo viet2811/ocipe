@@ -8,8 +8,8 @@ import { useState } from "react";
  *
  * @param id - Unique identifier for the draggable item.
  * @param name - The display name or value of the item.
- * @param onUpdate - Callback function invoked when the item's value is updated.
- * @param onDelete - Callback function invoked when the item is deleted.
+ * @param onUpdate - Callback function to update item, usually for POST.
+ * @param onDelete - Callback function to delete the item
  *
  * Utilizes `useDraggable` for drag-and-drop capabilities and renders a grip icon for dragging,
  * an editable text input for the item's name, and a delete icon for removing the item.

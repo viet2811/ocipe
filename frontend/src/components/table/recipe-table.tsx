@@ -32,6 +32,8 @@ import {
 } from "../ui/select";
 import { queryClient } from "@/lib/queryClient";
 import { type FridgeResponse } from "@/types/recipes";
+import { Link } from "react-router-dom";
+import { Button } from "../ui/button";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -189,7 +191,13 @@ export function DataTable<TData extends { id: number }, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Kitchen seems.. empty? Go{" "}
+                  <Link to="/recipes/add-a-recipe">
+                    <Button variant="link" className="p-0">
+                      here
+                    </Button>
+                  </Link>{" "}
+                  to start adding your recipe
                 </TableCell>
               </TableRow>
             )}
