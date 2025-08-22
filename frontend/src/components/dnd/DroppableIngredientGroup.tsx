@@ -30,9 +30,6 @@ type IngredientGroupProps = {
   ingredients: Ingredient[]; // To render and map draggable item inside
   isHighlighted: boolean; // If it's being hovered at when dragging
   setIngredientList: React.Dispatch<React.SetStateAction<IngredientGroup>>;
-  // onUpdate: (newName: string) => void
-  // onDelete: () => void
-  // I mean we could just handle these ourselves
 };
 
 // A droppable area, sharing its name to child - item

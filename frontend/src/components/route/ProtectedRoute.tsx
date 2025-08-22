@@ -1,11 +1,11 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // Adjust path as necessary
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext"; // Adjust path as necessary
 
 const ProtectedRoute: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth();
 
-  if (!isLoading){
+  if (!isLoading) {
     // Outlet renders child routes
     if (isAuthenticated) {
       return <Outlet />;

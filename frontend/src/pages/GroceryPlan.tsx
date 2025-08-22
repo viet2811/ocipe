@@ -341,6 +341,7 @@ export default function GroceryPlan() {
   const saveGroceryList = useMutation({
     mutationFn: saveGroceryListItems,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["grocery-list"] });
       toast.success("Items has been saved to grocery list."), navigate("/home");
     },
     onError: () => toast.error("Something went wrong. Please try again"),

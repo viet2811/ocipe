@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 interface quickButtonDataType {
   title: string;
@@ -27,7 +28,7 @@ interface quickButtonDataType {
 
 const quickButtonData: quickButtonDataType[] = [
   {
-    title: "Found a new recipe?",
+    title: "Found new recipe?",
     description: "Add recipe manually or with Gemini",
     logo: Utensils,
     url: "/recipes/add-a-recipe",
@@ -50,7 +51,7 @@ const quickButton = (data: quickButtonDataType) => {
   const Icon = data.logo;
   return (
     <Link to={data.url} key={data.title}>
-      <Card className="flex flex-row items-center max-w-70 h-20 flex-1 p-2 @md:p-4 !gap-3">
+      <Card className="flex flex-row items-center max-w-70 h-16 @md:h-20 flex-1 p-2 @md:p-4 !gap-3">
         <Icon className="min-h-6 min-w-6 ml-1"></Icon>
         <div className="w-max">
           <div className="text-xs md:text-sm @lg:text-base font-semibold">
@@ -135,6 +136,14 @@ const RecentPlan: React.FC = () => {
             </Fragment>
           );
         })}
+      {recentPlans?.length === 0 && (
+        <>
+          <span>Hmm there's nothing here :( </span>
+          <Link to="/grocery">
+            <Button>Plan meals</Button>
+          </Link>
+        </>
+      )}
     </>
   );
 };

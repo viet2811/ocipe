@@ -6,8 +6,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import WelcomePage from "./pages/WelcomePage";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicOnlyRoute from "./components/PublicOnlyRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -16,6 +14,9 @@ import { Toaster } from "sonner";
 import Fridge from "./pages/Fridge";
 import GroceryPlan from "./pages/GroceryPlan";
 import RecipeView from "./pages/RecipeView";
+import PublicOnlyRoute from "./components/route/PublicOnlyRoute";
+import ProtectedRoute from "./components/route/ProtectedRoute";
+import Introduction from "./pages/Introduction";
 
 const AppContent = () => {
   return (
@@ -36,6 +37,10 @@ const AppContent = () => {
           <Route path="/grocery">
             <Route index element={<Navigate to="plan-meals" replace />} />
             <Route path="plan-meals" element={<GroceryPlan />} />
+          </Route>
+          <Route path="/docs">
+            <Route index element={<Navigate to="introduction" replace />} />
+            <Route path="introduction" element={<Introduction />} />
           </Route>
         </Route>
       </Route>

@@ -82,23 +82,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     documentation: [
       {
         title: "Documentation",
-        url: "#",
+        url: "/docs",
         icon: BookOpen,
         children: [
           {
             title: "Introduction",
+            url: "/docs/introduction",
+          },
+          {
+            title: "Recipe",
             url: "#",
           },
           {
-            title: "Get Started",
+            title: "Fridge",
             url: "#",
           },
           {
-            title: "Tutorials",
-            url: "#",
-          },
-          {
-            title: "Changelog",
+            title: "Grocery",
             url: "#",
           },
         ],
