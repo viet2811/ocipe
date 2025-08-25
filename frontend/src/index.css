@@ -237,3 +237,40 @@ h1 {
 button {
   cursor: pointer;
 }
+
+.docs {
+  @apply mx-6 @md:mx-10 @lg:ml-24 @lg:w-3/5 mt-6 mb-12 space-y-8;
+  h1 {
+    @apply scroll-m-20 !text-4xl !font-extrabold !tracking-tight !text-balance;
+  }
+  h2 {
+    @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 mt-6;
+  }
+  section {
+    @apply space-y-4;
+    div {
+      @apply space-y-6;
+    }
+  }
+  blockquote {
+    @apply border-l-2 px-4 whitespace-pre-wrap;
+  }
+  ul {
+    @apply list-disc list-inside;
+  }
+  b {
+    @apply text-chart-5;
+  }
+  code {
+    @apply bg-muted rounded px-[0.5rem] py-[0.2rem] font-mono text-base font-semibold;
+  }
+  tr {
+    @apply even:bg-muted m-0 border-t p-0;
+  }
+  th {
+    @apply border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right;
+  }
+  td {
+    @apply border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right;
+  }
+}

@@ -9,7 +9,7 @@ type OnThisPageProps = {
   headings: Heading[];
 };
 
-export function OnThisPage({ headings }: OnThisPageProps) {
+function OnThisPage({ headings }: OnThisPageProps) {
   const [activeId, setActiveId] = useState<string | null>(
     headings[0]?.id ?? ""
   );
@@ -17,10 +17,10 @@ export function OnThisPage({ headings }: OnThisPageProps) {
   useEffect(() => {
     const handleScroll = () => {
       let current = null;
-      headings.forEach((h) => {
-        const el = document.getElementById(h.id);
-        if (el && el.getBoundingClientRect().top < 150) {
-          current = h.id;
+      headings.forEach((heading) => {
+        const element = document.getElementById(heading.id);
+        if (element && element.getBoundingClientRect().top < 150) {
+          current = heading.id;
         }
       });
       setActiveId(current);
@@ -48,5 +48,20 @@ export function OnThisPage({ headings }: OnThisPageProps) {
         ))}
       </ul>
     </aside>
+  );
+}
+
+interface DocsPageProps {
+  headings: Heading[];
+  content: React.ReactNode; // <-- not React.FC
+}
+
+export default function DocsPage({ headings, content }: DocsPageProps) {
+  // Content should be section(with id)> heading, div>text, blockquote, e.t.c
+  return (
+    <div className="flex @container">
+      <div className="docs">{content}</div>
+      <OnThisPage headings={headings} />
+    </div>
   );
 }
