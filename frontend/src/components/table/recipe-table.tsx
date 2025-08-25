@@ -185,6 +185,15 @@ export function DataTable<TData extends { id: number }, TValue>({
                   ))}
                 </TableRow>
               ))
+            ) : table.getCoreRowModel().rows?.length ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results
+                </TableCell>
+              </TableRow>
             ) : (
               <TableRow>
                 <TableCell

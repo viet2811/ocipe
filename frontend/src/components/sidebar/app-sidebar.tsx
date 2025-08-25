@@ -91,15 +91,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
           {
             title: "Recipe",
-            url: "#",
+            url: "/docs/recipe",
           },
           {
             title: "Fridge",
-            url: "#",
+            url: "/docs/fridge",
           },
           {
             title: "Grocery",
-            url: "#",
+            url: "/docs/grocery",
           },
         ],
       },

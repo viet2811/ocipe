@@ -16,7 +16,11 @@ import GroceryPlan from "./pages/GroceryPlan";
 import RecipeView from "./pages/RecipeView";
 import PublicOnlyRoute from "./components/route/PublicOnlyRoute";
 import ProtectedRoute from "./components/route/ProtectedRoute";
-import Introduction from "./pages/Introduction";
+import Introduction from "./pages/docs/Introduction";
+import RecipeDocs from "./pages/docs/RecipeDocs";
+import ScrollToTop from "./components/ScrollToTop";
+import FridgeDocs from "./pages/docs/FridgeDocs";
+import GroceryDocs from "./pages/docs/GroceryDocs";
 
 const AppContent = () => {
   return (
@@ -41,6 +45,9 @@ const AppContent = () => {
           <Route path="/docs">
             <Route index element={<Navigate to="introduction" replace />} />
             <Route path="introduction" element={<Introduction />} />
+            <Route path="recipe" element={<RecipeDocs />} />
+            <Route path="fridge" element={<FridgeDocs />} />
+            <Route path="grocery" element={<GroceryDocs />} />
           </Route>
         </Route>
       </Route>
@@ -55,6 +62,7 @@ function App() {
       <BrowserRouter>
         <ThemeProvider>
           <AuthProvider>
+            <ScrollToTop />
             <AppContent />
           </AuthProvider>
         </ThemeProvider>
