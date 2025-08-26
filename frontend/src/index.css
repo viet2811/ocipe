@@ -249,6 +249,9 @@ button {
   h3 {
     @apply scroll-m-20 text-xl font-semibold tracking-tight !mb-2;
   }
+  h4 {
+    @apply scroll-m-20 text-lg font-semibold tracking-tight;
+  }
   section {
     @apply space-y-4;
     div {

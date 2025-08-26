@@ -58,9 +58,9 @@ export default function FridgeDocs() {
             If you accidently add an ingredient to wrong group or just change
             your mind, worry free cause you can just drag and drop in another
             group <br />
-            <span className="flex items-center">
-              <Info size={16} className="mr-1 text-yellow-600" /> Drag the
-              recipe by the handle icon (⋮⋮) to move it, just like in most apps.
+            <span className="flex items-center mt-2">
+              <Info className="mr-2 text-yellow-600" /> Drag the recipe by the
+              handle icon (⋮⋮)
             </span>
           </p>
         </div>
