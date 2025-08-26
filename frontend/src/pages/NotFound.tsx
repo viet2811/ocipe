@@ -1,15 +1,15 @@
-import { RegisterForm } from "@/components/login/register-form";
+import { Link } from "react-router-dom";
 
-export default function Login() {
+export default function NotFound() {
   return (
-    <div className="flex flex-col min-h-[calc(100svh-3rem)] w-full items-center justify-center px-6 md:p-10">
-      <div className="flex flex-col items-center mb-4">
+    <div className="flex items-center justify-center min-h-[calc(100svh-8rem)]">
+      <div className="flex flex-col items-center mb-4 text-lg">
         <svg
           version="1.0"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1080 1080"
           preserveAspectRatio="xMidYMid meet"
-          className="w-32 h-32 !-mt-24 -mb-8"
+          className="w-32 h-32 !-mt-24 -mb-4"
         >
           <g
             transform="translate(0.000000,1080.000000) scale(0.100000,-0.100000)"
@@ -51,10 +51,16 @@ export default function Login() {
             />
           </g>
         </svg>
-        <h1>Welcome to Ocipe</h1>
-      </div>
-      <div className="w-full max-w-[28rem]">
-        <RegisterForm />
+        <span>
+          <b>404 Not Found</b> | Seems like you got lost my friend.
+        </span>
+        <span>
+          Click{" "}
+          <Link to="/" className="underline text-chart-5">
+            here
+          </Link>{" "}
+          to get home.
+        </span>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheck, ChevronsUpDown, LogOut, Sun, Moon } from "lucide-react";
+import { ChevronsUpDown, LogOut, Sun, Moon } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -84,10 +84,10 @@ export function NavUser({
                   className="ml-auto"
                 />
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <BadgeCheck />
                 Account
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem onClick={logout}>
                 <LogOut />
                 Log out

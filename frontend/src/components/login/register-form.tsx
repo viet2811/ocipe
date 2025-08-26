@@ -60,7 +60,7 @@ export function RegisterForm({
         <CardHeader>
           <CardTitle>Register your account</CardTitle>
           <CardDescription>
-            Enter your username below to sign up your account
+            To sync and access your data across devices.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -71,9 +71,12 @@ export function RegisterForm({
                 <Input
                   id="username"
                   type="text"
-                  placeholder="Enter your username"
+                  placeholder="Enter your username, at least 3 letters"
                   required
+                  minLength={3}
+                  maxLength={15}
                   value={username}
+                  autoComplete="username"
                   onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
@@ -86,6 +89,10 @@ export function RegisterForm({
                   type="password"
                   required
                   value={password}
+                  minLength={6}
+                  maxLength={20}
+                  placeholder="A memorable password, at least 6 letters "
+                  autoComplete="new-password"
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>

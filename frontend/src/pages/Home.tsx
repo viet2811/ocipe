@@ -74,10 +74,10 @@ const RecentPlan: React.FC = () => {
   });
   return (
     <>
-      <h1 className="flex items-center">
+      <h2 className="flex items-center font-bold text-2xl">
         Recent Plan
         <History className="ml-2" />
-      </h1>
+      </h2>
       {recentPlans &&
         recentPlans.map((item) => {
           const date = new Date(item.created_at);

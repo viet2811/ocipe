@@ -81,10 +81,10 @@ export default function Introduction() {
           <ul className="list-disc list-inside">
             Some very simple feature include
             <li>
-              A fridge components to organised what ingredients you have -{" "}
+              A fridge components to organise what ingredients you have -{" "}
               <span className="text-chart-5">for accurate grocery list</span>
             </li>
-            <li>A modified random to help in indecisive moments</li>
+            <li>A random selection to help in indecisive moments</li>
             <li>
               A view of what you have planned -{" "}
               <span className="text-chart-5">

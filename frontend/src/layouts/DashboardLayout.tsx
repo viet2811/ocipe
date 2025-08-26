@@ -65,7 +65,9 @@ const DashboardLayout: React.FC = () => {
             <Breadcrumbs />
           </div>
         </header>
-        <Outlet />
+        <main>
+          <Outlet />
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
