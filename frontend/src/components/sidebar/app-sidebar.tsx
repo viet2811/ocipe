@@ -95,11 +95,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
           {
             title: "Fridge",
-            url: "#",
+            url: "/docs/fridge",
           },
           {
             title: "Grocery",
-            url: "#",
+            url: "/docs/grocery",
           },
         ],
       },

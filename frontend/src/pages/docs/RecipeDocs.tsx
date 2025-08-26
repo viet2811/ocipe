@@ -7,7 +7,7 @@ export default function RecipeDocs() {
   const headings = [
     { id: "data", label: "Data" },
     { id: "view", label: "Views" },
-    { id: "add", label: "Adding recipe" },
+    { id: "add", label: "Adding" },
   ];
   const contents = (
     <>
@@ -106,12 +106,14 @@ export default function RecipeDocs() {
             </b>
             <br />
             <p className="italic">
-              Uhmm, I can explain ✋😐🤚. I agree having picture is nice, but we
-              usually saved ones that we might have cooked many times, and
-              already how good it taste. <br />
+              Uhmm, I can explain ✋😐🤚. Pictures are nice, sure, but we
+              usually saved recipes that we might have cooked many times, and
+              know how good it taste. <br />
               <span className="text-muted-foreground text-sm">
                 "Like personality, taste overweighs the look."
-              </span>
+              </span>{" "}
+              <br />
+              and it saved me dev times lol.
             </p>
           </blockquote>
         </div>
@@ -125,12 +127,12 @@ export default function RecipeDocs() {
             sorting. Mobile devices just have to accept this :(
           </p>
           <img
-            src="/public/recipe-mockup.png"
+            src="/recipe-mockup.png"
             alt="recipe-view-desktop-and-mobile"
             className="dark:hidden"
           />
           <img
-            src="/public/recipe-mockup-dark.png"
+            src="/recipe-mockup-dark.png"
             alt="recipe-view-desktop-and-mobile"
             className="hidden dark:block"
           />

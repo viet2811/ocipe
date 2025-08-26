@@ -74,7 +74,7 @@ export default function Introduction() {
             our head. However, when it comes to recipes for the whole week, it
             can be a lot.
           </p>
-          <p className="text-muted-foreground italic">
+          <p className="text-muted-foreground italic !-mt-4">
             I understand most people don't do this (especially if they have a
             shop in walking distance)
           </p>

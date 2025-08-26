@@ -19,6 +19,7 @@ import ProtectedRoute from "./components/route/ProtectedRoute";
 import Introduction from "./pages/docs/Introduction";
 import RecipeDocs from "./pages/docs/RecipeDocs";
 import ScrollToTop from "./components/ScrollToTop";
+import FridgeDocs from "./pages/docs/FridgeDocs";
 
 const AppContent = () => {
   return (
@@ -44,6 +45,7 @@ const AppContent = () => {
             <Route index element={<Navigate to="introduction" replace />} />
             <Route path="introduction" element={<Introduction />} />
             <Route path="recipe" element={<RecipeDocs />} />
+            <Route path="fridge" element={<FridgeDocs />} />
           </Route>
         </Route>
       </Route>
