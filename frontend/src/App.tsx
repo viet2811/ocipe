@@ -18,6 +18,7 @@ import PublicOnlyRoute from "./components/route/PublicOnlyRoute";
 import ProtectedRoute from "./components/route/ProtectedRoute";
 import Introduction from "./pages/docs/Introduction";
 import RecipeDocs from "./pages/docs/RecipeDocs";
+import ScrollToTop from "./components/ScrollToTop";
 
 const AppContent = () => {
   return (
@@ -57,6 +58,7 @@ function App() {
       <BrowserRouter>
         <ThemeProvider>
           <AuthProvider>
+            <ScrollToTop />
             <AppContent />
           </AuthProvider>
         </ThemeProvider>

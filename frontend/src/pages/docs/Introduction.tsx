@@ -97,7 +97,7 @@ export default function Introduction() {
 
       <div className="w-full flex items-center">
         <p>Now if you are in, let's get started</p>
-        <Link to="/docs/recipe" className="ml-auto">
+        <Link to="/docs/recipe#intro" className="ml-auto">
           <Button className="ml-auto">
             Recipe <ArrowRight />
           </Button>
