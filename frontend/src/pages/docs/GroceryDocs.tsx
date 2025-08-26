@@ -48,9 +48,9 @@ export default function GroceryDocs() {
               <b>Recipe board</b> for your selection, sums up the total amount
               of <u>longevity</u> <br />
               <span className="flex items-center mt-2">
-                <Info className="mr-2 text-yellow-600" /> If you want to order
-                which recipe you want to cook first, no worries. Drag the handle
-                (⋮⋮) on each recipe to reorder.
+                <Info className="mr-2 text-yellow-600 shrink-0" /> If you want
+                to order which recipe you want to cook first, no worries. Drag
+                the handle (⋮⋮) on each recipe to reorder.
               </span>
             </p>
             <div className="!space-y-2">
@@ -59,27 +59,25 @@ export default function GroceryDocs() {
                 Like previously mentioned, I sometimes don't know what to
                 choose. So I add some tools to help that.
               </p>
+              <b>Random</b> — simplest form to decide something innit? <br />
               <p>
-                <b>Random</b> — simplest form to decide something innit? <br />
-                <p>
-                  I had some "fairly simple" settings, which you can disable if
-                  you want to:
-                </p>
-                <ul className="ml-2">
-                  <li>
-                    Only random <b className="underline">active</b> recipe (you
-                    haven't eat yet)
-                  </li>
-                  <li>
-                    When you select bunch of recipe on the table, it will random
-                    only <u>the selected</u>.
-                  </li>
-                  <li>
-                    Extra settings for the 2nd one — after a recipe is randomed,
-                    its selection will be removed .
-                  </li>
-                </ul>
+                I had some "fairly simple" settings, which you can disable if
+                you want to:
               </p>
+              <ul className="ml-2 space-y-1">
+                <li>
+                  Only random <b className="underline">active</b> recipe (you
+                  haven't eat yet)
+                </li>
+                <li>
+                  When you select bunch of recipe on the table, it will random
+                  only <u>the selected</u>.
+                </li>
+                <li>
+                  Extra settings for the 2nd one — after a recipe is randomed,
+                  its selection will be removed .
+                </li>
+              </ul>
               <p>
                 <b>Previous plans</b> <br />
                 Have a look at what you have planned before. Either help you
