@@ -2,7 +2,7 @@ import { RegisterForm } from "@/components/login/register-form";
 
 export default function Login() {
   return (
-    <div className="flex flex-col min-h-svh w-full items-center justify-center p-6 md:p-10">
+    <div className="flex flex-col min-h-[calc(100svh-3rem)] w-full items-center justify-center px-6 md:p-10">
       <div className="flex flex-col items-center mb-4">
         <svg
           version="1.0"

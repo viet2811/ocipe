@@ -5,7 +5,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import WelcomePage from "./pages/WelcomePage";
 import { AuthProvider } from "./contexts/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -21,20 +20,25 @@ import RecipeDocs from "./pages/docs/RecipeDocs";
 import ScrollToTop from "./components/ScrollToTop";
 import FridgeDocs from "./pages/docs/FridgeDocs";
 import GroceryDocs from "./pages/docs/GroceryDocs";
+import PublicDocsLayout from "./layouts/PublicDocsLayout";
+import PublicNavBarLayout from "./layouts/PublicNavBarLayout";
+import LandingPage from "./pages/LandingPage";
 
 const AppContent = () => {
   return (
     <Routes>
       <Route element={<PublicOnlyRoute />}>
-        <Route path="/" element={<WelcomePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/docs">
-          <Route index element={<Navigate to="introduction" replace />} />
-          <Route path="introduction" element={<Introduction />} />
-          <Route path="recipe" element={<RecipeDocs />} />
-          <Route path="fridge" element={<FridgeDocs />} />
-          <Route path="grocery" element={<GroceryDocs />} />
+        <Route element={<PublicNavBarLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/docs" element={<PublicDocsLayout />}>
+            <Route index element={<Navigate to="introduction" replace />} />
+            <Route path="introduction" element={<Introduction />} />
+            <Route path="recipe" element={<RecipeDocs />} />
+            <Route path="fridge" element={<FridgeDocs />} />
+            <Route path="grocery" element={<GroceryDocs />} />
+          </Route>
         </Route>
       </Route>
       <Route element={<ProtectedRoute />}>
