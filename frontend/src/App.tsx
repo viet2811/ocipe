@@ -29,6 +29,13 @@ const AppContent = () => {
         <Route path="/" element={<WelcomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/docs">
+          <Route index element={<Navigate to="introduction" replace />} />
+          <Route path="introduction" element={<Introduction />} />
+          <Route path="recipe" element={<RecipeDocs />} />
+          <Route path="fridge" element={<FridgeDocs />} />
+          <Route path="grocery" element={<GroceryDocs />} />
+        </Route>
       </Route>
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>

@@ -58,7 +58,7 @@ export function LoginForm({
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>
-            Enter your username below to login to your account
+            To sync and access your data across devices.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -72,15 +72,20 @@ export function LoginForm({
                   placeholder="Enter your username"
                   required
                   value={username}
+                  autoComplete="username"
                   onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
               <div className="grid gap-3">
+                <Label htmlFor="password">Password</Label>
+
                 <Input
                   id="password"
                   type="password"
+                  placeholder="A memorable password"
                   required
                   value={password}
+                  autoComplete="current-password"
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
