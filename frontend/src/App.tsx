@@ -23,6 +23,7 @@ import GroceryDocs from "./pages/docs/GroceryDocs";
 import PublicDocsLayout from "./layouts/PublicDocsLayout";
 import PublicNavBarLayout from "./layouts/PublicNavBarLayout";
 import LandingPage from "./pages/LandingPage";
+import NotFound from "./pages/NotFound";
 
 const AppContent = () => {
   return (
@@ -39,6 +40,7 @@ const AppContent = () => {
             <Route path="fridge" element={<FridgeDocs />} />
             <Route path="grocery" element={<GroceryDocs />} />
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
       <Route element={<ProtectedRoute />}>
