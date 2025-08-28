@@ -162,7 +162,7 @@ export default function RecipeDocs() {
             <li>
               Your Fridge — instead typing all out like above, instantly see the
               closest match. Just remember to update your {""}
-              <Link to="#">
+              <Link to="/docs/fridge">
                 <b className="underline">Fridge</b>
               </Link>{" "}
               content.

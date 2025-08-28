@@ -18,8 +18,8 @@ export default function FridgeDocs() {
           </p>
           <p>
             <b>Why is this essential?</b> <br />
-            This app designed with grocery planner in mind. To figure out what
-            you need to buy, we need to know what you currently have.
+            This app is designed with grocery planner in mind. To figure out
+            what you need to buy, we need to know what you currently have.
           </p>
           <p>
             <span className="text-destructive">Else</span>, you will be
@@ -37,7 +37,7 @@ export default function FridgeDocs() {
             groups
           </p>
 
-          <h3>Preview</h3>
+          <h3>Preview (Desktop)</h3>
           <img
             src="/fridge.png"
             alt="fridge-ui-preview"
