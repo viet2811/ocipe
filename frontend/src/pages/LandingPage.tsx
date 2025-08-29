@@ -53,7 +53,7 @@ const LandingPage = () => {
               transition={{ duration: 0.8, delay: 1 }}
             >
               Your own digital{" "}
-              <span className="text-chart-5 underline">cookbook</span>, with a
+              <span className="text-chart-5 font-medium">cookbook</span>, with a
               grocery planner.
               <br />
               Better than Excel sheets

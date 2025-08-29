@@ -117,6 +117,7 @@ export function getRecipeColumns(
     },
     {
       id: "actions",
+      header: () => <span className="sr-only">Edit</span>,
       cell: ({ row }) => {
         const recipe = row.original;
         const recipeInput: RecipeInput = {

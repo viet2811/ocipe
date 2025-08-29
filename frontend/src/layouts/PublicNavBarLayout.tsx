@@ -34,6 +34,11 @@ export default function PublicNavBarLayout() {
               size="icon"
               onClick={() => setTheme(theme === "light" ? "dark" : "light")}
               className="rounded-md p-2 hover:bg-muted -ml-3"
+              aria-label={
+                theme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
             >
               {theme === "light" ? (
                 <Moon className="h-5 w-5" />

@@ -76,6 +76,7 @@ function GroceryListItem({ item }: { item: groceryListItem }) {
     >
       <Checkbox
         id={`list-item${item.id}`}
+        aria-label="checkbox"
         checked={isChecked}
         onCheckedChange={(newCheckedState) => {
           if (typeof newCheckedState === "boolean") {
@@ -151,10 +152,10 @@ export default function GroceryList() {
   return (
     <>
       <div className="flex">
-        <h1 className="flex items-center">
+        <h2 className="flex items-center font-bold text-2xl">
           Grocery List
           <Clipboard className="ml-2" />
-        </h1>
+        </h2>
         <Button
           variant="ghost"
           className="ml-auto"
@@ -183,7 +184,7 @@ export default function GroceryList() {
         {/* Checked */}
         <Accordion type="single" collapsible>
           <AccordionItem value="checked-items">
-            <AccordionTrigger className="text-muted-foreground">
+            <AccordionTrigger>
               {groceryListData?.filter((item) => item.isChecked).length ?? 0}{" "}
               Checked items
             </AccordionTrigger>

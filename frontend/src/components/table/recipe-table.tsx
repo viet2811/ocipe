@@ -15,6 +15,7 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -99,6 +100,7 @@ export function DataTable<TData extends { id: number }, TValue>({
           <Input
             type="text"
             value={globalFilter}
+            aria-label="global-search"
             onChange={(e) => table.setGlobalFilter(String(e.target.value))}
             placeholder="Search by name or meat type..."
             className="w-2/3 md:w-1/3 mr-3"
@@ -106,6 +108,7 @@ export function DataTable<TData extends { id: number }, TValue>({
         ) : (
           <Input
             type="text"
+            aria-label="search-by-ingredients"
             value={ingredientInput}
             onChange={(e) => {
               setIngredientInput(String(e.target.value));
@@ -155,7 +158,12 @@ export function DataTable<TData extends { id: number }, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      aria-label={
+                        header.column.id === "select" ? "Select row" : undefined
+                      }
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(

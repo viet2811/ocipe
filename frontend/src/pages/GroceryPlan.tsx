@@ -141,7 +141,12 @@ const RecipeSelection: React.FC<{
         </Button>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" className="-ml-2" size="icon">
+            <Button
+              variant="ghost"
+              className="-ml-2"
+              size="icon"
+              aria-label="random-settings"
+            >
               <Settings />
             </Button>
           </PopoverTrigger>
