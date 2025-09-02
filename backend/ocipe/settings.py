@@ -61,7 +61,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-  "http://localhost:5173",  
+  "https://ocipe.vercel.app",  
 ]
 
 ALLOWED_HOSTS = ['ocipe.onrender.com','localhost', '127.0.0.1']
