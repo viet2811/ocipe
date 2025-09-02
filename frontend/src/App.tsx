@@ -26,26 +26,25 @@ import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 
 const AppContent = () => {
-  const isAuthenticated = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   return (
     <Routes>
-      {isAuthenticated ? (
-        <Route path="/docs" element={<DashboardLayout />}>
-          <Route index element={<Navigate to="introduction" replace />} />
-          <Route path="introduction" element={<Introduction />} />
-          <Route path="recipe" element={<RecipeDocs />} />
-          <Route path="fridge" element={<FridgeDocs />} />
-          <Route path="grocery" element={<GroceryDocs />} />
-        </Route>
-      ) : (
-        <Route path="/docs" element={<PublicDocsLayout />}>
-          <Route index element={<Navigate to="introduction" replace />} />
-          <Route path="introduction" element={<Introduction />} />
-          <Route path="recipe" element={<RecipeDocs />} />
-          <Route path="fridge" element={<FridgeDocs />} />
-          <Route path="grocery" element={<GroceryDocs />} />
-        </Route>
-      )}
+      <Route
+        path="/docs"
+        element={
+          !isLoading && isAuthenticated ? (
+            <DashboardLayout />
+          ) : (
+            <PublicDocsLayout />
+          )
+        }
+      >
+        <Route index element={<Navigate to="introduction" replace />} />
+        <Route path="introduction" element={<Introduction />} />
+        <Route path="recipe" element={<RecipeDocs />} />
+        <Route path="fridge" element={<FridgeDocs />} />
+        <Route path="grocery" element={<GroceryDocs />} />
+      </Route>
       <Route element={<PublicOnlyRoute />}>
         <Route element={<PublicNavBarLayout />}>
           <Route path="/" element={<LandingPage />} />
