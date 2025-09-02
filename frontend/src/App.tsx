@@ -29,16 +29,23 @@ const AppContent = () => {
   const isAuthenticated = useAuth();
   return (
     <Routes>
-      <Route
-        path="/docs"
-        element={isAuthenticated ? <DashboardLayout /> : <PublicDocsLayout />}
-      >
-        <Route index element={<Navigate to="introduction" replace />} />
-        <Route path="introduction" element={<Introduction />} />
-        <Route path="recipe" element={<RecipeDocs />} />
-        <Route path="fridge" element={<FridgeDocs />} />
-        <Route path="grocery" element={<GroceryDocs />} />
-      </Route>
+      {isAuthenticated ? (
+        <Route path="/docs" element={<DashboardLayout />}>
+          <Route index element={<Navigate to="introduction" replace />} />
+          <Route path="introduction" element={<Introduction />} />
+          <Route path="recipe" element={<RecipeDocs />} />
+          <Route path="fridge" element={<FridgeDocs />} />
+          <Route path="grocery" element={<GroceryDocs />} />
+        </Route>
+      ) : (
+        <Route path="/docs" element={<PublicDocsLayout />}>
+          <Route index element={<Navigate to="introduction" replace />} />
+          <Route path="introduction" element={<Introduction />} />
+          <Route path="recipe" element={<RecipeDocs />} />
+          <Route path="fridge" element={<FridgeDocs />} />
+          <Route path="grocery" element={<GroceryDocs />} />
+        </Route>
+      )}
       <Route element={<PublicOnlyRoute />}>
         <Route element={<PublicNavBarLayout />}>
           <Route path="/" element={<LandingPage />} />
