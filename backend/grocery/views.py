@@ -62,12 +62,6 @@ class GroceryIngredientRetrieve(APIView):
             
 
         # Save recipes to history
-        # recipes = Recipe.objects.filter(id__in=recipe_ids).values_list('id', 'name', 'meat_type')
-        # recipes_data = [{
-        #     "id": id,
-        #     "name": name,
-        #     "meat-type": mt
-        # } for id, name, mt in recipes]
         History.objects.create(user=user, recipes=recipe_ids)
 
         # Update those recipe state to 'used'

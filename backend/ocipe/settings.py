@@ -30,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG")
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'users',
     'fridge',
     'grocery',
+    'monitoring',
 ]
 
 MIDDLEWARE = [
@@ -98,7 +99,7 @@ DATABASES = {
         'NAME': os.getenv("POSTGRES_DB"),
         'USER': os.getenv("POSTGRES_USER"),
         'PASSWORD': os.getenv("POSTGRES_PASSWORD"),
-        'HOST': 'db',
+        'HOST': 'db.hlpugcrupbroruuinjii.supabase.co',
         'PORT': 5432,
     }
 }
