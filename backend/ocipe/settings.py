@@ -29,17 +29,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET")
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.sessions',
     'django_filters',
     'rest_framework',
     'corsheaders',
@@ -54,6 +51,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -64,7 +62,7 @@ CORS_ALLOWED_ORIGINS = [
   "https://ocipe.vercel.app",  
 ]
 
-ALLOWED_HOSTS = ['ocipe.onrender.com','localhost', '127.0.0.1']
+ALLOWED_HOSTS = ["ocipe.onrender.com"]
 
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True

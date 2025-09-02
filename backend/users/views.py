@@ -6,6 +6,7 @@ from fridge.models import Fridge
 from grocery.models import GroceryList
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
+from django.http import HttpResponse
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # from rest_framework_simplejwt.authentication import JWTStatelessUserAuthentication
@@ -34,8 +35,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                 key='refresh_token',
                 value=refresh,
                 httponly=True,
-                secure=False,  #HTTPs for production
-                samesite='Lax',
+                secure=True,
+                samesite="None",
                 max_age=3600 * 24 * 30 # 30 Days
             )
         return response
@@ -50,6 +51,14 @@ class CookieTokenRefreshView(TokenRefreshView):
     
 class LogoutView(APIView):
     def post(self, request):
-        response = Response(status=status.HTTP_204_NO_CONTENT)
-        response.delete_cookie('refresh_token')
+        response = HttpResponse(content=status.HTTP_204_NO_CONTENT)
+        # I'm so done
+        response.set_cookie(
+            key='refresh_token',
+            value="",
+            httponly=True,
+            secure=True,
+            samesite="None",
+            max_age=3600 * 24 * 30 
+        )
         return response

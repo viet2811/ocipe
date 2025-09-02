@@ -50,7 +50,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const refreshToken = async () => {
       try {
-        const response = await axiosInstance.post("user/token/refresh/", {});
+        const response = await axiosInstance.post(
+          "user/token/refresh/",
+          {},
+          { withCredentials: true }
+        );
         const newAccessToken = response.data.access;
         setAccessToken(newAccessToken);
         setIsAuthenticated(true);
@@ -88,7 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           try {
             const response = await axiosInstance.post(
               "user/token/refresh/",
-              {}
+              {},
+              { withCredentials: true }
             );
             const newAccessToken = response.data.access;
             setAccessToken(newAccessToken);
