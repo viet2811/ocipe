@@ -16,6 +16,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { axiosInstance } from "@/api/axios";
 import { toast } from "sonner";
 
+interface LoginResponse {
+  access: string;
+}
+
 export function LoginForm({
   className,
   ...props
@@ -27,31 +31,37 @@ export function LoginForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await axiosInstance.post(
+    await toast.promise(
+      axiosInstance.post<LoginResponse>(
         "/user/token/",
         { username, password },
         { withCredentials: true }
-      );
-      login(response.data?.access);
-      localStorage.setItem("name", username);
-      toast.success("Log in successfully");
-      navigate("/home");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {
-          toast.error(
-            "Cannot connect to server. Please check if the backend is running."
-          );
-        } else if (error.response?.status === 401) {
-          toast.warning("Username or password is not correct. Please retry");
-        }
-      } else {
-        console.log(error);
-        toast.error("An error occurred. Please try again.");
+      ),
+      {
+        loading: "Logging in...",
+        success: (response) => {
+          login(response.data?.access);
+          localStorage.setItem("name", username);
+          navigate("/home");
+          return "Logged in successfully!";
+        },
+        error: (error) => {
+          if (axios.isAxiosError(error)) {
+            if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {
+              return "Cannot connect to server :(";
+            } else if (error.response?.status === 401) {
+              toast.warning(
+                "Username or password is incorrect. Please try again."
+              );
+              return "";
+            }
+          }
+          return "An error occurred. Please try again.";
+        },
       }
-    }
+    );
   };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>

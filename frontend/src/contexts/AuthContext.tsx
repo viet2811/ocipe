@@ -13,7 +13,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (token: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -37,12 +37,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticated(false);
       // Clear persisted data, name, query cache on localStorage
       localStorage.removeItem("name");
-
       queryClient.clear();
       await localStoragePersister.removeClient();
     } catch (e) {
       console.log(e);
+      throw e;
     }
+    return Promise.resolve();
   };
 
   // Run when mount: Instantly get refresh token when reopening

@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import RecipeAdd from "./pages/RecipeAdd";
 import { Toaster } from "sonner";
 import Fridge from "./pages/Fridge";
@@ -50,7 +50,15 @@ const AppContent = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
+          {!isLoading && !isAuthenticated && (
+            <Route path="/docs" element={<PublicDocsLayout />}>
+              <Route index element={<Navigate to="introduction" replace />} />
+              <Route path="introduction" element={<Introduction />} />
+              <Route path="recipe" element={<RecipeDocs />} />
+              <Route path="fridge" element={<FridgeDocs />} />
+              <Route path="grocery" element={<GroceryDocs />} />
+            </Route>
+          )}
           <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
@@ -66,18 +74,32 @@ const AppContent = () => {
             <Route index element={<Navigate to="plan-meals" replace />} />
             <Route path="plan-meals" element={<GroceryPlan />} />
           </Route>
+          {!isLoading && isAuthenticated && (
+            <Route path="/docs">
+              <Route index element={<Navigate to="introduction" replace />} />
+              <Route path="introduction" element={<Introduction />} />
+              <Route path="recipe" element={<RecipeDocs />} />
+              <Route path="fridge" element={<FridgeDocs />} />
+              <Route path="grocery" element={<GroceryDocs />} />
+            </Route>
+          )}
         </Route>
       </Route>
     </Routes>
   );
 };
 
+function ToasterWrapper() {
+  const { theme } = useTheme();
+  return <Toaster position="top-center" theme={theme} />;
+}
+
 function App() {
   return (
     <>
-      <Toaster position="top-center" />
       <BrowserRouter>
         <ThemeProvider>
+          <ToasterWrapper />
           <AuthProvider>
             <ScrollToTop />
             <AppContent />

@@ -1,6 +1,6 @@
 // A draggable item - this is fine outside
 // This has an onUpdate, onDelete props so we can handle it outside
-import type { FridgeResponse, IngredientGroup } from "@/types/recipes";
+import type { IngredientGroup } from "@/types/recipes";
 import {
   DndContext,
   MouseSensor,
@@ -11,7 +11,7 @@ import {
 } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { getFridge, updateSingleIngredient } from "@/api/fridge";
 import { Button } from "@/components/ui/button";
@@ -37,19 +37,10 @@ export default function Fridge() {
   });
 
   // Fridge fetch data
-  const { data } = useQuery<FridgeResponse>({
+  const { data: ingredientList } = useQuery<IngredientGroup>({
     queryKey: ["fridge"],
     queryFn: getFridge,
   });
-
-  const [ingredientList, setIngredientList] = useState<IngredientGroup>({});
-  useEffect(() => {
-    if (data && Object.keys(data.ingredient_list).length !== 0) {
-      setIngredientList(data.ingredient_list);
-    } else {
-      setIngredientList({ General: [] });
-    }
-  }, [data]);
 
   // Local data for drag and drop
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
@@ -60,7 +51,7 @@ export default function Fridge() {
     const [fromGroup, ingredientIdStr] = (active.id as string).split("-");
 
     // Drop into same group or outside a droppable field
-    if (!over || fromGroup === over.id) return;
+    if (!over || fromGroup === over.id || !ingredientList) return;
 
     const ingredientId = Number(ingredientIdStr);
     const toGroup = over.id;
@@ -71,7 +62,7 @@ export default function Fridge() {
 
     const previousList = ingredientList;
 
-    setIngredientList((prev) => {
+    queryClient.setQueryData<IngredientGroup>(["fridge"], (prev) => {
       const newList = { ...prev };
       // Remove from old group
       newList[fromGroup] = newList[fromGroup].filter(
@@ -89,7 +80,7 @@ export default function Fridge() {
       },
       {
         onError: () => {
-          setIngredientList(previousList);
+          queryClient.setQueryData<IngredientGroup>(["fridge"], previousList);
           toast.error("Something went wrong. Please retry");
         },
       }
@@ -132,14 +123,20 @@ export default function Fridge() {
           className="text-muted-foreground hover:bg-muted hover:shadow-none hover:text-inherit cursor-pointer justify-start w-max"
           onClick={() =>
             isMobile
-              ? setIngredientList((prev) => ({
-                  [""]: [],
-                  ...prev,
-                }))
-              : setIngredientList((prev) => ({
-                  ...prev,
-                  [""]: [],
-                }))
+              ? queryClient.setQueryData<IngredientGroup>(
+                  ["fridge"],
+                  (old) => ({
+                    [""]: [],
+                    ...old,
+                  })
+                )
+              : queryClient.setQueryData<IngredientGroup>(
+                  ["fridge"],
+                  (old) => ({
+                    ...old,
+                    [""]: [],
+                  })
+                )
           }
         >
           <Plus /> Add an ingredient group
@@ -149,16 +146,16 @@ export default function Fridge() {
             breakpointCols={breakpointColumnsObj}
             className="flex w-auto bg-clip-padding space-x-4"
           >
-            {Object.entries(ingredientList).map(([groupName, ingredients]) => (
-              <DroppableIngredientGroup
-                key={groupName}
-                groupId={groupName}
-                name={groupName}
-                ingredients={ingredients}
-                isHighlighted={activeGroup === groupName}
-                setIngredientList={setIngredientList}
-              />
-            ))}
+            {ingredientList &&
+              Object.entries(ingredientList).map(([groupName, ingredients]) => (
+                <DroppableIngredientGroup
+                  key={groupName}
+                  groupId={groupName}
+                  name={groupName}
+                  ingredients={ingredients}
+                  isHighlighted={activeGroup === groupName}
+                />
+              ))}
           </Masonry>
         </div>
       </div>

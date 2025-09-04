@@ -5,13 +5,7 @@ import { EditableTextInput } from "../editable-text-input";
 import type { Ingredient, IngredientGroup } from "@/types/recipes";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import {
-  addAnIngredient,
-  deleteIngredientGroup,
-  deleteSingleIngredient,
-  renameIngredientGroup,
-  updateSingleIngredient,
-} from "@/api/fridge";
+import { deleteIngredientGroup, renameIngredientGroup } from "@/api/fridge";
 import { useState } from "react";
 import { DraggableIngredient } from "./DraggableIngredient";
 import { Button } from "../ui/button";
@@ -29,7 +23,11 @@ type IngredientGroupProps = {
   name: string; // Initial name, can be changed
   ingredients: Ingredient[]; // To render and map draggable item inside
   isHighlighted: boolean; // If it's being hovered at when dragging
-  setIngredientList: React.Dispatch<React.SetStateAction<IngredientGroup>>;
+};
+
+const onErrorMutation = (e: Error) => {
+  console.log(e);
+  toast.error("Something went wrong. Please retry");
 };
 
 // A droppable area, sharing its name to child - item
@@ -38,38 +36,7 @@ export default function DroppableIngredientGroup({
   name,
   ingredients,
   isHighlighted,
-  setIngredientList,
 }: IngredientGroupProps) {
-  // Helper function
-  // Invalidate query key and toast a success
-  const onSuccessMutation = (successMessage: string) => {
-    queryClient.invalidateQueries({ queryKey: ["fridge"] });
-    toast.success(successMessage);
-  };
-  // Console log error and toast error
-  const onErrorMutation = (e: Error) => {
-    console.log(e);
-    toast.error("Something went wrong. Please retry");
-  };
-
-  const updateIngredientMutation = useMutation({
-    mutationFn: updateSingleIngredient,
-    onSuccess: () => onSuccessMutation("Ingredient updated!"),
-    onError: (e) => onErrorMutation(e),
-  });
-
-  const deleteIngredientMutation = useMutation({
-    mutationFn: deleteSingleIngredient,
-    onSuccess: () => onSuccessMutation("Ingredient deleted!"),
-    onError: (e) => onErrorMutation(e),
-  });
-
-  const createIngredientMutation = useMutation({
-    mutationFn: addAnIngredient,
-    onSuccess: () => onSuccessMutation("Ingredient added!"),
-    onError: (e) => onErrorMutation(e),
-  });
-
   const renameGroupMutation = useMutation({
     mutationFn: ({
       old_name,
@@ -78,18 +45,18 @@ export default function DroppableIngredientGroup({
       old_name: string;
       new_name: string;
     }) => renameIngredientGroup(old_name, new_name),
-    onSuccess: () => onSuccessMutation("Group renamed successfully!"),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fridge"] }),
     onError: (e) => onErrorMutation(e),
   });
-
   const deleteGroupMutation = useMutation({
     mutationFn: deleteIngredientGroup,
-    onSuccess: () => onSuccessMutation("Group is successfully deleted!"),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fridge"] }),
     onError: (e) => onErrorMutation(e),
   });
 
   const { setNodeRef } = useDroppable({ id: groupId });
   const [groupName, setGroupName] = useState(name);
+  const [newItemCounter, setNewItemCounter] = useState<number>(-1); //Avoid 2 identical id
 
   const onGroupUpdate = (newName: string) => {
     // Exist group, call PUT api
@@ -100,7 +67,7 @@ export default function DroppableIngredientGroup({
         new_name: newName,
       });
     } else {
-      setIngredientList((prev) => {
+      queryClient.setQueryData<IngredientGroup>(["fridge"], (prev) => {
         let updated = { ...prev };
         delete updated[groupName];
         updated[newName] = [];
@@ -116,22 +83,25 @@ export default function DroppableIngredientGroup({
       deleteGroupMutation.mutate(groupName);
     }
     // delete from ingredientList
-    setIngredientList((prev) => {
+    queryClient.setQueryData<IngredientGroup>(["fridge"], (prev) => {
       let updated = { ...prev };
       delete updated[groupName];
       return updated;
     });
   };
   const handleAddIngredient = (groupName: string) => {
-    setIngredientList((prev) => {
+    queryClient.setQueryData<IngredientGroup>(["fridge"], (prev) => {
       const newList = { ...prev };
       newList[groupName] = [
         ...newList[groupName],
         {
-          id: -1,
+          id: newItemCounter,
           name: "",
         },
       ];
+      setTimeout(() => {
+        setNewItemCounter((prev) => prev - 1);
+      }, 0);
       return newList;
     });
   };
@@ -145,7 +115,7 @@ export default function DroppableIngredientGroup({
       )}
       ref={setNodeRef}
     >
-      <div className="flex space-x-4 items-center px-2 py-1 pl-0">
+      <div id="title" className="flex space-x-4 items-center px-2 py-1 pl-0">
         <EditableTextInput
           baseValue={groupId}
           onUpdate={(newName) => onGroupUpdate(newName)}
@@ -174,36 +144,19 @@ export default function DroppableIngredientGroup({
         </DropdownMenu>
       </div>
       <ul className="-mt-6">
-        {ingredients.map((ingredient) => (
+        {ingredients.map((ingredient, itemIndex) => (
           <DraggableIngredient
-            id={`${groupId}-${ingredient.id}`}
-            key={ingredient.id}
-            name={ingredient.name}
-            onUpdate={(newName) => {
-              // Exist ingredient, update
-              if (ingredient.id !== -1) {
-                updateIngredientMutation.mutate({
-                  id: ingredient.id,
-                  data: { name: newName, group: groupName },
-                });
-                // New ingredient, id = -1, create
-              } else {
-                createIngredientMutation.mutate({
-                  name: newName,
-                  group: groupName,
-                });
-              }
-            }}
+            dragId={`${groupId}-${ingredient.id}`} // Use this as a hint to handle drag
+            key={`group${groupId}-item${itemIndex}`}
+            ingredient={ingredient}
+            groupName={groupName}
             onDelete={() => {
-              // Existed: call API
-              if (ingredient.id !== -1) {
-                deleteIngredientMutation.mutate(ingredient.id);
-              }
               // Remove from UI
-              setIngredientList((prev) => {
+              console.log("Deleting index: ", itemIndex);
+              queryClient.setQueryData<IngredientGroup>(["fridge"], (prev) => {
                 let updated = { ...prev };
                 updated[groupName] = updated[groupName].filter(
-                  (item) => item.id !== ingredient.id
+                  (curItem) => curItem.id !== ingredient.id
                 );
                 return updated;
               });

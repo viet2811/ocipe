@@ -21,6 +21,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/contexts/ThemeContext";
+import { toast } from "sonner";
 
 export function NavUser({
   user,
@@ -88,7 +89,15 @@ export function NavUser({
                 <BadgeCheck />
                 Account
               </DropdownMenuItem> */}
-              <DropdownMenuItem onClick={logout}>
+              <DropdownMenuItem
+                onClick={() => {
+                  toast.promise(logout(), {
+                    loading: "Logging out...",
+                    success: "Logged out!",
+                    error: "Logout failed. Please try again.",
+                  });
+                }}
+              >
                 <LogOut />
                 Log out
               </DropdownMenuItem>
