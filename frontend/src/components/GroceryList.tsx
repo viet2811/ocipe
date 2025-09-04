@@ -29,6 +29,8 @@ type groceryListItem = {
 };
 
 function GroceryListItem({ item }: { item: groceryListItem }) {
+  const [listItemId, setListItemID] = useState<number>(item.id);
+
   const updateItemMutation = useMutation({
     mutationFn: updateSingleGroceryListItem,
     onSuccess: () => {
@@ -39,12 +41,12 @@ function GroceryListItem({ item }: { item: groceryListItem }) {
 
   const onDelete = () => {
     queryClient.setQueryData<groceryListItem[]>(["grocery-list"], (old) =>
-      old ? old.filter((cur_item) => cur_item.id !== item.id) : []
+      old ? old.filter((cur_item) => cur_item.id !== listItemId) : []
     );
   };
 
   const deleteItemMutation = useMutation({
-    mutationFn: () => deleteSingleGroceryListItem({ id: item.id }),
+    mutationFn: () => deleteSingleGroceryListItem({ id: listItemId }),
     onMutate: () => {
       const previousList = queryClient.getQueryData<groceryListItem[]>([
         "grocery-list",
@@ -63,8 +65,9 @@ function GroceryListItem({ item }: { item: groceryListItem }) {
 
   const createNewItemMutation = useMutation({
     mutationFn: saveGroceryListItems,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["grocery-list"] }),
+    onSuccess: (response) => {
+      setListItemID(response.id);
+    },
   });
 
   const [isChecked, setIsChecked] = useState<boolean>(item.isChecked);
@@ -97,9 +100,9 @@ function GroceryListItem({ item }: { item: groceryListItem }) {
         <EditableTextInput
           baseValue={item.item}
           onUpdate={(newValue) => {
-            if (item.id !== -1) {
+            if (listItemId > -1) {
               updateItemMutation.mutate({
-                id: item.id,
+                id: listItemId,
                 data: { item: newValue },
               });
             } else {
@@ -124,6 +127,7 @@ export default function GroceryList() {
     queryKey: ["grocery-list"],
     queryFn: getGroceryList,
   });
+  const [newItemCounter, setNewItemCounter] = useState<number>(-1);
 
   const clearAllGroceryList = useMutation({
     mutationFn: clearGroceryListAll,
@@ -139,10 +143,11 @@ export default function GroceryList() {
 
   const addNewItemToList = () => {
     let item: groceryListItem = {
-      id: -1,
+      id: newItemCounter,
       item: "",
       isChecked: false,
     };
+    setNewItemCounter((prev) => prev - 1);
     queryClient.setQueryData<groceryListItem[]>(["grocery-list"], (old) => [
       item,
       ...(old ?? []),

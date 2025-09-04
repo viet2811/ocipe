@@ -129,12 +129,19 @@ class GroceryListRetrieveCreate(APIView):
 
         grocery_list, _ = GroceryList.objects.get_or_create(user=self.request.user)
 
-        # Create new items
+        # One item
+        if len(item_names) == 1:
+            new_item = GroceryListItem.objects.create(
+                grocery=grocery_list,
+                item=item_names[0]
+            )
+            return Response({"id": new_item.id})
+        
+        # Bulk create
         GroceryListItem.objects.bulk_create([
             GroceryListItem(grocery=grocery_list, item=name)
             for name in item_names
         ])
-
         return Response(status.HTTP_201_CREATED)
     
     def delete(self, request):
