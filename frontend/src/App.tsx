@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { AuthProvider } from "./contexts/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import RecipeAdd from "./pages/RecipeAdd";
 import { Toaster } from "sonner";
 import Fridge from "./pages/Fridge";
@@ -68,12 +68,17 @@ const AppContent = () => {
   );
 };
 
+function ToasterWrapper() {
+  const { theme } = useTheme();
+  return <Toaster position="top-center" theme={theme} />;
+}
+
 function App() {
   return (
     <>
-      <Toaster position="top-center" />
       <BrowserRouter>
         <ThemeProvider>
+          <ToasterWrapper />
           <AuthProvider>
             <ScrollToTop />
             <AppContent />

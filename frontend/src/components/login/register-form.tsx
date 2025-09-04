@@ -25,33 +25,32 @@ export function RegisterForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await axiosInstance.post(
+    await toast.promise(
+      axiosInstance.post(
         "/user/register/",
         { username, password },
         {
           headers: { "Content-Type": "application/json" },
         }
-      );
-      // Axious resolve for 2xx status
-      toast.success("Registration successful! Now log-in to your account");
-      navigate("/login");
-      // Non-2xx errors
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {
-          toast.error(
-            "Cannot connect to server. Please check if the backend is running."
-          );
-        } else if (error.response?.status === 400) {
-          toast.warning(
-            "Username already exists. Please try another username."
-          );
-        }
-      } else {
-        toast.error("An error occurred. Please try again.");
+      ),
+      {
+        loading: "Registering...",
+        success: () => {
+          navigate("/login");
+          return "Registration successful! Now log-in to your account";
+        },
+        error: (error) => {
+          if (axios.isAxiosError(error)) {
+            if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {
+              return "Cannot connect to server :(";
+            } else if (error.response?.status === 400) {
+              return "Username already exists. Please try another username.";
+            }
+          }
+          return "An error occurred. Please try again.";
+        },
       }
-    }
+    );
   };
 
   return (
