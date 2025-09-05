@@ -3,7 +3,7 @@ import { axiosInstance } from "./axios";
 
 export async function getFridge() {
   const response = await axiosInstance.get("/fridge");
-  return response.data;
+  return response.data?.ingredient_list;
 }
 
 export async function updateSingleIngredient({
