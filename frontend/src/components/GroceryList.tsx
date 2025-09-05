@@ -65,8 +65,17 @@ function GroceryListItem({ item }: { item: groceryListItem }) {
 
   const createNewItemMutation = useMutation({
     mutationFn: saveGroceryListItems,
-    onSuccess: (response) => {
+    onSuccess: (response, newValue) => {
       setListItemID(response.id);
+      let newItem: groceryListItem = {
+        id: response.id,
+        item: newValue,
+        isChecked: false,
+      };
+      queryClient.setQueryData<groceryListItem[]>(["grocery-list"], (old) => {
+        if (!old) return [newItem];
+        return old.map((item) => (item.id === listItemId ? newItem : item));
+      });
     },
   });
 
@@ -110,7 +119,7 @@ function GroceryListItem({ item }: { item: groceryListItem }) {
             }
           }}
           onDelete={onDelete}
-          className="!w-40"
+          className="!w-40 cursor-text"
         />
       </Label>
       <X
