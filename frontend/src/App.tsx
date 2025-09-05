@@ -24,6 +24,7 @@ import PublicDocsLayout from "./layouts/PublicDocsLayout";
 import PublicNavBarLayout from "./layouts/PublicNavBarLayout";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
+import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -104,6 +105,7 @@ function App() {
             <ScrollToTop />
             <AppContent />
           </AuthProvider>
+          <Analytics />
         </ThemeProvider>
       </BrowserRouter>
     </>
