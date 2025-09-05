@@ -152,7 +152,6 @@ export default function DroppableIngredientGroup({
             groupName={groupName}
             onDelete={() => {
               // Remove from UI
-              console.log("Deleting index: ", itemIndex);
               queryClient.setQueryData<IngredientGroup>(["fridge"], (prev) => {
                 let updated = { ...prev };
                 updated[groupName] = updated[groupName].filter(

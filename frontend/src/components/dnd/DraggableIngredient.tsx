@@ -70,7 +70,8 @@ export const DraggableIngredient = ({
         let itemIndex = newList[groupName].findIndex(
           (curIngre) => curIngre.id === ingredient.id
         );
-        if (itemIndex) {
+        if (itemIndex !== null) {
+          //first one index is 0 so will be false. Changed to !== null
           newList[groupName][itemIndex] = {
             id: response.id,
             name: value.name,
