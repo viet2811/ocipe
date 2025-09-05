@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import RecipeAdd from "./pages/RecipeAdd";
@@ -26,6 +26,7 @@ import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 
 const AppContent = () => {
+  const { isAuthenticated, isLoading } = useAuth();
   return (
     <Routes>
       <Route element={<PublicOnlyRoute />}>
@@ -33,13 +34,15 @@ const AppContent = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/docs" element={<PublicDocsLayout />}>
-            <Route index element={<Navigate to="introduction" replace />} />
-            <Route path="introduction" element={<Introduction />} />
-            <Route path="recipe" element={<RecipeDocs />} />
-            <Route path="fridge" element={<FridgeDocs />} />
-            <Route path="grocery" element={<GroceryDocs />} />
-          </Route>
+          {!isLoading && !isAuthenticated && (
+            <Route path="/docs" element={<PublicDocsLayout />}>
+              <Route index element={<Navigate to="introduction" replace />} />
+              <Route path="introduction" element={<Introduction />} />
+              <Route path="recipe" element={<RecipeDocs />} />
+              <Route path="fridge" element={<FridgeDocs />} />
+              <Route path="grocery" element={<GroceryDocs />} />
+            </Route>
+          )}
           <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
@@ -55,13 +58,15 @@ const AppContent = () => {
             <Route index element={<Navigate to="plan-meals" replace />} />
             <Route path="plan-meals" element={<GroceryPlan />} />
           </Route>
-          <Route path="/docs">
-            <Route index element={<Navigate to="introduction" replace />} />
-            <Route path="introduction" element={<Introduction />} />
-            <Route path="recipe" element={<RecipeDocs />} />
-            <Route path="fridge" element={<FridgeDocs />} />
-            <Route path="grocery" element={<GroceryDocs />} />
-          </Route>
+          {!isLoading && isAuthenticated && (
+            <Route path="/docs">
+              <Route index element={<Navigate to="introduction" replace />} />
+              <Route path="introduction" element={<Introduction />} />
+              <Route path="recipe" element={<RecipeDocs />} />
+              <Route path="fridge" element={<FridgeDocs />} />
+              <Route path="grocery" element={<GroceryDocs />} />
+            </Route>
+          )}
         </Route>
       </Route>
     </Routes>
