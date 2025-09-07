@@ -1,11 +1,11 @@
-from django.http import JsonResponse
+from django.http import HttpResponse
 from django.db import connection
 
 def health(request):
-    return JsonResponse({"status": "ok"})
+    return HttpResponse({"status": "ok"})
 
 def db_ping(request):
     with connection.cursor() as cursor:
         cursor.execute("SELECT 1;")
         result = cursor.fetchone()
-    return JsonResponse({"db": result[0]})
+    return HttpResponse({"db": result[0]})
