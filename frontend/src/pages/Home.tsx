@@ -18,6 +18,7 @@ import {
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface quickButtonDataType {
   title: string;
@@ -67,18 +68,22 @@ const quickButton = (data: quickButtonDataType) => {
 };
 
 const RecentPlan: React.FC = () => {
-  const { data: recipes } = useRecipes();
-  const { data: recentPlans } = useQuery<HistoryPlans[]>({
+  const { data: recipes, isLoading: recipeLoading } = useRecipes();
+  const { data: recentPlans, isLoading: planLoading } = useQuery<
+    HistoryPlans[]
+  >({
     queryKey: ["recent-plan"],
     queryFn: getRecentGroceryPlan,
   });
+
   return (
     <>
       <h2 className="flex items-center font-bold text-2xl">
         Recent Plan
         <History className="ml-2" />
       </h2>
-      {recentPlans &&
+      {recipes &&
+        recentPlans &&
         recentPlans.map((item) => {
           const date = new Date(item.created_at);
           const formatted_date = date.toLocaleDateString("en-GB", {
@@ -136,13 +141,19 @@ const RecentPlan: React.FC = () => {
             </Fragment>
           );
         })}
-      {recentPlans?.length === 0 && (
+      {recentPlans && recentPlans.length === 0 && (
         <>
           <span>Hmm there's nothing here :( </span>
           <Link to="/grocery">
             <Button>Plan meals</Button>
           </Link>
         </>
+      )}
+      {(recipeLoading || planLoading) && (
+        <div>
+          <Skeleton className="h-6 w-36" />
+          <Skeleton className="h-15 w-full mt-2 rounded-lg" />
+        </div>
       )}
     </>
   );
