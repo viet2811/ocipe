@@ -212,17 +212,17 @@ export default function RecipeForm({
                     </FormItem>
                   )}
                 ></FormField>
-                {/* Meat type */}
+                {/* Category Meat type */}
                 <FormField
                   control={form.control}
                   name="meat_type"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Meat type</FormLabel>
+                      <FormLabel>Category</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Enter meat type or None if not..."
+                          placeholder="Enter meat type or other category..."
                         />
                       </FormControl>
                       <FormMessage />

@@ -135,6 +135,7 @@ const RecipeSelection: React.FC<{
               ]);
             }
           }}
+          disabled={tableInstance?.getCoreRowModel().rows.length === 0}
         >
           <Shuffle></Shuffle>
           Random

@@ -20,6 +20,7 @@ import DroppableIngredientGroup from "@/components/dnd/DroppableIngredientGroup"
 import Masonry from "react-masonry-css";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { queryClient } from "@/lib/queryClient";
+import { Link } from "react-router-dom";
 
 // The main container with DnD context along handle drag end.
 // Also need a local state to hold fetch data in order to manipulate changing group, and deletion/change
@@ -44,8 +45,8 @@ export default function Fridge() {
 
   // Local data for drag and drop
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
-  // Sensor for both touch and mouse user
-  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor)); // Sensor for both touch and mouse user
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     const [fromGroup, ingredientIdStr] = (active.id as string).split("-");
@@ -87,6 +88,7 @@ export default function Fridge() {
     );
   };
 
+  // Breakpoint for Masonry
   const breakpointColumnsObj = {
     default: 5,
     1440: 4,
@@ -120,7 +122,7 @@ export default function Fridge() {
         <Button
           variant="ghost"
           type="button"
-          className="text-muted-foreground hover:bg-muted hover:shadow-none hover:text-inherit cursor-pointer justify-start w-max"
+          className="text-chart-5 hover:bg-muted hover:shadow-none hover:text-chart-5 cursor-pointer justify-start w-max"
           onClick={() =>
             isMobile
               ? queryClient.setQueryData<IngredientGroup>(
@@ -141,23 +143,37 @@ export default function Fridge() {
         >
           <Plus /> Add an ingredient group
         </Button>
-        <div className="my-3">
-          <Masonry
-            breakpointCols={breakpointColumnsObj}
-            className="flex w-auto bg-clip-padding space-x-4"
-          >
-            {ingredientList &&
-              Object.entries(ingredientList).map(([groupName, ingredients]) => (
-                <DroppableIngredientGroup
-                  key={groupName}
-                  groupId={groupName}
-                  name={groupName}
-                  ingredients={ingredients}
-                  isHighlighted={activeGroup === groupName}
-                />
-              ))}
-          </Masonry>
-        </div>
+        {ingredientList && Object.keys(ingredientList).length > 0 ? (
+          <div className="my-3">
+            <Masonry
+              breakpointCols={breakpointColumnsObj}
+              className="flex w-auto bg-clip-padding space-x-4"
+            >
+              {Object.entries(ingredientList).map(
+                ([groupName, ingredients]) => (
+                  <DroppableIngredientGroup
+                    key={groupName}
+                    groupId={groupName}
+                    name={groupName}
+                    ingredients={ingredients}
+                    isHighlighted={activeGroup === groupName}
+                  />
+                )
+              )}
+            </Masonry>
+          </div>
+        ) : (
+          <div className="text-muted-foreground mx-4 text-sm mt-2">
+            Start adding your ingredient to get accurate grocery list <br />
+            Go{" "}
+            <Link to="/docs/fridge">
+              <Button variant="link" className="p-0 underline text-chart-5">
+                here
+              </Button>
+            </Link>{" "}
+            to learn more about Fridge
+          </div>
+        )}
       </div>
     </DndContext>
   );

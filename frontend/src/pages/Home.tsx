@@ -201,7 +201,9 @@ const Home = () => {
             />
           </g>
         </svg>
-        <h1>Hi {user}, how are we feeling?</h1>
+        <h1 className="pl-2 text-wrap text-center md:pl-0">
+          Hi {user}, how are we feeling?
+        </h1>
       </div>
       <div className="flex mx-auto max-w-max my-4 max-h-100 flex-grow px-4">
         <div id="divB" className="flex flex-col ml-2 space-y-2">

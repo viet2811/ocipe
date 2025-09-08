@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { postRecipe } from "@/api/recipes";
 import { toast } from "sonner";
-import { type RecipeInput } from "@/types/recipes";
+import { type Recipe, type RecipeInput } from "@/types/recipes";
 import type { RecipeFormValues } from "@/components/RecipeForm";
 import RecipeForm from "@/components/RecipeForm";
 import type { UseFormReturn } from "react-hook-form";
@@ -20,25 +20,25 @@ const defaultFormValues: RecipeInput = {
 export default function RecipeAdd() {
   const postMutation = useMutation({
     mutationFn: postRecipe,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recipes"] });
-      toast.success("Recipes is successfully added");
-    },
-    onError: (e) => {
-      toast.error("Something went wrong. Please retry");
-      console.log(e);
-    },
   });
 
   function onSubmit(
     values: RecipeFormValues,
     form: UseFormReturn<RecipeFormValues>
   ) {
-    // Use Query for post
-    // Mutation for post, invalid ["recipes"]
-    postMutation.mutate(values, {
-      onSuccess: () => {
+    toast.promise(postMutation.mutateAsync(values), {
+      loading: "Adding recipe...",
+      success: (newRecipe: Recipe) => {
         form.reset(defaultFormValues);
+        queryClient.setQueryData<Recipe[]>(["recipes"], (old) => [
+          newRecipe,
+          ...(old ?? []),
+        ]);
+        return "Recipe is successfully added";
+      },
+      error: (e) => {
+        console.log(e);
+        return "Something went wrong. Please retry";
       },
     });
   }
