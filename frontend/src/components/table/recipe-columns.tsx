@@ -52,7 +52,7 @@ export function getRecipeColumns(
     },
     {
       accessorKey: "meat_type",
-      header: ({ column }) => <SortButton column={column} label="Meat type" />,
+      header: ({ column }) => <SortButton column={column} label="Category" />,
       cell: ({ row }) => (
         <div className="mx-2 text-xs py-0.5 px-1.5 text-muted-foreground border font-medium rounded-md w-max">
           {row.getValue("meat_type")}
@@ -128,31 +128,34 @@ export function getRecipeColumns(
 
         const deleteMutation = useMutation({
           mutationFn: (id: number) => deleteSingleRecipe(id),
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["recipes"] });
-            toast.success("Recipe deleted successfully");
-          },
-          onError: () => {
-            toast.error("Failed to delete recipe");
-          },
         });
 
         const closeDialogRef = useRef<HTMLButtonElement>(null);
         const updateMutation = useMutation({
           mutationFn: updateSingleRecipe,
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["recipes"] });
-            toast.success("Recipes is successfully saved");
-            closeDialogRef.current?.click();
-          },
-          onError: (e) => {
-            toast.error("Something went wrong. Please retry");
-            console.log(e);
-          },
         });
 
         function onSubmit(values: RecipeFormValues) {
           let id = recipe.id;
+          toast.promise(updateMutation.mutateAsync({ id, data: values }), {
+            loading: "Saving recipe...",
+            success: (savedItem: Recipe) => {
+              queryClient.setQueryData<Recipe[]>(["recipes"], (old) => {
+                if (old) {
+                  return old.map((curRecipe) =>
+                    curRecipe.id === id ? savedItem : curRecipe
+                  );
+                }
+                return [];
+              });
+              closeDialogRef.current?.click();
+              return "Recipe is saved!";
+            },
+            error: (e) => {
+              console.log(e);
+              return "Something went wrong. Please retry.";
+            },
+          });
           updateMutation.mutate({ id, data: values });
         }
 
@@ -205,6 +208,24 @@ export function getRecipeColumns(
               <DropdownMenuItem
                 className="cursor-pointer text-destructive hover:!text-destructive hover:!bg-destructive/10"
                 onClick={() => {
+                  toast.promise(deleteMutation.mutateAsync(recipe.id), {
+                    loading: "Deleting",
+                    success: () => {
+                      queryClient.setQueryData<Recipe[]>(["recipes"], (old) => {
+                        if (old) {
+                          return old.filter(
+                            (curRecipe) => curRecipe.id !== recipe.id
+                          );
+                        }
+                        return [];
+                      });
+                      return "Item deleted";
+                    },
+                    error: (e) => {
+                      console.log(e);
+                      return "Something went wrong. Please retry.";
+                    },
+                  });
                   deleteMutation.mutate(recipe.id);
                 }}
                 disabled={deleteMutation.isPending}

@@ -37,8 +37,9 @@ export default function RecipeDocs() {
             <code>recipe-name</code> — self-explanatory
           </p>
           <p>
-            <code>meat-type</code> — type of meat the dish contains, it can be
-            none.
+            <code>category</code> — this field allow organizing recipes into
+            group, easier to search & sort. You can define whatever you desire:
+            meat type, dinner/lunch/breakfast, etc
           </p>
           <p>
             <code>longevity</code> — how long this recipe gonna last. It can be

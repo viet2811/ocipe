@@ -18,6 +18,9 @@ import {
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ScrollArea } from "../ui/scroll-area";
+//Link inside recipe note
+import DOMPurify from "dompurify";
+import Autolinker from "autolinker";
 
 const accuracyNode = (accuracy: number) => {
   let colorStyling = "";
@@ -50,6 +53,16 @@ export default function RecipeContent(recipeData: Recipe) {
       {accuracy !== undefined && accuracyNode(accuracy)}
     </div>
   );
+
+  const cleanNote = DOMPurify.sanitize(
+    Autolinker.link(recipeData.note || "No note", {
+      newWindow: true,
+    }),
+    {
+      ADD_ATTR: ["target", "rel"], // allow these for newWindow
+    }
+  );
+
   const detailContents = (
     <>
       <div className="flex flex-col mx-4">
@@ -63,25 +76,30 @@ export default function RecipeContent(recipeData: Recipe) {
       <div className="flex flex-col mx-4 my-2">
         <label className="font-semibold text-sm flex-1">Note</label>
         <ScrollArea className="max-h-[200px] overflow-auto">
-          <blockquote className="my-2 border-l-2 px-4 italic whitespace-pre-wrap">
-            {recipeData.note || "No note"}
-          </blockquote>
+          <blockquote
+            className="my-2 border-l-2 px-4 italic whitespace-pre-wrap [&_a]:text-chart-5 [&_a]:underline"
+            dangerouslySetInnerHTML={{
+              __html: cleanNote,
+            }}
+          />
         </ScrollArea>
       </div>
       <div className="flex flex-col mx-4 mb-6">
         <label className="font-semibold text-sm flex-1">Ingredients</label>
-        <ul className="ml-6 list-disc [&>li]:mt-2">
-          {recipeData.ingredient_list?.map((item, index) => (
-            <li key={`ingredient${index}`}>
-              {item.name}
-              {item.quantity ? (
-                <span className="font-medium"> — {item.quantity}</span>
-              ) : (
-                ""
-              )}
-            </li>
-          ))}
-        </ul>
+        <ScrollArea className="max-h-[247px] md:max-h-[280px] overflow-auto">
+          <ul className="ml-6 list-disc [&>li]:mt-2">
+            {recipeData.ingredient_list?.map((item, index) => (
+              <li key={`ingredient${index}`}>
+                {item.name}
+                {item.quantity ? (
+                  <span className="font-medium"> — {item.quantity}</span>
+                ) : (
+                  ""
+                )}
+              </li>
+            ))}
+          </ul>
+        </ScrollArea>
       </div>
     </>
   );

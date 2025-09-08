@@ -69,16 +69,6 @@ function ImportDialog() {
 
   const bulkCreateMutation = useMutation({
     mutationFn: bulkCreateRecipe,
-    onSuccess: (data) => {
-      const count = Array.isArray(data) ? data.length : 0;
-      toast.success(`${count} recipes imported successfully!`);
-      queryClient.invalidateQueries({ queryKey: ["recipes"] });
-      setOpen(false);
-    },
-    onError: (e) => {
-      console.log(e);
-      toast.error("File data is not correctly formatted. Please retry.");
-    },
   });
 
   return (
@@ -122,7 +112,7 @@ function ImportDialog() {
           </DialogClose>
           <Button
             type="button"
-            disabled={!file}
+            disabled={!file || bulkCreateMutation.isPending}
             onClick={() => {
               const reader = new FileReader();
               reader.onload = (e) => {
@@ -132,8 +122,21 @@ function ImportDialog() {
                   toast.error("File does not contain a recipe list");
                   return;
                 }
-                bulkCreateMutation.mutate(parsed);
-
+                toast.promise(bulkCreateMutation.mutateAsync(parsed), {
+                  loading: "Importing...",
+                  success: async (data) => {
+                    const count = Array.isArray(data) ? data.length : 0;
+                    await queryClient.invalidateQueries({
+                      queryKey: ["recipes"],
+                    });
+                    setOpen(false);
+                    return `${count} recipes imported successfully!`;
+                  },
+                  error: (e) => {
+                    console.log(e);
+                    return "File data is not correctly formatted. Please retry.";
+                  },
+                });
                 // logs JSON object
               };
               file && reader.readAsText(file);
@@ -150,24 +153,37 @@ function ImportDialog() {
 export default function RecipeView() {
   const deleteAllMutation = useMutation({
     mutationFn: deleteAllRecipes,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recipes"] });
-      toast.success("All recipes deleted successfully");
-    },
-    onError: () => {
-      toast.error("Something went wrong. Please retry");
-    },
   });
+  const handleDeleteAll = () => {
+    toast.promise(deleteAllMutation.mutateAsync(), {
+      loading: "Refreshing..",
+      success: () => {
+        queryClient.setQueryData<Recipe[]>(["recipes"], []);
+        return "All recipes deleted";
+      },
+      error: (e) => {
+        console.log(e);
+        return "Something went wrong. Please retry";
+      },
+    });
+  };
+
   const refreshMutation = useMutation({
     mutationFn: refreshRecipes,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recipes"] });
-      toast.success("All recipes state refresh to active");
-    },
-    onError: () => {
-      toast.error("Something went wrong. Please retry");
-    },
   });
+  const handleRefresh = () => {
+    toast.promise(refreshMutation.mutateAsync(), {
+      loading: "Refreshing..",
+      success: async () => {
+        await queryClient.invalidateQueries({ queryKey: ["recipes"] });
+        return "All recipes state refresh to active";
+      },
+      error: (e) => {
+        console.log(e);
+        return "Something went wrong. Please retry";
+      },
+    });
+  };
 
   const LeftSideButtons: React.FC = () => (
     <div className="grid grid-cols-2 gap-2 mb-2 @md:flex">
@@ -190,7 +206,7 @@ export default function RecipeView() {
         variant="secondary"
         size="sm"
         className="cursor-pointer"
-        onClick={() => refreshMutation.mutate()}
+        onClick={handleRefresh}
       >
         <RefreshCw /> Reset status
       </Button>
@@ -212,7 +228,7 @@ export default function RecipeView() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Oops, misclick</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteAllMutation.mutate()}>
+            <AlertDialogAction onClick={handleDeleteAll}>
               Pretty sure
             </AlertDialogAction>
           </AlertDialogFooter>

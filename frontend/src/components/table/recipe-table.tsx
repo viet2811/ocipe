@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { queryClient } from "@/lib/queryClient";
-import { type FridgeResponse } from "@/types/recipes";
+import { type IngredientGroup } from "@/types/recipes";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 
@@ -101,7 +101,7 @@ export function DataTable<TData extends { id: number }, TValue>({
             value={globalFilter}
             aria-label="global-search"
             onChange={(e) => table.setGlobalFilter(String(e.target.value))}
-            placeholder="Search by name or meat type..."
+            placeholder="Search by name, category..."
             className="w-2/3 md:w-1/3 mr-3"
           />
         ) : (
@@ -121,11 +121,11 @@ export function DataTable<TData extends { id: number }, TValue>({
           onValueChange={(value) => {
             if (value === "fridge") {
               setSearchType("ingredients");
-              let fridge_data = queryClient.getQueryData<FridgeResponse>([
+              let fridge_data = queryClient.getQueryData<IngredientGroup>([
                 "fridge",
               ]);
               if (fridge_data) {
-                let groups = fridge_data.ingredient_list;
+                let groups = fridge_data;
                 let strings = Object.values(groups) // get all ingredient arrays
                   .flat() // flatten them into one array
                   .map((ingredient) => ingredient.name) // pick out names
@@ -143,7 +143,7 @@ export function DataTable<TData extends { id: number }, TValue>({
             <SelectValue>Search by</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="default">Name + Meat Type</SelectItem>
+            <SelectItem value="default">Name & Category</SelectItem>
             <SelectItem value="ingredients">Ingredient(s)</SelectItem>
             <SelectItem value="fridge">Your Fridge</SelectItem>
           </SelectContent>
@@ -196,7 +196,7 @@ export function DataTable<TData extends { id: number }, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 md:text-center"
                 >
                   No results
                 </TableCell>
@@ -205,9 +205,10 @@ export function DataTable<TData extends { id: number }, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 pl-5 @md:text-center @md:pl-0"
                 >
-                  Kitchen seems.. empty? Go{" "}
+                  Kitchen seems.. empty? <br />
+                  Go{" "}
                   <Link to="/recipes/add-a-recipe">
                     <Button variant="link" className="p-0">
                       here

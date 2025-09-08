@@ -1,13 +1,14 @@
 import { getRecipeColumns } from "@/components/table/recipe-columns";
 import { DataTable } from "@/components/table/recipe-table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Loading from "@/components/loading";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import type { Recipe } from "@/types/recipes";
 import { getRecipesByIngredient } from "@/api/recipes";
 import { useDebounce } from "@/hooks/useDebounce";
 import { type Table } from "@tanstack/react-table";
 import { useRecipes } from "@/hooks/useRecipes";
+import { toast } from "sonner";
 
 type RecipeListProps = {
   rowSelectionEnabled: boolean;
@@ -29,27 +30,38 @@ export default function RecipeList({
   const debouncedIngredient = useDebounce(ingredientInput, 700);
 
   const { data: recipes, isLoading } = useRecipes();
-
-  // Custom sorted data by ingredients
-  const { data: filteredRecipes, isFetching: ingredientFetching } = useQuery<
-    Recipe[]
-  >({
-    queryKey: ["recipes-by-ingredients", debouncedIngredient],
-    queryFn: () => getRecipesByIngredient(debouncedIngredient),
-    enabled: searchType === "ingredients" && !!debouncedIngredient,
-    placeholderData: keepPreviousData,
-  });
-
   // Handle loading state
   if (isLoading) {
     return <Loading label="recipes" />;
   }
 
+  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[] | null>(null);
+  const ingredientFilteredMutation = useMutation({
+    mutationFn: getRecipesByIngredient,
+  });
+
+  useEffect(() => {
+    if (searchType === "ingredients" && debouncedIngredient) {
+      toast.promise(
+        ingredientFilteredMutation.mutateAsync(debouncedIngredient),
+        {
+          loading: "Filtering recipes..",
+          success: (responseData: Recipe[]) => {
+            setFilteredRecipes(responseData);
+            return "Filtered";
+          },
+          error: (e) => {
+            console.log(e);
+            return "Something went wrong. Please retry";
+          },
+        }
+      );
+    }
+  }, [debouncedIngredient, searchType]);
+
   const recipesData =
-    searchType === "ingredients" &&
-    debouncedIngredient &&
-    (!ingredientFetching || filteredRecipes)
-      ? filteredRecipes || []
+    searchType === "ingredients" && debouncedIngredient && filteredRecipes
+      ? filteredRecipes
       : recipes || [];
 
   return (
