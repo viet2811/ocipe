@@ -21,6 +21,7 @@ import Masonry from "react-masonry-css";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { queryClient } from "@/lib/queryClient";
 import { Link } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // The main container with DnD context along handle drag end.
 // Also need a local state to hold fetch data in order to manipulate changing group, and deletion/change
@@ -38,7 +39,7 @@ export default function Fridge() {
   });
 
   // Fridge fetch data
-  const { data: ingredientList } = useQuery<IngredientGroup>({
+  const { data: ingredientList, isLoading } = useQuery<IngredientGroup>({
     queryKey: ["fridge"],
     queryFn: getFridge,
   });
@@ -143,26 +144,29 @@ export default function Fridge() {
         >
           <Plus /> Add an ingredient group
         </Button>
-        {ingredientList && Object.keys(ingredientList).length > 0 ? (
-          <div className="my-3">
-            <Masonry
-              breakpointCols={breakpointColumnsObj}
-              className="flex w-auto bg-clip-padding space-x-4"
-            >
-              {Object.entries(ingredientList).map(
-                ([groupName, ingredients]) => (
-                  <DroppableIngredientGroup
-                    key={groupName}
-                    groupId={groupName}
-                    name={groupName}
-                    ingredients={ingredients}
-                    isHighlighted={activeGroup === groupName}
-                  />
-                )
-              )}
-            </Masonry>
-          </div>
-        ) : (
+        <div
+          className="my-3"
+          hidden={ingredientList && Object.keys(ingredientList).length === 0}
+        >
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className="flex w-auto bg-clip-padding space-x-4"
+          >
+            {isLoading && <Skeleton className="h-48 rounded-xl mb-4" />}
+            {isLoading && <Skeleton className="h-36 rounded-xl mb-4" />}
+            {ingredientList &&
+              Object.entries(ingredientList).map(([groupName, ingredients]) => (
+                <DroppableIngredientGroup
+                  key={groupName}
+                  groupId={groupName}
+                  name={groupName}
+                  ingredients={ingredients}
+                  isHighlighted={activeGroup === groupName}
+                />
+              ))}
+          </Masonry>
+        </div>
+        {ingredientList && Object.keys(ingredientList).length === 0 && (
           <div className="text-muted-foreground mx-4 text-sm mt-2">
             Start adding your ingredient to get accurate grocery list <br />
             Go{" "}

@@ -21,6 +21,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./ui/accordion";
+import { Skeleton } from "./ui/skeleton";
 
 type groceryListItem = {
   id: number;
@@ -132,10 +133,11 @@ function GroceryListItem({ item }: { item: groceryListItem }) {
 }
 
 export default function GroceryList() {
-  const { data: groceryListData } = useQuery<groceryListItem[]>({
+  const { data: groceryListData, isLoading } = useQuery<groceryListItem[]>({
     queryKey: ["grocery-list"],
     queryFn: getGroceryList,
   });
+
   const [newItemCounter, setNewItemCounter] = useState<number>(-1);
 
   const clearAllGroceryList = useMutation({
@@ -162,6 +164,16 @@ export default function GroceryList() {
       ...(old ?? []),
     ]);
   };
+
+  function ListItemSkeleton() {
+    return (
+      <li className="flex items-center space-x-2 mb-2">
+        <Skeleton className="w-6 aspect-square " />
+        <Skeleton className="w-40 h-6" />
+        <Skeleton className="w-6 h-6 ml-auto" />
+      </li>
+    );
+  }
 
   return (
     <>
@@ -195,6 +207,12 @@ export default function GroceryList() {
                 return <GroceryListItem item={item} key={`item-${item.id}`} />;
             })}
         </ScrollArea>
+        {isLoading && (
+          <>
+            <ListItemSkeleton />
+            <ListItemSkeleton />
+          </>
+        )}
         {/* Checked */}
         <Accordion type="single" collapsible>
           <AccordionItem value="checked-items">
