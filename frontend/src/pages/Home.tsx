@@ -123,7 +123,7 @@ const RecentPlan: React.FC = () => {
                             index < item.recipes.length - 1 && "border-b"
                           )}
                         >
-                          <div className="flex flex-wrap items-center mr-4 px-3">
+                          <div className="flex flex-wrap items-center mr-4 px-3 max-w-75">
                             <span className="-ml-3">
                               <RecipeContent {...recipe} />
                             </span>

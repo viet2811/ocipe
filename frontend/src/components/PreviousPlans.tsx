@@ -33,6 +33,7 @@ import type { HistoryPlans, Recipe } from "@/types/recipes";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { FileWarning, HistoryIcon, X } from "lucide-react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { toast } from "sonner";
 
 export default function PreviousPlansButton({
   setRecipeBoard,
@@ -156,11 +157,21 @@ export default function PreviousPlansButton({
 
   const clearAllHistory = useMutation({
     mutationFn: clearHistory,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["history"] });
-      queryClient.invalidateQueries({ queryKey: ["recent-plan"] });
-    },
   });
+  const handleClearAll = () => {
+    toast.promise(clearAllHistory.mutateAsync(), {
+      loading: "Clearing...",
+      success: () => {
+        queryClient.setQueryData<HistoryPlans[]>(["history"], []);
+        queryClient.setQueryData<HistoryPlans[]>(["recent-plan"], []);
+        return "Cleared!";
+      },
+      error: (e) => {
+        console.log(e);
+        return "Something went wrong. Please retry.";
+      },
+    });
+  };
 
   const contentTrigger = (
     <Button variant="outline" className="ml-auto">
@@ -172,7 +183,8 @@ export default function PreviousPlansButton({
     <Button
       variant="destructive"
       className="ml-auto"
-      onClick={() => clearAllHistory.mutate()}
+      onClick={handleClearAll}
+      disabled={history?.length === 0}
     >
       <X /> Clear all
     </Button>
