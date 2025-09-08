@@ -30,22 +30,6 @@ const AppContent = () => {
   const { isAuthenticated, isLoading } = useAuth();
   return (
     <Routes>
-      <Route
-        path="/docs"
-        element={
-          !isLoading && isAuthenticated ? (
-            <DashboardLayout />
-          ) : (
-            <PublicDocsLayout />
-          )
-        }
-      >
-        <Route index element={<Navigate to="introduction" replace />} />
-        <Route path="introduction" element={<Introduction />} />
-        <Route path="recipe" element={<RecipeDocs />} />
-        <Route path="fridge" element={<FridgeDocs />} />
-        <Route path="grocery" element={<GroceryDocs />} />
-      </Route>
       <Route element={<PublicOnlyRoute />}>
         <Route element={<PublicNavBarLayout />}>
           <Route path="/" element={<LandingPage />} />
