@@ -346,11 +346,6 @@ export default function GroceryPlan() {
 
   const saveGroceryList = useMutation({
     mutationFn: saveGroceryListItems,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["grocery-list"] });
-      toast.success("Items has been saved to grocery list."), navigate("/home");
-    },
-    onError: () => toast.error("Something went wrong. Please try again"),
   });
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -417,7 +412,7 @@ export default function GroceryPlan() {
                     <Loading label="your grocery list..." />
                   ) : (
                     <div className="space-y-4">
-                      <div>
+                      <ScrollArea className="max-h-[285px] overflow-auto">
                         <ul ref={listRef} className="list-inside">
                           {grocery.length === 0 &&
                             "Congrats. You don't need to buy anything"}
@@ -453,7 +448,7 @@ export default function GroceryPlan() {
                               </li>
                             ))}
                         </ul>
-                      </div>
+                      </ScrollArea>
                       <div className="flex items-center gap-3">
                         <Checkbox
                           id="quantity"
@@ -515,7 +510,23 @@ export default function GroceryPlan() {
                       onClick={() => {
                         if (listRef.current) {
                           const textToCopy = listRef.current.innerText;
-                          saveGroceryList.mutate(textToCopy);
+                          toast.promise(
+                            saveGroceryList.mutateAsync(textToCopy),
+                            {
+                              loading: "Saving",
+                              success: async () => {
+                                await queryClient.invalidateQueries({
+                                  queryKey: ["grocery-list"],
+                                });
+                                navigate("/home");
+                                return "Items saved";
+                              },
+                              error: (e) => {
+                                console.log(e);
+                                return "Something went wrong. Please retry";
+                              },
+                            }
+                          );
                         }
                       }}
                     >
