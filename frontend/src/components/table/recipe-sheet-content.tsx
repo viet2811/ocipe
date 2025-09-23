@@ -84,7 +84,7 @@ export default function RecipeContent(recipeData: Recipe) {
           />
         </ScrollArea>
       </div>
-      <div className="flex flex-col mx-4 mb-6">
+      <div className="flex flex-col mx-4 mb-10">
         <label className="font-semibold text-sm flex-1">Ingredients</label>
         <ScrollArea className="max-h-[247px] md:max-h-[280px] overflow-auto">
           <ul className="ml-6 list-disc [&>li]:mt-2">
