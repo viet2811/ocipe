@@ -1,5 +1,5 @@
 # About the app
-Ocipe is basically a digital personal cookbook with a built-in grocery planner targets in making the whole process "easier"
+[Ocipe](https://ocipe.vercel.app) is basically a digital personal cookbook with a built-in grocery planner targets in making the whole process "easier"
 
 I love cooking, but deciding what to eat and buy from 50+ saved recipes across apps, bookmarks, screenshots? Yeah… when life gets busy, that’s quite a nightmare.
 
@@ -22,4 +22,3 @@ Some very simple feature include
 + A fridge components to organise what ingredients you have - for accurate grocery list
 + A random selection to help in indecisive moments
 + A view of what you have planned - if repetiveness is not your cup of tea
-
