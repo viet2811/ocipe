@@ -66,18 +66,17 @@ export const DraggableIngredient = ({
     onSuccess: (response, value) => {
       setIngreId(response.id);
       queryClient.setQueryData<IngredientGroup>(["fridge"], (prev) => {
-        const newList = { ...prev };
-        let itemIndex = newList[groupName].findIndex(
-          (curIngre) => curIngre.id === ingredient.id
+        const groupCopy = [...prev![groupName]];
+        const itemIndex = groupCopy.findIndex(
+          (curIngre) => curIngre.id === ingredient.id,
         );
-        if (itemIndex !== null) {
-          //first one index is 0 so will be false. Changed to !== null
-          newList[groupName][itemIndex] = {
+        if (itemIndex !== -1) {
+          groupCopy[itemIndex] = {
             id: response.id,
             name: value.name,
           };
         }
-        return newList;
+        return { ...prev, [groupName]: groupCopy };
       });
     },
     onError: (e) => onErrorMutation(e),

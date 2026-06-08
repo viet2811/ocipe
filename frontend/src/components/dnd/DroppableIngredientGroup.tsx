@@ -111,7 +111,7 @@ export default function DroppableIngredientGroup({
       key={groupId}
       className={cn(
         "p-4 h-max transition-colors mb-4",
-        isHighlighted ? "border-primary" : "border-transparent"
+        isHighlighted ? "border-primary" : "border-transparent",
       )}
       ref={setNodeRef}
     >
@@ -144,10 +144,10 @@ export default function DroppableIngredientGroup({
         </DropdownMenu>
       </div>
       <ul className="-mt-6">
-        {ingredients.map((ingredient, itemIndex) => (
+        {ingredients.map((ingredient, _) => (
           <DraggableIngredient
             dragId={`${groupId}-${ingredient.id}`} // Use this as a hint to handle drag
-            key={`group${groupId}-item${itemIndex}`}
+            key={`group${groupId}-item${ingredient.id}`}
             ingredient={ingredient}
             groupName={groupName}
             onDelete={() => {
@@ -155,7 +155,7 @@ export default function DroppableIngredientGroup({
               queryClient.setQueryData<IngredientGroup>(["fridge"], (prev) => {
                 let updated = { ...prev };
                 updated[groupName] = updated[groupName].filter(
-                  (curItem) => curItem.id !== ingredient.id
+                  (curItem) => curItem.id !== ingredient.id,
                 );
                 return updated;
               });
