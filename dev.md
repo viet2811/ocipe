@@ -1,8 +1,10 @@
 ## Update code
+
 Use `dev` branch to update code locally with Docker compose
 
 ## After update
-**DO NOT** merge dev to main 
+
+**DO NOT** merge dev to main
 
 Instead, run this code to get commit hash
 
@@ -22,4 +24,12 @@ For range of commits
 
 ```
 git cherry-pick <oldest-hash>^..<newest-hash>
+```
+
+## Merge multi commit into one
+
+For `n`th recent commit
+
+```
+git rebase -i HEAD~<n>
 ```
