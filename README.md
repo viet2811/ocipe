@@ -18,9 +18,9 @@ Select recipes for the week, optionally randomize when you’re indecisive, and 
 
 
 # About this branch
-This branch contains the live code that current deploying 
-- `Vercel` on frontend
-- `Render` on backend
+This branch contains the live code that current deploying on
+- `Vercel` for frontend
+- `Render` for backend
 - `Supabase` for database
 
 For local dev environment, head to `dev` branch for `Docker-compose` environment
