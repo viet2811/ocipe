@@ -46,7 +46,7 @@ def getRecipeFromURL(url):
           """
 
     response = client.models.generate_content(
-        model="gemini-2.0-flash-lite",
+        model="gemini-3.1-flash-lite",
         contents=prompt,
         config=types.GenerateContentConfig(
             temperature=0.7,
