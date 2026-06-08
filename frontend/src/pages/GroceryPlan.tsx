@@ -70,7 +70,7 @@ const RecipeSelection: React.FC<{
   setRecipeBoard: React.Dispatch<React.SetStateAction<RecipeBoardItems[]>>;
 }> = ({ recipeBoard, setRecipeBoard }) => {
   const [tableInstance, setTableInstance] = useState<Table<Recipe> | null>(
-    null
+    null,
   );
 
   const isMobile = useIsMobile();
@@ -243,10 +243,10 @@ const RecipeSelection: React.FC<{
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const oldIndex = recipeBoard.findIndex(
-        (item) => item.instanceID === active.id
+        (item) => item.instanceID === active.id,
       );
       const newIndex = recipeBoard.findIndex(
-        (item) => item.instanceID === over.id
+        (item) => item.instanceID === over.id,
       );
       setRecipeBoard((items) => arrayMove(items, oldIndex, newIndex));
     }
@@ -324,7 +324,7 @@ export default function GroceryPlan() {
   // For grocery list results
   const [grocery, setGrocery] = useState<IngredientDetails[]>([]);
   const [existGroceryItem, setExistGroceryItem] = useState<IngredientDetails[]>(
-    []
+    [],
   );
   const [fullDetails, setFullDetails] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<boolean>(false);
@@ -491,7 +491,6 @@ export default function GroceryPlan() {
                     onClick={() => {
                       if (listRef.current) {
                         const textToCopy = listRef.current.innerText;
-                        console.log(textToCopy);
                         navigator.clipboard
                           .writeText(textToCopy)
                           .then(() => {
@@ -525,7 +524,7 @@ export default function GroceryPlan() {
                                 console.log(e);
                                 return "Something went wrong. Please retry";
                               },
-                            }
+                            },
                           );
                         }
                       }}
@@ -555,7 +554,7 @@ export default function GroceryPlan() {
               className={cn(
                 "transition-colors duration-300 inline-flex items-center",
                 index < currentStep && "text-chart-5",
-                index > currentStep && "text-muted-foreground"
+                index > currentStep && "text-muted-foreground",
               )}
             >
               {index < currentStep ? (
@@ -577,14 +576,16 @@ export default function GroceryPlan() {
                   "md:bg-muted",
 
                   // Completed step styling
-                  index < currentStep && "after:text-chart-5 md:bg-transparent"
+                  index < currentStep && "after:text-chart-5 md:bg-transparent",
                 )}
               >
                 {/* Animate line only on desktop */}
                 <div
                   className={cn(
                     "hidden md:block absolute inset-0 bg-chart-5 transition-all duration-700 origin-left",
-                    index < currentStep ? "w-full scale-x-100" : "w-0 scale-x-0"
+                    index < currentStep
+                      ? "w-full scale-x-100"
+                      : "w-0 scale-x-0",
                   )}
                 />
               </li>

@@ -53,7 +53,6 @@ const Breadcrumbs: React.FC = () => {
 
 const DashboardLayout: React.FC = () => {
   const isFetching = useIsFetching();
-  console.log(isFetching);
   return (
     <SidebarProvider>
       <AppSidebar />
