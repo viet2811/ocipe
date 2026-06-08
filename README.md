@@ -17,6 +17,14 @@ Track what ingredients you currently have at home. Ocipe uses your fridge invent
 Select recipes for the week, optionally randomize when you’re indecisive, and get an instant aggregated shopping list — minus what’s already in your fridge.
 
 
+# About this branch
+This branch contains the live code that current deploying 
+- `Vercel` on frontend
+- `Render` on backend
+- `Supabase` for database
+
+For local dev environment, head to `dev` branch for `Docker-compose` environment
+
 # Documentation
 ## App Documentation
 To understand how to use the app, head to the [web documentation](https://ocipe.vercel.app/docs/introduction)
