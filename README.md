@@ -5,20 +5,21 @@ I love cooking, but deciding what to eat and buy from 50+ saved recipes across a
 
 So hey, let make an actual software with cool feature to organise and make the process better.
 
-## Cookbook
-The idea are quite simple innit?
+## Core Features
+The idea is quite simple
+### Cookbook
+Store all your personal recipes with ingredients, cooking notes, and frequency labels. Search by name, category, or ingredients you already have.
 
-Cookbook are where all the recipes, instructions are written down to help you when cooking. 
-Here's the catch: someone's gotta write them down first. And in this app, you are the manager, the writer.
+### Fridge
+Track what ingredients you currently have at home. Ocipe uses your fridge inventory to subtract items from generated grocery lists automatically.
 
-Unlike physical cookbook, here you can search it by many means:
-+ Can't remember its name? Search by meat types or even ingredients.
-+ Can't bother buying new grocery? Find what you can cook with what you have.
-  
-## Grocery Planner
-Thinking what to buy for one specific recipe might be easily done in our head. However, when it comes to recipes for the whole week, it can be a lot.
+### Grocery Planner
+Select recipes for the week, optionally randomize when you’re indecisive, and get an instant aggregated shopping list — minus what’s already in your fridge.
 
-Some very simple feature include
-+ A fridge components to organise what ingredients you have - for accurate grocery list
-+ A random selection to help in indecisive moments
-+ A view of what you have planned - if repetiveness is not your cup of tea
+
+# Documentation
+## App Documentation
+To understand how to use the app, head to the [web documentation](https://ocipe.vercel.app/docs/introduction)
+
+## Full System Documentation
+If you want to understand how the system work fully under the hood, head to [Mintlify documentation](https://mintlify.wiki/viet2811/ocipe)
